@@ -186,7 +186,7 @@
     </div>
 
     <!-- TABEL 2: PERMINTAAN WITHDRAWAL -->
-    <h3 class="section-title">Permintaan Penarikan / Withdrawal (Keluar)</h3>
+    <h3 class="section-title">Permintaan Penarikan (Keluar)</h3>
     <div class="table-container">
       <table id="withdrawalTable">
         <thead>
@@ -235,7 +235,6 @@
       window.location.href = 'auth.html';
     } else {
       const user = JSON.parse(userJson);
-      // Memastikan username sesuai dengan yang Anda tetapkan
       if (user.username !== 'admin_casino') {
         alert('Akses Ditolak! Anda bukan admin.');
         window.location.href = 'index.html';
@@ -266,8 +265,7 @@
         if (db.users) {
           tbodyUsers.innerHTML = '';
           db.users.forEach((u, index) => {
-            if (u.username === 'admin_casino' || u.username === 'admin') return;
-            
+            // HAPUS LOGIKA PENYEMBUNYIAN AKUN AGAR ADMIN BISA MENGETES RTP UNTUK AKUNNYA SENDIRI
             const rtpDisplay = u.winRate !== undefined ? `${u.winRate}%` : '15% (Default)';
             
             const tr = document.createElement('tr');
@@ -416,19 +414,17 @@
         : `Tolak permintaan penarikan dari ${wd.username}?`;
 
       if (confirm(confirmMsg)) {
-        // Jika disetujui, potong saldo pemain
         if (action === 'approved') {
           const userIndex = globalDatabase.users.findIndex(u => u.username === wd.username);
           if (userIndex !== -1) {
             let currentBalance = parseInt(globalDatabase.users[userIndex].balance) || 0;
             let wdAmount = parseInt(wd.amount);
             
-            // Cek apakah saldo mencukupi
             if (currentBalance >= wdAmount) {
               globalDatabase.users[userIndex].balance = currentBalance - wdAmount;
             } else {
               alert(`Error: Saldo pemain tidak mencukupi!\nSaldo saat ini: ${currentBalance.toLocaleString()}\nPermintaan WD: ${wdAmount.toLocaleString()}`);
-              return; // Batalkan proses
+              return;
             }
           } else {
             alert('Error: Username tidak ditemukan di database pemain!');
@@ -478,10 +474,12 @@
       if (!globalDatabase) return;
       
       const currentRtp = globalDatabase.users[userIndex].winRate !== undefined ? globalDatabase.users[userIndex].winRate : 15;
-      const newRtpStr = prompt(`Atur Tingkat Kemenangan (RTP) untuk ${username}.\n\nMasukkan angka 0 - 100 (Contoh: 80 untuk 80% peluang menang):`, currentRtp);
+      
+      // Prompt yang diperjelas agar tidak salah input 1 vs 100
+      const newRtpStr = prompt(`Atur Tingkat Kemenangan (RTP) untuk ${username}.\n\nKetik angka 0 sampai 100:\n(Contoh: 100 = Selalu Menang, 0 = Selalu Kalah, 15 = Normal)`, currentRtp);
       
       if (newRtpStr !== null && newRtpStr !== "") {
-        const newRtp = parseInt(newRtpStr);
+        const newRtp = parseFloat(newRtpStr); // Menggunakan parseFloat untuk akurasi
         
         if (isNaN(newRtp) || newRtp < 0 || newRtp > 100) {
           alert('Error: Masukkan angka yang valid antara 0 sampai 100!');
