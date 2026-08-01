@@ -7,22 +7,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   /* =========================================
-     CSS VARIABLES - TEMA KASINO VIP PREMIUM
+     CSS VARIABLES - VIP SPACE THEME
      ========================================= */
   :root {
-    --bg-base: #030507;
+    --bg-base: #02040a;
     --bg-panel: #0a0e14;
-    --bg-glass: rgba(10, 14, 20, 0.8);
+    --bg-glass: rgba(10, 14, 20, 0.85);
+    
     --gold-light: #fef08a;
     --gold-main: #eab308;
     --gold-dark: #a16207;
     --text-light: #f8fafc;
-    --text-muted: #94a3b8;
+    --text-muted: #64748b;
     
     --danger: #ef4444;
-    --danger-dark: #991b1b;
     --success: #10b981;
-    --success-dark: #065f46;
+    --info: #3b82f6;
+    --epic: #a855f7;
+    --orange: #f97316;
     
     --font-title: 'Cinzel', serif;
     --font-ui: 'Montserrat', sans-serif;
@@ -32,7 +34,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #162032 0%, var(--bg-base) 100%);
+    background: var(--bg-base);
     color: var(--text-light);
     font-family: var(--font-ui);
     min-height: 100dvh;
@@ -45,54 +47,75 @@
      TOP BAR
      ========================================= */
   .top-bar {
-    background: var(--bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    background: var(--bg-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(234, 179, 8, 0.15);
     padding: calc(10px + env(safe-area-inset-top)) 15px 10px;
     display: flex; justify-content: space-between; align-items: center; z-index: 100;
   }
-  .btn-back { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 10px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
-  .btn-back:hover { background: var(--danger); color: white; box-shadow: 0 0 10px rgba(239,68,68,0.5);}
+  .btn-back { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.5); color: var(--danger); padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 10px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
+  .btn-back:hover { background: var(--danger); color: white; box-shadow: 0 0 15px rgba(239,68,68,0.5);}
   
   .balance-display { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
-  .balance-title { font-size: 9px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
-  .balance-amount { font-family: var(--font-digital); font-size: 18px; color: var(--gold-light); text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); font-weight: bold;}
+  .balance-title { font-size: 9px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; }
+  .balance-amount { font-family: var(--font-digital); font-size: 18px; color: var(--gold-main); text-shadow: 0 0 15px rgba(234, 179, 8, 0.4); font-weight: bold;}
 
   /* =========================================
-     CRASH CHART AREA
+     CRASH CHART AREA (SPACE THEME)
      ========================================= */
   .chart-container {
     flex: 1; position: relative; display: flex; justify-content: center; align-items: center;
-    background: #000; border-bottom: 2px solid #1e293b; overflow: hidden;
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
+    background: radial-gradient(circle at center, #0a1128 0%, #000000 100%);
+    border-bottom: 2px solid #1e293b; overflow: hidden;
+    box-shadow: inset 0 0 80px rgba(0,0,0,1);
+  }
+
+  /* Space Background Elements */
+  .stars-layer { position: absolute; inset: 0; pointer-events: none; z-index: 0; background: transparent; }
+  .space-object { position: absolute; z-index: 1; opacity: 0.6; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); animation: floatObj 15s infinite ease-in-out alternate; pointer-events: none; }
+  
+  @keyframes floatObj {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-30px) rotate(10deg); }
+  }
+
+  /* Grid Overlay */
+  .grid-overlay {
+    position: absolute; inset: 0; z-index: 1; opacity: 0.1;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center bottom;
   }
   
-  /* Canvas untuk menggambar grafik */
-  #crashCanvas {
-    position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
-  }
+  #crashCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
 
   /* Teks Besar Multiplier */
-  .multiplier-display {
-    position: relative; z-index: 10; text-align: center;
-  }
+  .multiplier-display { position: relative; z-index: 10; text-align: center; }
   .multiplier-text {
-    font-family: var(--font-digital); font-size: clamp(3rem, 15vw, 6rem);
-    font-weight: 900; color: #fff; text-shadow: 0 5px 20px rgba(0,0,0,0.8);
-    transition: color 0.2s;
+    font-family: var(--font-digital); font-size: clamp(4rem, 18vw, 7rem);
+    font-weight: 900; transition: color 0.3s, text-shadow 0.3s;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.9);
   }
-  .multiplier-text.running { color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
-  .multiplier-text.crashed { color: var(--danger); text-shadow: 0 0 20px rgba(239, 68, 68, 0.6); animation: shake 0.3s; }
+  
+  /* Dynamic Colors for Multiplier */
+  .mult-tier-1 { color: #f8fafc; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+  .mult-tier-2 { color: var(--info); text-shadow: 0 0 30px rgba(59,130,246,0.6); }
+  .mult-tier-3 { color: var(--epic); text-shadow: 0 0 40px rgba(168,85,247,0.8); }
+  .mult-tier-4 { color: var(--gold-main); text-shadow: 0 0 50px rgba(234,179,8,1); }
+  .crashed-text { color: var(--danger); text-shadow: 0 0 30px rgba(239, 68, 68, 0.8); animation: shakeScreen 0.4s cubic-bezier(.36,.07,.19,.97) both; }
   
   .status-text {
-    font-family: var(--font-title); font-size: 14px; color: var(--text-muted);
-    letter-spacing: 2px; margin-top: 10px; text-transform: uppercase;
+    font-family: var(--font-title); font-size: 13px; color: var(--text-muted);
+    letter-spacing: 3px; margin-top: 5px; text-transform: uppercase; font-weight: 800;
   }
 
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    50% { transform: translateX(10px); }
-    75% { transform: translateX(-5px); }
+  @keyframes shakeScreen {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(-15px, 5px) rotate(-1deg); }
+    40% { transform: translate(10px, -10px) rotate(1deg); }
+    60% { transform: translate(-10px, 15px) rotate(0deg); }
+    80% { transform: translate(15px, -5px) rotate(-1deg); }
   }
 
   /* =========================================
@@ -100,57 +123,57 @@
      ========================================= */
   .control-console {
     background: var(--bg-panel); padding: 20px 15px calc(20px + env(safe-area-inset-bottom));
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px;
-    position: relative; z-index: 20;
+    box-shadow: 0 -15px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column; gap: 15px;
+    position: relative; z-index: 20; border-top: 1px solid rgba(255,255,255,0.05);
   }
   
   /* Bet Adjuster */
   .bet-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .bet-btn-ctrl {
-    background: #1e293b; border: 1px solid #334155; color: #fff;
-    width: 50px; height: 50px; border-radius: 12px; font-size: 24px; font-weight: 300;
+    background: #0f172a; border: 1px solid #1e293b; color: #fff;
+    width: 55px; height: 55px; border-radius: 14px; font-size: 18px; font-weight: 800;
     display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
   }
-  .bet-btn-ctrl:active { transform: scale(0.9); background: var(--gold-dark); }
+  .bet-btn-ctrl:active { transform: scale(0.9); background: var(--gold-dark); border-color: var(--gold-main);}
   .bet-display-box {
-    flex: 1; background: #000; height: 50px; border-radius: 12px; border: 1px solid var(--gold-dark);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    flex: 1; background: #030507; height: 55px; border-radius: 14px; border: 1px solid var(--gold-dark);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
   }
-  .bet-display-label { font-size: 9px; color: var(--gold-main); letter-spacing: 1px; font-weight: 700;}
-  .bet-display-val { font-family: var(--font-digital); font-size: 18px; color: #fff; font-weight: bold;}
+  .bet-display-label { font-size: 9px; color: var(--gold-main); letter-spacing: 1px; font-weight: 800; text-transform: uppercase;}
+  .bet-display-val { font-family: var(--font-digital); font-size: 20px; color: #fff; font-weight: bold;}
   
   /* Preset Chips */
   .chip-selector { display: flex; justify-content: space-between; gap: 8px; }
   .chip-btn {
-    flex: 1; padding: 10px 0; border-radius: 8px; border: 1px solid #334155;
+    flex: 1; padding: 12px 0; border-radius: 10px; border: 1px solid #1e293b;
     background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-digital); font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    font-family: var(--font-digital); font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s;
   }
-  .chip-btn:active { background: var(--gold-dark); border-color: var(--gold-main); }
+  .chip-btn:active, .chip-btn.active { background: rgba(234,179,8,0.1); border-color: var(--gold-main); color: var(--gold-main); }
 
   /* Main Action Button */
   .btn-action-main {
     background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; border: none;
-    padding: 16px; border-radius: 12px; font-family: var(--font-ui); font-weight: 900; font-size: 18px;
-    cursor: pointer; box-shadow: 0 5px 20px rgba(234, 179, 8, 0.4); text-transform: uppercase; letter-spacing: 1px;
-    transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 18px; border-radius: 14px; font-family: var(--font-ui); font-weight: 900; font-size: 20px;
+    cursor: pointer; box-shadow: 0 8px 25px rgba(234, 179, 8, 0.4); text-transform: uppercase; letter-spacing: 1px;
+    transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;
   }
-  .btn-action-main:active { transform: scale(0.98); }
+  .btn-action-main:active { transform: scale(0.97); }
   
   /* State Classes for Button */
   .btn-bet { background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; }
-  .btn-cashout { background: linear-gradient(180deg, var(--orange), #c2410c); color: #fff; box-shadow: 0 5px 20px rgba(249, 115, 22, 0.4); animation: pulseBtn 1s infinite alternate;}
-  .btn-disabled { background: #1e293b !important; color: #64748b !important; pointer-events: none; box-shadow: none !important;}
-  .btn-success { background: linear-gradient(180deg, var(--success), var(--success-dark)); color: white; pointer-events: none; }
+  .btn-cashout { background: linear-gradient(180deg, var(--orange), #c2410c); color: #fff; box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5); animation: pulseBtn 0.8s infinite alternate;}
+  .btn-disabled { background: #0f172a !important; color: #475569 !important; border: 1px solid #1e293b; pointer-events: none; box-shadow: none !important;}
+  .btn-success { background: linear-gradient(180deg, var(--success), var(--success-dark)); color: white; pointer-events: none; box-shadow: 0 0 20px rgba(16,185,129,0.5);}
 
-  .cashout-profit { font-family: var(--font-digital); font-size: 12px; opacity: 0.9; margin-top: 4px; font-weight: bold;}
+  .cashout-profit { font-family: var(--font-digital); font-size: 14px; opacity: 0.9; margin-top: 4px; font-weight: bold; text-shadow: 0 2px 5px rgba(0,0,0,0.5);}
 
   @keyframes pulseBtn {
-    0% { transform: scale(1); box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); }
-    100% { transform: scale(1.02); box-shadow: 0 0 25px rgba(249, 115, 22, 0.8); }
+    0% { transform: scale(1); box-shadow: 0 0 15px rgba(249, 115, 22, 0.5); }
+    100% { transform: scale(1.03); box-shadow: 0 0 35px rgba(249, 115, 22, 0.8); }
   }
 
-  /* Confetti Overlay */
+  /* Confetti */
   canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
 </style>
 </head>
@@ -162,17 +185,25 @@
   <header class="top-bar">
     <button class="btn-back" id="btnExit" onclick="saveAndExit()">⬅ LOBBY</button>
     <div class="balance-display">
-      <div class="balance-title">CREDITS</div>
+      <div class="balance-title">TOTAL CREDITS</div>
       <div class="balance-amount" id="displayBalance">0</div>
     </div>
   </header>
 
   <!-- CRASH CHART -->
-  <main class="chart-container">
+  <main class="chart-container" id="chartArea">
+    <div class="grid-overlay"></div>
+    
+    <!-- Space Decorations -->
+    <div class="space-object" style="top: 15%; left: 80%; font-size: 50px;">🌕</div>
+    <div class="space-object" style="top: 60%; left: 10%; font-size: 40px; animation-delay: 2s; animation-duration: 20s;">🧑‍🚀</div>
+    <div class="space-object" style="top: 25%; left: 20%; font-size: 30px; animation-delay: 1s; animation-duration: 18s;">🛰️</div>
+
     <canvas id="crashCanvas"></canvas>
+    
     <div class="multiplier-display">
-      <div class="multiplier-text" id="multText">1.00x</div>
-      <div class="status-text" id="statusText">WAITING FOR NEXT ROUND</div>
+      <div class="multiplier-text mult-tier-1" id="multText">1.00x</div>
+      <div class="status-text" id="statusText">PREPARING ROCKET...</div>
     </div>
   </main>
 
@@ -180,7 +211,7 @@
   <footer class="control-console">
     <!-- Preset Chips -->
     <div class="chip-selector">
-      <button class="chip-btn" onclick="setBetAmount(100)">100</button>
+      <button class="chip-btn active" onclick="setBetAmount(100)">100</button>
       <button class="chip-btn" onclick="setBetAmount(1000)">1K</button>
       <button class="chip-btn" onclick="setBetAmount(5000)">5K</button>
       <button class="chip-btn" onclick="setBetAmount(10000)">10K</button>
@@ -191,8 +222,8 @@
     <div class="bet-row">
       <button class="bet-btn-ctrl" onclick="adjustBet(0.5)">½</button>
       <div class="bet-display-box">
-        <span class="bet-display-label">CURRENT BET</span>
-        <span class="bet-display-val" id="betDisplay">1,000</span>
+        <span class="bet-display-label">BET AMOUNT</span>
+        <span class="bet-display-val" id="betDisplay">100</span>
       </div>
       <button class="bet-btn-ctrl" onclick="adjustBet(2)">x2</button>
     </div>
@@ -207,7 +238,7 @@
 <script>
 /**
  * ==============================================================
- * 1. AUTH & SETUP
+ * 1. AUTH, SETUP & RTP SYSTEM
  * ==============================================================
  */
 const userJson = localStorage.getItem('currentUser');
@@ -215,7 +246,6 @@ if (!userJson) window.location.href = 'auth.html';
 let currentUser = JSON.parse(userJson);
 let playerWinRate = 0.15; 
 
-// Tarik data RTP JSON Bin
 if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
     if (db && db.users) {
@@ -229,26 +259,21 @@ if (typeof api !== 'undefined' && api.getDatabase) {
   }).catch(e => console.error(e));
 }
 
-function updateBalanceUI() {
-  document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
-}
+function updateBalanceUI() { document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString(); }
 updateBalanceUI();
 
 async function saveAndExit() {
   document.getElementById('btnExit').textContent = "SAVING...";
-  try {
-    if (typeof api !== 'undefined' && api.saveProgress) {
-      await api.saveProgress(currentUser.username, currentUser.balance, currentUser.level || 1, currentUser.exp || 0);
-    }
+  try { if (typeof api !== 'undefined' && api.saveProgress) await api.saveProgress(currentUser.username, currentUser.balance, currentUser.level || 1, currentUser.exp || 0);
   } catch(e) {} finally { window.location.href = 'index.html'; }
 }
 
 /**
  * ==============================================================
- * 2. GAME STATE & BETTING LOGIC
+ * 2. GAME STATE LOGIC
  * ==============================================================
  */
-let currentBet = 1000;
+let currentBet = 100;
 let gameState = 'IDLE'; // IDLE, BET_PLACED, PLAYING, CASHED_OUT, CRASHED
 let currentMultiplier = 1.00;
 let crashPoint = 1.00;
@@ -257,6 +282,8 @@ function setBetAmount(amount) {
   if (gameState !== 'IDLE') return;
   currentBet = amount;
   document.getElementById('betDisplay').textContent = currentBet.toLocaleString();
+  document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
 }
 
 function adjustBet(factor) {
@@ -264,6 +291,7 @@ function adjustBet(factor) {
   currentBet = Math.floor(currentBet * factor);
   if(currentBet < 100) currentBet = 100;
   document.getElementById('betDisplay').textContent = currentBet.toLocaleString();
+  document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
 }
 
 function handleAction() {
@@ -277,56 +305,47 @@ function handleAction() {
     
     gameState = 'BET_PLACED';
     btn.className = 'btn-action-main btn-disabled';
-    btn.innerHTML = 'WAITING TO START...';
+    btn.innerHTML = 'READY FOR LAUNCH...';
     
-    // Mulai game setelah 1.5 detik
-    setTimeout(() => {
-      if(gameState === 'BET_PLACED') startRound();
-    }, 1500);
+    setTimeout(() => { if(gameState === 'BET_PLACED') startRound(); }, 1500);
 
   } else if (gameState === 'PLAYING') {
-    // CASH OUT!
     cashOut();
   }
 }
 
 /**
  * ==============================================================
- * 3. RTP ENGINE (ANTI-FARMING CRASH POINT)
+ * 3. STRICT RTP ENGINE (ANTI-FARMING)
  * ==============================================================
  */
 function calculateCrashPoint() {
   let isWinRound = Math.random() < playerWinRate;
   
   if (isWinRound) {
-    // MENANG: Multiplier bagus (2x sampai 15x, atau kadang sangat tinggi)
     let r = Math.random();
-    if (r < 0.7) return 2.00 + (Math.random() * 3.00); // 2x - 5x
-    else if (r < 0.95) return 5.00 + (Math.random() * 5.00); // 5x - 10x
-    else return 10.00 + (Math.random() * 20.00); // 10x - 30x (Jackpot chance)
+    if (r < 0.6) return 2.00 + (Math.random() * 3.00); // 2x - 5x
+    else if (r < 0.9) return 5.00 + (Math.random() * 10.00); // 5x - 15x
+    else return 15.00 + (Math.random() * 35.00); // Epic 15x - 50x
   } else {
-    // KALAH/ZONK: Anti-Farming System
-    // Jika giliran zonk, pemain DILARANG KERAS farming dengan cashout cepat.
+    // ZONK ROUND (Anti-Cashout Cepat)
     let r = Math.random();
-    if (r < 0.40) {
-      return 1.00; // 40% kemungkinan Instan Crash (Pemain pasti rugi)
-    } else if (r < 0.85) {
-      return 1.01 + (Math.random() * 0.19); // 1.01x - 1.20x (Sangat pelit)
-    } else {
-      return 1.21 + (Math.random() * 0.50); // 1.21x - 1.71x (Sesekali naik dikit agar realistik)
-    }
+    if (r < 0.40) return 1.00; // 40% chance Meledak Instan di base
+    else if (r < 0.85) return 1.01 + (Math.random() * 0.19); // Sangat pendek (1.01 - 1.20)
+    else return 1.21 + (Math.random() * 0.40); // Max 1.60x agar bandar menang
   }
 }
 
 /**
  * ==============================================================
- * 4. GAME LOOP & CANVAS ANIMATION
+ * 4. CANVAS ANIMATION: ROCKET, PLANET, & TRAILS
  * ==============================================================
  */
 const canvas = document.getElementById('crashCanvas');
 const ctx = canvas.getContext('2d');
 let animFrame;
 let startTime = 0;
+let particles = [];
 
 function resizeCanvas() {
   canvas.width = canvas.parentElement.clientWidth;
@@ -335,55 +354,93 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
+// Render Partikel Ekor Roket
+function renderParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.life -= 0.03;
+    p.size *= 0.95;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(234, 179, 8, ${p.life})`; // Gold smoke
+    ctx.fill();
+  }
+}
+
 function drawGraph(elapsedMs) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  renderParticles();
   
-  // Hitung persentase progress visual (sumbu X dan Y)
-  // Grafik sumbu X akan penuh jika mencapai 10 detik
-  let progressX = Math.min(elapsedMs / 10000, 1) * canvas.width;
-  
-  // Sumbu Y berdasarkan multiplier (visual maksimal limit misal 10x)
+  // Perhitungan X & Y
+  let progressX = Math.min(elapsedMs / 10000, 1) * canvas.width * 0.9; // Menyisakan ruang di kanan
   let yMax = 10;
-  let progressY = canvas.height - Math.min((currentMultiplier - 1) / yMax, 1) * (canvas.height * 0.8); 
+  let rawYProgress = Math.min((currentMultiplier - 1) / yMax, 1);
+  let progressY = canvas.height - (rawYProgress * canvas.height * 0.7) - 30; // Mulai dari bawah
   
-  // Posisikan garis dari bawah kiri
+  // Gambar Garis Kurva
   ctx.beginPath();
   ctx.moveTo(0, canvas.height);
   
-  // Tarik kurva halus mengikuti waktu
-  ctx.quadraticCurveTo(progressX * 0.5, canvas.height, progressX, progressY);
+  let cpX = progressX * 0.4;
+  let cpY = canvas.height;
+  ctx.quadraticCurveTo(cpX, cpY, progressX, progressY);
   
-  // Warna Grafik
-  if (gameState === 'CRASHED') ctx.strokeStyle = '#ef4444'; // Red
-  else if (gameState === 'CASHED_OUT') ctx.strokeStyle = '#94a3b8'; // Gray (user safety)
-  else ctx.strokeStyle = '#10b981'; // Green
+  // Style Garis
+  if (gameState === 'CRASHED') ctx.strokeStyle = 'transparent';
+  else if (gameState === 'CASHED_OUT') ctx.strokeStyle = '#94a3b8';
+  else ctx.strokeStyle = '#3b82f6'; // Neon Blue Curve
   
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
   ctx.stroke();
 
-  // Efek Gradien dibawah grafik
-  ctx.lineTo(progressX, canvas.height);
-  ctx.lineTo(0, canvas.height);
-  let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  // Hitung Sudut (Angle) untuk Rotasi Roket
+  let angle = Math.atan2(progressY - cpY, progressX - cpX);
+
+  ctx.save();
+  ctx.translate(progressX, progressY);
   
   if (gameState === 'CRASHED') {
-    grad.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
-    grad.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+    // ANIMASI MENABRAK PLANET & MELEDAK
+    ctx.font = '50px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText("🪐", 30, -10); // Planet muncul mendadak
+    ctx.fillText("💥", 0, 0);   // Ledakan di koordinat roket
   } else {
-    grad.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-    grad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+    // ANIMASI ROKET MELUNCUR
+    ctx.rotate(angle);
+    ctx.font = '40px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText("🚀", 0, 0);
+    
+    // Tambah partikel api ke array
+    if (Math.random() > 0.3) {
+      particles.push({
+        x: progressX - Math.cos(angle)*20 + (Math.random()*10-5),
+        y: progressY - Math.sin(angle)*20 + (Math.random()*10-5),
+        size: Math.random() * 8 + 4,
+        life: 1
+      });
+    }
   }
-  
-  ctx.fillStyle = grad;
-  ctx.fill();
+  ctx.restore();
+}
 
-  // Gambar Dot Roket di ujung grafik
-  ctx.beginPath();
-  ctx.arc(progressX, progressY, 6, 0, Math.PI * 2);
-  ctx.fillStyle = '#fff';
-  ctx.fill();
-  ctx.shadowColor = ctx.strokeStyle;
-  ctx.shadowBlur = 15;
+function updateMultiplierColor() {
+  const multText = document.getElementById('multText');
+  if (gameState === 'CRASHED') {
+    multText.className = 'multiplier-text crashed-text';
+  } else {
+    let colorClass = 'mult-tier-1'; // White
+    if (currentMultiplier >= 10) colorClass = 'mult-tier-4'; // Gold
+    else if (currentMultiplier >= 5) colorClass = 'mult-tier-3'; // Purple
+    else if (currentMultiplier >= 2) colorClass = 'mult-tier-2'; // Blue
+    multText.className = `multiplier-text ${colorClass}`;
+  }
 }
 
 function startRound() {
@@ -391,45 +448,43 @@ function startRound() {
   crashPoint = calculateCrashPoint();
   currentMultiplier = 1.00;
   startTime = performance.now();
+  particles = [];
   
   const multText = document.getElementById('multText');
   const statText = document.getElementById('statusText');
   const btn = document.getElementById('mainBtn');
   
-  multText.className = 'multiplier-text running';
-  statText.textContent = 'FLYING...';
+  updateMultiplierColor();
+  statText.textContent = 'ROCKET IN FLIGHT...';
   
   btn.className = 'btn-action-main btn-cashout';
-  btn.innerHTML = `CASH OUT<div class="cashout-profit">Win: ${currentBet.toLocaleString()}</div>`;
+  btn.innerHTML = `EJECT NOW<div class="cashout-profit">Win: ${currentBet.toLocaleString()}</div>`;
 
-  // Start Animation Loop
+  // Game Loop
   function tick(now) {
     let elapsed = now - startTime;
     
-    // Formula Kuadratik Eksponensial: Naik pelan lalu semakin cepat
-    currentMultiplier = 1.00 + Math.pow(elapsed / 1000, 2) * 0.05;
+    // Kurva eksponensial (naik lambat lalu memburu)
+    currentMultiplier = 1.00 + Math.pow(elapsed / 1500, 2) * 0.05;
     
-    // Jika mencapai batas hancur
     if (currentMultiplier >= crashPoint) {
       currentMultiplier = crashPoint;
       crashRound();
-      drawGraph(elapsed); // Gambar final
+      drawGraph(elapsed);
       return;
     }
 
-    // Update UI Teks
     multText.textContent = currentMultiplier.toFixed(2) + 'x';
+    updateMultiplierColor();
     
-    // Update Button Profit Text dynamically
     if (gameState === 'PLAYING') {
       let currentProfit = Math.floor(currentBet * currentMultiplier);
-      btn.innerHTML = `CASH OUT<div class="cashout-profit">Win: ${currentProfit.toLocaleString()}</div>`;
+      btn.innerHTML = `EJECT NOW<div class="cashout-profit">Win: ${currentProfit.toLocaleString()}</div>`;
     }
 
     drawGraph(elapsed);
     animFrame = requestAnimationFrame(tick);
   }
-  
   animFrame = requestAnimationFrame(tick);
 }
 
@@ -445,47 +500,44 @@ function cashOut() {
   btn.className = 'btn-action-main btn-success';
   btn.innerHTML = `SUCCESS<div class="cashout-profit">+${winAmount.toLocaleString()}</div>`;
   
-  document.getElementById('statusText').textContent = 'CASHED OUT! WAITING FOR CRASH...';
+  document.getElementById('statusText').textContent = 'SAFE! WAITING FOR CRASH...';
   confettiEngine.burst(50);
 }
 
 function crashRound() {
+  // Layar bergetar dipanggil melalui class CSS di updateMultiplierColor()
   if (gameState === 'PLAYING') {
-    // Pemain telat cashout (ZONK)
     gameState = 'CRASHED';
     const btn = document.getElementById('mainBtn');
     btn.className = 'btn-action-main btn-disabled';
-    btn.innerHTML = 'BET LOST';
+    btn.innerHTML = 'ROCKET CRASHED';
   } else if (gameState === 'CASHED_OUT') {
-    // Status grafik hancur, tapi player sudah aman
     gameState = 'CRASHED';
   }
   
-  const multText = document.getElementById('multText');
-  multText.className = 'multiplier-text crashed';
-  multText.textContent = crashPoint.toFixed(2) + 'x';
-  document.getElementById('statusText').textContent = 'CRASHED!';
+  document.getElementById('multText').textContent = crashPoint.toFixed(2) + 'x';
+  updateMultiplierColor();
+  document.getElementById('statusText').textContent = 'CRASHED INTO PLANET!';
   
-  // Auto Save
+  // Auto Save Background
   if(typeof api !== 'undefined' && api.saveProgress) {
     api.saveProgress(currentUser.username, currentUser.balance, currentUser.level||1, currentUser.exp||0).catch(()=>{});
   }
 
-  // Reset setelah 3 detik
-  setTimeout(() => {
-    resetBoard();
-  }, 3000);
+  // Reset otomatis setelah 3.5 detik
+  setTimeout(resetBoard, 3500);
 }
 
 function resetBoard() {
   gameState = 'IDLE';
   currentMultiplier = 1.00;
+  particles = [];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   const multText = document.getElementById('multText');
-  multText.className = 'multiplier-text';
+  multText.className = 'multiplier-text mult-tier-1';
   multText.textContent = '1.00x';
-  document.getElementById('statusText').textContent = 'WAITING FOR NEXT ROUND';
+  document.getElementById('statusText').textContent = 'PREPARING ROCKET...';
   
   const btn = document.getElementById('mainBtn');
   btn.className = 'btn-action-main btn-bet';
@@ -494,35 +546,32 @@ function resetBoard() {
 
 /**
  * ==============================================================
- * 5. CONFETTI ENGINE (Sama dengan sebelumnya)
+ * 5. CONFETTI ENGINE (Kemenangan)
  * ==============================================================
  */
 const confettiEngine = {
-  canvas: document.getElementById('confettiCanvas'), ctx: null, particles: [], isActive: false,
+  canvas: document.getElementById('confettiCanvas'), ctx: null, parts: [],
   colors: ['#10b981', '#34d399', '#fef08a', '#ffffff'],
-  init() { this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); this.run(); },
+  init() { this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', ()=>this.resize()); this.run(); },
   resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
-  spawn(count) {
+  burst(count) {
     for(let i=0; i<count; i++) {
-      this.particles.push({
+      this.parts.push({
         x: this.canvas.width/2, y: this.canvas.height/2, vx: (Math.random()-0.5)*35, vy: (Math.random()-1)*35,
-        size: Math.random()*12+6, color: this.colors[Math.floor(Math.random()*this.colors.length)],
-        rot: Math.random()*360, rotSpd: (Math.random()-0.5)*20, life: 1
+        size: Math.random()*12+6, color: this.colors[Math.floor(Math.random()*this.colors.length)], rot: Math.random()*360, rotSpd: (Math.random()-0.5)*20, life: 1
       });
     }
   },
-  burst(count) { this.spawn(count); },
   run() {
-    if(this.particles.length > 0) {
-      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
-      this.particles.forEach((p, i) => {
-        p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
-        this.ctx.save(); this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rot*Math.PI/180);
-        this.ctx.fillStyle = p.color; this.ctx.globalAlpha = Math.max(p.life, 0);
-        this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); this.ctx.restore();
-        if(p.y > this.canvas.height || p.life <= 0) this.particles.splice(i, 1);
-      });
-    } else { this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height); }
+    this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+    for (let i = this.parts.length - 1; i >= 0; i--) {
+      let p = this.parts[i];
+      p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
+      this.ctx.save(); this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rot*Math.PI/180);
+      this.ctx.fillStyle = p.color; this.ctx.globalAlpha = Math.max(p.life, 0);
+      this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); this.ctx.restore();
+      if(p.y > this.canvas.height || p.life <= 0) this.parts.splice(i, 1);
+    }
     requestAnimationFrame(() => this.run());
   }
 };
