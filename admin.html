@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Casino - Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #06090e;
+    --bg-panel: #11151e;
+    --gold-main: #d4af37;
+    --gold-dark: #8a6d1c;
+    --text-light: #e2e8f0;
+    --text-muted: #64748b;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --font-ui: 'Montserrat', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #06090e;
+    color: var(--text-light);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .admin-header {
+    background: var(--bg-panel);
+    border-bottom: 2px solid var(--gold-dark);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin-title {
+    font-family: 'Cinzel', serif;
+    color: var(--gold-main);
+    font-size: 24px;
+  }
+
+  .btn-back {
+    background: #1e293b;
+    color: white;
+    border: 1px solid #334155;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 12px;
+  }
+
+  .container {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .btn-refresh {
+    background: var(--gold-main);
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .table-container {
+    background: var(--bg-panel);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  th, td {
+    padding: 15px;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  th {
+    background: #0f172a;
+    color: var(--gold-main);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  td {
+    font-size: 14px;
+  }
+
+  .balance-col {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--success);
+    font-weight: bold;
+  }
+
+  .btn-edit {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 50px;
+    color: var(--gold-main);
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+  <header class="admin-header">
+    <div class="admin-title">👑 ROYAL CASINO - ADMIN PANEL</div>
+    <a href="index.html" class="btn-back">KEMBALI KE LOBBY</a>
+  </header>
+
+  <div class="container">
+    <div class="controls">
+      <h2>Data Pemain Terdaftar</h2>
+      <button class="btn-refresh" onclick="loadData()" id="btnRefresh">🔄 Refresh Data</button>
+    </div>
+
+    <div class="table-container">
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Nama Lengkap</th>
+            <th>Kontak (HP/Email)</th>
+            <th>Rekening</th>
+            <th>Level</th>
+            <th>Saldo (Credits)</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="7" class="loading">Memuat data dari server...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    // 1. CEK OTORISASI (HANYA UNTUK USERNAME 'admin')
+    const userJson = localStorage.getItem('currentUser');
+    if (!userJson) {
+      window.location.href = 'auth.html';
+    } else {
+      const user = JSON.parse(userJson);
+      if (user.username !== 'admin') {
+        alert('Akses Ditolak! Anda bukan admin.');
+        window.location.href = 'index.html';
+      }
+    }
+
+    let globalDatabase = null;
+
+    // 2. FUNGSI MEMUAT DATA PEMAIN
+    async function loadData() {
+      const tbody = document.getElementById('tableBody');
+      const btnRefresh = document.getElementById('btnRefresh');
+      
+      btnRefresh.textContent = "Memuat...";
+      btnRefresh.disabled = true;
+      tbody.innerHTML = '<tr><td colspan="7" class="loading">Memuat data dari server...</td></tr>';
+
+      const db = await api.getDatabase();
+      
+      if (db && db.users) {
+        globalDatabase = db;
+        tbody.innerHTML = '';
+        
+        db.users.forEach((u, index) => {
+          // Jangan tampilkan akun admin di tabel
+          if (u.username === 'admin') return;
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${u.username}</strong></td>
+            <td>${u.fullName || '-'}</td>
+            <td>${u.phone || '-'}<br><span style="font-size:10px; color:gray;">${u.email || '-'}</span></td>
+            <td>${u.bank || '-'}</td>
+            <td>Lvl ${u.level || 1}</td>
+            <td class="balance-col">${(u.balance || 0).toLocaleString()}</td>
+            <td>
+              <button class="btn-edit" onclick="editBalance(${index}, '${u.username}')">Ubah Saldo</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        if (tbody.innerHTML === '') {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Belum ada pemain terdaftar.</td></tr>';
+        }
+      } else {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: red;">Gagal memuat data dari server. Periksa API Key kamu.</td></tr>';
+      }
+
+      btnRefresh.textContent = "🔄 Refresh Data";
+      btnRefresh.disabled = false;
+    }
+
+    // 3. FUNGSI MENGUBAH SALDO PEMAIN SECARA MANUAL
+    async function editBalance(userIndex, username) {
+      if (!globalDatabase) return;
+
+      const currentBalance = globalDatabase.users[userIndex].balance;
+      const newBalanceStr = prompt(`Masukkan saldo baru untuk pemain ${username}:`, currentBalance);
+      
+      if (newBalanceStr !== null && newBalanceStr !== "") {
+        const newBalance = parseInt(newBalanceStr);
+        if (isNaN(newBalance)) {
+          alert('Error: Masukkan angka yang valid!');
+          return;
+        }
+
+        // Konfirmasi perubahan
+        const confirmMsg = `Yakin mengubah saldo ${username} dari ${currentBalance} menjadi ${newBalance}?`;
+        if (confirm(confirmMsg)) {
+          // Update data lokal
+          globalDatabase.users[userIndex].balance = newBalance;
+          
+          // Kirim ke server
+          document.getElementById('btnRefresh').textContent = "Menyimpan...";
+          const result = await api.updateDatabase(globalDatabase);
+          
+          if (result) {
+            alert('Saldo berhasil diubah!');
+            loadData(); // Render ulang tabel
+          } else {
+            alert('Gagal menyimpan ke server!');
+          }
+        }
+      }
+    }
+
+    // Muat data saat halaman pertama kali dibuka
+    window.onload = loadData;
+  </script>
+</body>
+</html>
