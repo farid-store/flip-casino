@@ -84,6 +84,19 @@
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
   }
 
+  /* 📢 TICKER KEMENANGAN */
+  .ticker-wrap {
+    background: rgba(15, 23, 42, 0.8); border-bottom: 1px solid var(--gold-dark);
+    padding: 8px 15px; overflow: hidden; display: flex; align-items: center;
+  }
+  .ticker-wrap span { color: var(--gold-main); margin-right: 15px; font-size: 14px; flex-shrink: 0; }
+  .ticker-content {
+    white-space: nowrap; animation: ticker 25s linear infinite;
+    font-family: var(--font-digital); font-size: 12px; color: var(--gold-light);
+    letter-spacing: 1px;
+  }
+  @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+
   /* Profil Player Dashboard */
   .dashboard-section {
     padding: 30px 20px;
@@ -155,6 +168,16 @@
     text-decoration: underline;
   }
 
+  /* 🎁 TOMBOL BONUS HARIAN */
+  .btn-bonus {
+    display: block; background: linear-gradient(135deg, #a855f7, #7e22ce); color: white;
+    border: none; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;
+    font-family: var(--font-ui); cursor: pointer; margin-top: 10px; box-shadow: 0 4px 10px rgba(126, 34, 206, 0.4);
+    transition: 0.2s;
+  }
+  .btn-bonus:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(126, 34, 206, 0.6); }
+  .btn-bonus:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+
   .wallet-info {
     text-align: right;
   }
@@ -182,7 +205,7 @@
     flex-wrap: wrap;
   }
 
-  .btn-topup, .btn-withdraw, .btn-history {
+  .btn-topup, .btn-withdraw, .btn-history, .btn-leaderboard {
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 10px;
@@ -201,6 +224,10 @@
   
   .btn-history { background: #1e293b; border: 1px solid #334155; color: var(--gold-light); }
   .btn-history:hover { background: #334155; transform: translateY(-2px); }
+
+  /* 🏆 TOMBOL LEADERBOARD */
+  .btn-leaderboard { background: #000; border: 1px solid var(--gold-main); color: var(--gold-light); }
+  .btn-leaderboard:hover { background: var(--gold-dark); color: #fff; transform: translateY(-2px); }
 
   /* Game Selection Grid */
   .section-title {
@@ -282,7 +309,7 @@
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
   }
 
-  /* MODALS (DEPOSIT, WD, PROFILE, HISTORY) */
+  /* MODALS GLOBAL STYLES */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
     display: flex; justify-content: center; align-items: center; z-index: 2000;
@@ -360,6 +387,16 @@
   .badge-approved { background: var(--success); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; width: max-content;}
   .badge-rejected { background: var(--danger); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; width: max-content;}
 
+  /* 🏆 LEADERBOARD MODAL STYLES */
+  .leaderboard-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; }
+  .lb-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #0f172a; border-radius: 8px; border: 1px solid #1e293b;}
+  .lb-rank { font-family: var(--font-title); font-size: 16px; font-weight: bold; color: var(--text-muted); width: 35px; text-align: center; }
+  .lb-rank.rank-1 { color: #ffd700; font-size: 22px; text-shadow: 0 0 10px #ffd700; }
+  .lb-rank.rank-2 { color: #c0c0c0; font-size: 20px; text-shadow: 0 0 8px #c0c0c0; }
+  .lb-rank.rank-3 { color: #cd7f32; font-size: 18px; text-shadow: 0 0 8px #cd7f32; }
+  .lb-name { flex: 1; font-weight: bold; font-size: 14px; margin-left: 10px;}
+  .lb-score { font-family: var(--font-digital); color: var(--gold-light); font-weight: bold; }
+
   /* FLOATING CS BUTTON */
   .floating-cs {
     position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white;
@@ -380,6 +417,14 @@
     </div>
   </header>
 
+  <!-- Ticker Kemenangan / Pengumuman -->
+  <div class="ticker-wrap">
+    <span>📢</span>
+    <div class="ticker-content">
+      🔥 Player_88 baru saja memenangkan SUPER JACKPOT 5.000.000 Credits dari Fruit Flip! &nbsp;&nbsp;&nbsp; 💸 SultanX baru saja melakukan Penarikan Dana 2.500.000! &nbsp;&nbsp;&nbsp; 🏆 Budi_Vip berhasil mencapai Level 10! &nbsp;&nbsp;&nbsp; 🎁 Klaim Bonus Harian Anda di Profil sekarang juga!
+    </div>
+  </div>
+
   <!-- Main Dashboard -->
   <main class="dashboard-section">
     <!-- Profil Card -->
@@ -390,6 +435,9 @@
           <h2 id="displayUsername">Player</h2>
           <div class="user-level" id="displayLevel">LEVEL 1</div>
           <button class="btn-edit-profile" onclick="openProfileModal()">✏️ Edit Info Profil</button>
+          
+          <!-- Tombol Klaim Bonus Harian -->
+          <button class="btn-bonus" id="btnDailyClaim" onclick="claimDailyBonus()">🎁 KLAIM BONUS (5.000)</button>
         </div>
       </div>
       <div class="wallet-info">
@@ -399,6 +447,9 @@
           <button class="btn-topup" onclick="openDepositModal()">+ DEPOSIT</button>
           <button class="btn-withdraw" onclick="openWithdrawModal()">- TARIK DANA</button>
           <button class="btn-history" onclick="openHistoryModal()">📜 RIWAYAT</button>
+          
+          <!-- Tombol Papan Peringkat -->
+          <button class="btn-leaderboard" onclick="openLeaderboardModal()">🏆 TOP GLOBAL</button>
         </div>
       </div>
     </div>
@@ -504,6 +555,19 @@
     </div>
   </div>
 
+  <!-- MODAL TOP GLOBAL (LEADERBOARD) -->
+  <div class="modal-overlay" id="leaderboardModal">
+    <div class="modal-content">
+      <button class="btn-close-modal" onclick="closeLeaderboardModal()">×</button>
+      <h2 style="font-family: var(--font-title); color: #ffd700; text-align: center; margin-bottom: 10px;">🏆 TOP SULTAN GLOBAL</h2>
+      <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 20px;">10 Pemain dengan Saldo Tertinggi</p>
+      
+      <div class="leaderboard-list" id="leaderboardContainer">
+        <div style="text-align: center; color: var(--gold-main); font-size: 12px; padding: 20px;">Mencari Sultan...</div>
+      </div>
+    </div>
+  </div>
+
   <script src="api.js"></script>
   <script>
     const userJson = localStorage.getItem('currentUser');
@@ -528,6 +592,7 @@
             user.fullName = freshUser.fullName || user.fullName;
             user.phone = freshUser.phone || user.phone;
             user.bank = freshUser.bank || user.bank;
+            user.level = freshUser.level || user.level;
             localStorage.setItem('currentUser', JSON.stringify(user));
             updateUI();
           }
@@ -535,8 +600,60 @@
       } catch(e) { console.error("Gagal sinkronisasi data", e); }
     }
 
+    /* --- BONUS HARIAN --- */
+    function checkDailyBonus() {
+      const lastClaim = localStorage.getItem('lastClaimDate_' + user.username);
+      const today = new Date().toDateString();
+      const btn = document.getElementById('btnDailyClaim');
+      
+      if (lastClaim === today) {
+        btn.disabled = true;
+        btn.innerHTML = '✅ BONUS DIAMBIL';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
+      }
+    }
+
+    async function claimDailyBonus() {
+      const btn = document.getElementById('btnDailyClaim');
+      btn.disabled = true;
+      btn.innerHTML = 'MEMPROSES...';
+
+      try {
+        const db = await api.getDatabase();
+        if(db && db.users) {
+          const userIndex = db.users.findIndex(u => u.username === user.username);
+          if (userIndex !== -1) {
+            let currentBal = parseInt(db.users[userIndex].balance) || 0;
+            db.users[userIndex].balance = currentBal + 5000; // Bonus 5K
+            
+            if (await api.updateDatabase(db)) {
+              user.balance = db.users[userIndex].balance;
+              localStorage.setItem('currentUser', JSON.stringify(user));
+              localStorage.setItem('lastClaimDate_' + user.username, new Date().toDateString());
+              
+              alert("🎉 Selamat! Anda mendapatkan 5.000 Credits Bonus Harian!");
+              updateUI();
+              checkDailyBonus();
+            } else {
+              alert("Gagal klaim bonus dari server.");
+              btn.disabled = false;
+              btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
+            }
+          }
+        }
+      } catch (e) {
+        console.error(e);
+        btn.disabled = false;
+        btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
+      }
+    }
+
+    // Inisialisasi awal
     updateUI();
     syncDataWithServer();
+    checkDailyBonus();
 
     function logout() { localStorage.removeItem('currentUser'); window.location.href = 'auth.html'; }
 
@@ -740,6 +857,57 @@
       } catch (error) {
         console.error(error);
         container.innerHTML = '<div style="text-align: center; color: var(--danger); font-size: 12px; padding: 20px;">Gagal memuat riwayat.</div>';
+      }
+    }
+
+    /* --- LEADERBOARD (PAPAN PERINGKAT) --- */
+    function openLeaderboardModal() {
+      document.getElementById('leaderboardModal').classList.add('show');
+      loadLeaderboard();
+    }
+    function closeLeaderboardModal() { document.getElementById('leaderboardModal').classList.remove('show'); }
+
+    async function loadLeaderboard() {
+      const container = document.getElementById('leaderboardContainer');
+      container.innerHTML = '<div style="text-align: center; color: var(--gold-main); font-size: 12px; padding: 20px;">Mencari Sultan...</div>';
+
+      try {
+        const db = await api.getDatabase();
+        if (db && db.users) {
+          // Hilangkan admin dan urutkan berdasarkan saldo terbanyak (Top 10)
+          let topUsers = db.users
+            .filter(u => u.username !== 'admin_casino' && u.username !== 'admin')
+            .sort((a, b) => (parseInt(b.balance) || 0) - (parseInt(a.balance) || 0))
+            .slice(0, 10);
+            
+          if (topUsers.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada pemain.</div>';
+            return;
+          }
+
+          container.innerHTML = topUsers.map((u, index) => {
+            const rank = index + 1;
+            let rankClass = 'lb-rank';
+            let rankDisplay = `#${rank}`;
+            
+            if (rank === 1) { rankClass += ' rank-1'; rankDisplay = '🥇'; }
+            else if (rank === 2) { rankClass += ' rank-2'; rankDisplay = '🥈'; }
+            else if (rank === 3) { rankClass += ' rank-3'; rankDisplay = '🥉'; }
+
+            // Privasi: Sensor sebagian nama (Contoh: Budi => Bud***)
+            const maskedName = u.username.length > 3 ? u.username.substring(0, 3) + '***' : u.username + '***';
+
+            return `
+              <div class="lb-item">
+                <div class="${rankClass}">${rankDisplay}</div>
+                <div class="lb-name">${maskedName} <span style="font-size:9px; color:var(--text-muted); font-weight:normal; margin-left:5px;">Lvl ${u.level || 1}</span></div>
+                <div class="lb-score">${(parseInt(u.balance)||0).toLocaleString()}</div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (e) {
+        container.innerHTML = '<div style="text-align: center; color: var(--danger); font-size: 12px;">Gagal memuat papan peringkat.</div>';
       }
     }
   </script>
