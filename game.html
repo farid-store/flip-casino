@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<!-- FIX: Tambahan viewport-fit=cover untuk iOS/Safari safe area -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Royal Casino: Fruit Flip 🎰</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
@@ -31,21 +32,24 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
   
-body {
-  background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
-  color: var(--text-light); font-family: var(--font-ui);
-  display: flex; flex-direction: column; align-items: center;
-  min-height: 100vh; /* Fallback browser lama */
-  min-height: 100dvh; /* FIX: Menyesuaikan UI Browser (Safari/Chrome Mobile) */
-  height: 100dvh; /* Mencegah layar mantul (bounce) saat ditarik */
-  overflow: hidden; touch-action: none;
-}
+  body {
+    background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
+    color: var(--text-light); font-family: var(--font-ui);
+    display: flex; flex-direction: column; align-items: center;
+    /* FIX UI: Support browser modern dengan 100dvh agar tidak tertutup search bar */
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden; touch-action: none;
+  }
 
   /* =========================================
      TOP BAR & LEVEL SYSTEM
      ========================================= */
   .top-bar {
     width: 100%; max-width: 600px; padding: 15px 20px;
+    /* FIX UI: Jarak atas aman untuk notch/status bar */
+    padding-top: calc(15px + env(safe-area-inset-top));
     display: flex; justify-content: space-between; align-items: center;
     background: linear-gradient(180deg, rgba(17,21,30,0.95), transparent);
     border-bottom: 1px solid rgba(212, 175, 55, 0.2);
@@ -129,10 +133,13 @@ body {
      ========================================= */
   .control-console {
     width: 100%; max-width: 600px; background: var(--bg-panel);
-    border-top: 2px solid var(--gold-dark); padding: 20px 15px;
-    padding: 20px 15px calc(20px + env(safe-area-inset-bottom));
+    border-top: 2px solid var(--gold-dark); 
+    
+    /* FIX UI: Tambahan env() agar aman dari tombol home indicator iOS & search bar bawah */
+    padding: 15px 15px calc(15px + env(safe-area-inset-bottom));
+    
     border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
-    display: flex; flex-direction: column; gap: 16px;
+    display: flex; flex-direction: column; gap: 12px;
   }
 
   /* Digital Info Banner */
@@ -327,7 +334,6 @@ body {
       </div>
       <div class="pt-info">
         <b>Match 3+ on any line (Horz, Vert, Diag)</b><br>
-        Diagonal pays x0.5. <br>
         Lose 4x in a row? Watch out for the Zonk Bomb! 💣
       </div>
       <button class="btn-close-modal" onclick="document.getElementById('paytableModal').classList.remove('show')">CLOSE</button>
@@ -995,7 +1001,10 @@ const gameEngine = {
 
       if (maxSeq >= 3) {
         let lengthMult = maxSeq === 5 ? 10 : (maxSeq === 4 ? 3 : 1);
-        let diagPenalty = pl.type === 'D' ? 0.5 : 1;
+        
+        // FIX UI/UX: Hapus penalti diagonal agar pemain tidak rugi jika dapat combo silang
+        let diagPenalty = 1; 
+        
         let lineWin = Math.floor(gameState.currentBet * bestSym.multiplier * lengthMult * diagPenalty);
         
         totalWin += lineWin;
