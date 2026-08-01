@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Royal Casino: Fruit Flip 🎰</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 <!-- Tambahkan library QRCode -->
@@ -31,12 +31,15 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
   
-  body {
-    background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
-    color: var(--text-light); font-family: var(--font-ui);
-    display: flex; flex-direction: column; align-items: center;
-    min-height: 100vh; overflow: hidden; touch-action: none;
-  }
+body {
+  background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
+  color: var(--text-light); font-family: var(--font-ui);
+  display: flex; flex-direction: column; align-items: center;
+  min-height: 100vh; /* Fallback browser lama */
+  min-height: 100dvh; /* FIX: Menyesuaikan UI Browser (Safari/Chrome Mobile) */
+  height: 100dvh; /* Mencegah layar mantul (bounce) saat ditarik */
+  overflow: hidden; touch-action: none;
+}
 
   /* =========================================
      TOP BAR & LEVEL SYSTEM
@@ -127,6 +130,7 @@
   .control-console {
     width: 100%; max-width: 600px; background: var(--bg-panel);
     border-top: 2px solid var(--gold-dark); padding: 20px 15px;
+    padding: 20px 15px calc(20px + env(safe-area-inset-bottom));
     border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
     display: flex; flex-direction: column; gap: 16px;
   }
