@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royal Casino - Lobby Utama</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<!-- Tambahkan library QRCode -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
   /* Variabel Tema Kasino Konsisten */
   :root {
@@ -16,6 +19,7 @@
     --text-light: #e2e8f0;
     --text-muted: #64748b;
     --danger: #ef4444;
+    --success: #22c55e;
     --font-title: 'Cinzel', serif;
     --font-ui: 'Montserrat', sans-serif;
     --font-digital: 'Orbitron', sans-serif;
@@ -154,6 +158,26 @@
     text-shadow: 0 0 10px rgba(255, 223, 115, 0.4);
   }
 
+  .btn-topup {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-dark));
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+    font-family: var(--font-ui);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  .btn-topup:hover {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    transform: translateY(-2px);
+  }
+
   /* Game Selection Grid */
   .section-title {
     font-family: var(--font-title);
@@ -179,7 +203,6 @@
     transition: 0.3s;
     cursor: pointer;
     position: relative;
-    group: hover;
   }
 
   .game-card:hover {
@@ -235,6 +258,47 @@
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
   }
 
+  /* MODAL DEPOSIT */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+    display: flex; justify-content: center; align-items: center; z-index: 2000;
+    opacity: 0; pointer-events: none; transition: 0.3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  
+  .modal-content {
+    background: var(--bg-panel); border: 2px solid var(--gold-main);
+    border-radius: 16px; padding: 30px; width: 90%; max-width: 420px;
+    position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+  }
+
+  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+  .btn-preset {
+    background: #1e293b; border: 1px solid #334155; color: var(--gold-light);
+    padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
+    transition: 0.2s; font-family: var(--font-digital);
+  }
+  .btn-preset:hover, .btn-preset.active {
+    background: var(--gold-dark); color: #fff; border-color: var(--gold-main);
+  }
+
+  .input-custom {
+    width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; 
+    color: #fff; border-radius: 8px; text-align: center; margin-bottom: 20px;
+    font-family: var(--font-digital); font-size: 16px;
+  }
+  .input-custom:focus { outline: none; border-color: var(--gold-main); }
+
+  .btn-close-modal {
+    position: absolute; top: 15px; right: 20px; background: transparent; border: none;
+    color: var(--text-muted); font-size: 28px; cursor: pointer;
+  }
+  .btn-close-modal:hover { color: var(--danger); }
+  
+  #qrcode {
+    background: white; padding: 15px; display: inline-block; 
+    border-radius: 12px; margin: 15px 0; border: 3px solid var(--gold-main);
+  }
 </style>
 </head>
 <body>
@@ -261,13 +325,15 @@
       <div class="wallet-info">
         <div class="wallet-label">TOTAL CREDITS</div>
         <div class="wallet-balance" id="displayBalance">0</div>
+        <!-- Tombol Tambah Deposit -->
+        <button class="btn-topup" onclick="openDepositModal()">+ DEPOSIT QRIS</button>
       </div>
     </div>
 
     <!-- Pilihan Game -->
     <h3 class="section-title">PERMAINAN EKSKLUSIF</h3>
     <div class="games-grid">
-      <!-- Game 1: Fruit Flip (Web Simulator aslinya) -->
+      <!-- Game 1: Fruit Flip -->
       <div class="game-card" onclick="window.location.href='game.html'">
         <div class="game-thumb">🍒👑🍋</div>
         <div class="game-info">
@@ -277,7 +343,7 @@
         </div>
       </div>
       
-      <!-- Slot Kosong (Coming Soon) -->
+      <!-- Slot Kosong -->
       <div class="game-card" style="opacity: 0.6; cursor: not-allowed;">
         <div class="game-thumb" style="filter: grayscale(1);">🃏</div>
         <div class="game-info">
@@ -289,26 +355,189 @@
     </div>
   </main>
 
+  <!-- MODAL DEPOSIT QRIS -->
+  <div class="modal-overlay" id="depositModal">
+    <div class="modal-content">
+      <button class="btn-close-modal" onclick="closeDepositModal()">×</button>
+      <h2 style="font-family: var(--font-title); color: var(--gold-main); text-align: center; margin-bottom: 25px;">TOP UP CREDITS</h2>
+      
+      <!-- Langkah 1: Pilih Nominal -->
+      <div id="depositStep1">
+        <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Pilih Nominal Deposit</p>
+        <div class="preset-grid">
+          <button class="btn-preset" onclick="setNominal(25000)">25.000</button>
+          <button class="btn-preset" onclick="setNominal(50000)">50.000</button>
+          <button class="btn-preset" onclick="setNominal(100000)">100.000</button>
+          <button class="btn-preset" onclick="setNominal(500000)">500.000</button>
+        </div>
+        <input type="number" id="customAmount" class="input-custom" placeholder="Nominal Lain (Min. 10.000)">
+        <button class="btn-play" onclick="generateQRIS()">GENERATE QRIS</button>
+      </div>
+
+      <!-- Langkah 2: Scan QRIS -->
+      <div id="depositStep2" style="display: none; text-align: center;">
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 5px;">Total Pembayaran:</p>
+        <p style="font-size: 24px; color: var(--gold-light); margin-bottom: 10px; font-weight: bold; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
+        
+        <div id="qrcode"></div>
+        
+        <p style="font-size: 11px; color: var(--danger); margin-bottom: 20px;">*Wajib transfer sesuai nominal agar dapat diproses otomatis oleh Admin.</p>
+        
+        <button class="btn-play" style="background: var(--success); color: white; margin-bottom: 10px;" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
+        <button class="btn-logout" style="width: 100%; border: none; color: var(--text-muted);" onclick="resetDepositModal()">Batal / Ubah Nominal</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="api.js"></script>
   <script>
-    // 1. Cek Autentikasi: Tolak akses jika tidak ada data login
+    // 1. Cek Autentikasi
     const userJson = localStorage.getItem('currentUser');
     if (!userJson) {
       window.location.href = 'auth.html';
     }
 
-    // 2. Parse data JSON dan render ke antarmuka
     const user = JSON.parse(userJson);
+    let selectedAmount = 0;
+    let qrEngine = null;
     
+    // Tampilkan data ke UI
     document.getElementById('displayUsername').textContent = user.username.toUpperCase();
-    document.getElementById('displayLevel').textContent = `LEVEL ${user.level}`;
-    document.getElementById('displayBalance').textContent = user.balance.toLocaleString();
+    document.getElementById('displayLevel').textContent = `LEVEL ${user.level || 1}`;
+    document.getElementById('displayBalance').textContent = (user.balance || 0).toLocaleString();
 
-    // 3. Fungsi Logout
     function logout() {
-      // Hapus data sesi dari browser
       localStorage.removeItem('currentUser');
-      // Arahkan kembali ke halaman login
       window.location.href = 'auth.html';
+    }
+
+    /* =========================================
+       LOGIKA DEPOSIT QRIS
+       ========================================= */
+    function openDepositModal() {
+      document.getElementById('depositModal').classList.add('show');
+    }
+
+    function closeDepositModal() {
+      document.getElementById('depositModal').classList.remove('show');
+      setTimeout(resetDepositModal, 300);
+    }
+
+    function resetDepositModal() {
+      document.getElementById('depositStep1').style.display = 'block';
+      document.getElementById('depositStep2').style.display = 'none';
+      document.getElementById('customAmount').value = '';
+      document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+      selectedAmount = 0;
+    }
+
+    function setNominal(amount) {
+      selectedAmount = amount;
+      document.getElementById('customAmount').value = amount;
+      document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // Fungsi CRC16 untuk Validasi String QRIS (Diadaptasi dari kode sistem Farid Store)
+    function crc16(str) {
+      let c = 0xFFFF;
+      for(let i = 0; i < str.length; i++) { 
+        c ^= str.charCodeAt(i) << 8; 
+        for(let j = 0; j < 8; j++) { c = ((c & 0x8000) !== 0) ? (c << 1) ^ 0x1021 : c << 1; c &= 0xFFFF; } 
+      }
+      return c.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    function generateQRIS() {
+      const inputVal = parseInt(document.getElementById('customAmount').value);
+      if (isNaN(inputVal) || inputVal < 10000) {
+        alert("Minimal deposit adalah 10.000 Credits!");
+        return;
+      }
+      selectedAmount = inputVal;
+
+      // Merakit Payload QRIS
+      const amountStr = selectedAmount.toString();
+      const amountLen = amountStr.length.toString().padStart(2, '0');
+      
+      const mid = '93600915300002827902090000282790';
+      const merch = 'Royal Casino';
+      const merchLen = merch.length.toString().padStart(2, '0');
+      const city = 'Pekanbaru';
+      const cityLen = city.length.toString().padStart(2, '0');
+      const postal = '28294';
+      const postalLen = postal.length.toString().padStart(2, '0');
+      
+      // Payload Dinamis Nasional
+      let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
+      
+      const qrisString = raw + crc16(raw);
+
+      // Render Barcode
+      const qrcodeContainer = document.getElementById('qrcode');
+      if (qrEngine) {
+        qrEngine.clear();
+        qrEngine.makeCode(qrisString);
+      } else {
+        qrcodeContainer.innerHTML = '';
+        qrEngine = new QRCode(qrcodeContainer, {
+          text: qrisString,
+          width: 200,
+          height: 200,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+
+      document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
+      
+      // Transisi UI
+      document.getElementById('depositStep1').style.display = 'none';
+      document.getElementById('depositStep2').style.display = 'block';
+    }
+
+    async function submitDeposit() {
+      const btn = document.getElementById('btnConfirmDeposit');
+      btn.textContent = "MEMPROSES...";
+      btn.disabled = true;
+
+      try {
+        // Ambil Data Base melalui API
+        const db = await api.getDatabase();
+        if (!db) throw new Error("Koneksi gagal");
+
+        // Validasi ketersediaan array deposits
+        if (!db.deposits) db.deposits = [];
+
+        // Buat record deposit baru
+        const newDeposit = {
+          date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
+          username: user.username,
+          method: 'QRIS',
+          amount: selectedAmount,
+          status: 'pending' // Status wajib pending sampai disetujui Admin
+        };
+
+        db.deposits.push(newDeposit);
+
+        // Update database di server
+        const isSuccess = await api.updateDatabase(db);
+
+        if (isSuccess) {
+          alert("✅ Bukti Permintaan Deposit Berhasil Terkirim!\n\nSilakan tunggu beberapa saat hingga Admin menyetujui. Refresh halaman ini nanti untuk melihat saldo bertambah.");
+          closeDepositModal();
+        } else {
+          alert("❌ Terjadi kesalahan saat menyimpan ke server.");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Gagal terhubung ke server database.");
+      } finally {
+        btn.textContent = "SAYA SUDAH TRANSFER";
+        btn.disabled = false;
+      }
     }
   </script>
 </body>
