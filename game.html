@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Royal Casino: Fruit Flip 🎰</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<!-- Tambahkan library QRCode -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   /* =========================================
      CSS VARIABLES - TEMA KASINO PROFESIONAL
@@ -58,9 +60,16 @@
   .exp-bar-bg { width: 100px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden; }
   .exp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold-light)); width: 0%; transition: width 0.3s ease; }
 
-  .balance-display { text-align: right; }
+  .balance-display { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
   .balance-title { font-size: 10px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
   .balance-amount { font-family: var(--font-digital); font-size: 20px; color: var(--gold-light); text-shadow: 0 0 10px rgba(255, 223, 115, 0.4); }
+  
+  .btn-topup {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-dark));
+    color: #000; border: none; padding: 4px 8px; border-radius: 4px;
+    font-size: 9px; font-weight: 800; cursor: pointer; margin-top: 4px;
+    font-family: var(--font-ui); box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
 
   /* =========================================
      MAIN GAME BOARD (SLOT MACHINE)
@@ -178,9 +187,10 @@
   }
   .overlay.show { opacity: 1; pointer-events: auto; }
 
-  /* Paytable */
   .modal-panel { background: var(--bg-panel); border: 2px solid var(--gold-main); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; position: relative; }
   .modal-title { font-family: var(--font-title); color: var(--gold-light); text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
+  
+  /* Paytable */
   .paytable-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
   .pt-item { background: #000; padding: 8px; border-radius: 8px; text-align: center; border: 1px solid #333; }
   .pt-icon { font-size: 24px; }
@@ -205,6 +215,37 @@
   .zonk-loss { font-family: var(--font-digital); font-size: 2rem; color: #fff; }
   @keyframes bombShake { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 75%{transform:rotate(10deg);} }
 
+  /* Deposit Modal Tambahan */
+  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  .btn-preset {
+    background: #1e293b; border: 1px solid #334155; color: var(--gold-light);
+    padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;
+    font-family: var(--font-digital); transition: 0.2s;
+  }
+  .btn-preset.active, .btn-preset:hover {
+    background: var(--gold-dark); color: #fff; border-color: var(--gold-main);
+  }
+  .input-custom {
+    width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
+    color: #fff; border-radius: 8px; text-align: center; margin-bottom: 15px;
+    font-family: var(--font-digital); font-size: 16px;
+  }
+  .input-custom:focus { outline: none; border-color: var(--gold-main); }
+  #qrcode { background: white; padding: 10px; border-radius: 10px; display: inline-block; border: 3px solid var(--gold-main); margin-bottom: 15px;}
+  
+  .btn-action-primary {
+    background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; width: 100%; padding: 12px;
+    border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui);
+  }
+  .btn-action-success {
+    background: var(--success); color: white; width: 100%; padding: 12px;
+    border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui);
+  }
+  .btn-action-cancel {
+    background: transparent; color: var(--text-muted); width: 100%; padding: 10px;
+    border: none; font-weight: bold; cursor: pointer; font-family: var(--font-ui);
+  }
+
   canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
 </style>
 </head>
@@ -224,9 +265,10 @@
       </div>
     </div>
     
-    <div class="balance-display" style="flex: 1; text-align: right;">
+    <div class="balance-display" style="flex: 1;">
       <div class="balance-title">CREDITS</div>
       <div class="balance-amount" id="balanceDisplay">0</div>
+      <button class="btn-topup" onclick="openDepositModal()">+ DEPOSIT</button>
     </div>
   </header>
 
@@ -288,6 +330,40 @@
     </div>
   </div>
 
+  <!-- MODAL: DEPOSIT QRIS -->
+  <div class="overlay" id="depositModal" onclick="closeDepositModal()">
+    <div class="modal-panel" onclick="event.stopPropagation()">
+      <h2 class="modal-title" style="margin-bottom: 15px;">TOP UP CREDITS</h2>
+      
+      <!-- Langkah 1: Pilih Nominal -->
+      <div id="depositStep1">
+        <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Pilih Nominal Deposit</p>
+        <div class="preset-grid">
+          <button class="btn-preset" onclick="setNominal(25000)">25.000</button>
+          <button class="btn-preset" onclick="setNominal(50000)">50.000</button>
+          <button class="btn-preset" onclick="setNominal(100000)">100.000</button>
+          <button class="btn-preset" onclick="setNominal(500000)">500.000</button>
+        </div>
+        <input type="number" id="customAmount" class="input-custom" placeholder="Nominal Lain (Min. 10.000)">
+        <button class="btn-action-primary" onclick="generateQRIS()">GENERATE QRIS</button>
+        <button class="btn-action-cancel" onclick="closeDepositModal()">TUTUP</button>
+      </div>
+
+      <!-- Langkah 2: Scan QRIS -->
+      <div id="depositStep2" style="display: none; text-align: center;">
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">Total Pembayaran:</p>
+        <p style="font-size: 20px; color: var(--gold-light); margin-bottom: 10px; font-weight: bold; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
+        
+        <div id="qrcode"></div>
+        
+        <p style="font-size: 10px; color: var(--danger); margin-bottom: 15px;">*Wajib transfer sesuai nominal agar diproses otomatis oleh Admin.</p>
+        
+        <button class="btn-action-success" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
+        <button class="btn-action-cancel" onclick="resetDepositModal()">Batal / Ubah Nominal</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: JACKPOT -->
   <div class="overlay" id="jackpotModal" onclick="gameUI.closeJackpot()">
     <div class="jackpot-wrapper">
@@ -332,7 +408,123 @@ async function saveAndExit() {
 
 /**
  * ==============================================================
- * 1. GAME CONFIGURATION (PENGATURAN TERPUSAT)
+ * 1. DEPOSIT SYSTEM LOGIC
+ * ==============================================================
+ */
+let selectedAmount = 0;
+let qrEngine = null;
+
+function openDepositModal() {
+  document.getElementById('depositModal').classList.add('show');
+}
+
+function closeDepositModal() {
+  document.getElementById('depositModal').classList.remove('show');
+  setTimeout(resetDepositModal, 300);
+}
+
+function resetDepositModal() {
+  document.getElementById('depositStep1').style.display = 'block';
+  document.getElementById('depositStep2').style.display = 'none';
+  document.getElementById('customAmount').value = '';
+  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+  selectedAmount = 0;
+}
+
+function setNominal(amount) {
+  selectedAmount = amount;
+  document.getElementById('customAmount').value = amount;
+  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function crc16(str) {
+  let c = 0xFFFF;
+  for(let i = 0; i < str.length; i++) { 
+    c ^= str.charCodeAt(i) << 8; 
+    for(let j = 0; j < 8; j++) { c = ((c & 0x8000) !== 0) ? (c << 1) ^ 0x1021 : c << 1; c &= 0xFFFF; } 
+  }
+  return c.toString(16).toUpperCase().padStart(4, '0');
+}
+
+function generateQRIS() {
+  const inputVal = parseInt(document.getElementById('customAmount').value);
+  if (isNaN(inputVal) || inputVal < 10000) {
+    alert("Minimal deposit adalah 10.000 Credits!");
+    return;
+  }
+  selectedAmount = inputVal;
+
+  const amountStr = selectedAmount.toString();
+  const amountLen = amountStr.length.toString().padStart(2, '0');
+  const mid = '93600915300002827902090000282790';
+  const merch = 'Royal Casino';
+  const merchLen = merch.length.toString().padStart(2, '0');
+  const city = 'Pekanbaru';
+  const cityLen = city.length.toString().padStart(2, '0');
+  const postal = '28294';
+  const postalLen = postal.length.toString().padStart(2, '0');
+  
+  let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
+  const qrisString = raw + crc16(raw);
+
+  const qrcodeContainer = document.getElementById('qrcode');
+  if (qrEngine) {
+    qrEngine.clear();
+    qrEngine.makeCode(qrisString);
+  } else {
+    qrcodeContainer.innerHTML = '';
+    qrEngine = new QRCode(qrcodeContainer, {
+      text: qrisString, width: 160, height: 160,
+      colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
+  document.getElementById('depositStep1').style.display = 'none';
+  document.getElementById('depositStep2').style.display = 'block';
+}
+
+async function submitDeposit() {
+  const btn = document.getElementById('btnConfirmDeposit');
+  btn.textContent = "MEMPROSES...";
+  btn.disabled = true;
+
+  try {
+    const db = await api.getDatabase();
+    if (!db) throw new Error("Koneksi gagal");
+    if (!db.deposits) db.deposits = [];
+
+    const newDeposit = {
+      date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
+      username: currentUser.username,
+      method: 'QRIS',
+      amount: selectedAmount,
+      status: 'pending'
+    };
+
+    db.deposits.push(newDeposit);
+    const isSuccess = await api.updateDatabase(db);
+
+    if (isSuccess) {
+      alert("✅ Deposit Terkirim!\nSilakan hubungi Admin atau tunggu beberapa saat hingga disetujui. Refresh halaman ini nanti untuk update saldo.");
+      closeDepositModal();
+    } else {
+      alert("❌ Terjadi kesalahan saat menyimpan ke server.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Gagal terhubung ke server database.");
+  } finally {
+    btn.textContent = "SAYA SUDAH TRANSFER";
+    btn.disabled = false;
+  }
+}
+
+
+/**
+ * ==============================================================
+ * 2. GAME CONFIGURATION (PENGATURAN TERPUSAT)
  * ==============================================================
  */
 const CONFIG = {
@@ -372,10 +564,9 @@ const CONFIG = {
 
 /**
  * ==============================================================
- * 2. GAME STATE & CORE LOGIC
+ * 3. GAME STATE & CORE LOGIC
  * ==============================================================
  */
-// Hitung nilai awal exp yang dibutuhkan berdasarkan level saat ini
 const calcExpNeeded = (level) => {
   return Math.floor(CONFIG.leveling.baseExpForLevel2 * Math.pow(CONFIG.leveling.expMultiplierPerLevel, level - 1));
 };
@@ -409,7 +600,7 @@ const PAYLINES = [
 
 /**
  * ==============================================================
- * 3. UI CONTROLLER (Mengatur Tampilan)
+ * 4. UI CONTROLLER (Mengatur Tampilan)
  * ==============================================================
  */
 const gameUI = {
@@ -586,7 +777,7 @@ const gameUI = {
 
 /**
  * ==============================================================
- * 4. GAME ENGINE (Logika Inti Permainan)
+ * 5. GAME ENGINE (Logika Inti Permainan)
  * ==============================================================
  */
 const gameEngine = {
@@ -631,7 +822,9 @@ const gameEngine = {
       gameUI.setBanner("STOPPING AFTER SPIN...");
     } else {
       if (gameState.currentBet > gameState.balance) { 
-        gameUI.setBanner("INSUFFICIENT BALANCE!", true); return; 
+        gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
+        openDepositModal(); // Munculkan popup deposit
+        return; 
       }
       gameState.isAutoLoop = true;
       gameUI.updateAutoLoopBtn();
@@ -641,12 +834,16 @@ const gameEngine = {
 
   async startSpin(mode) {
     if (gameState.currentBet > gameState.balance && !gameState.isAutoLoop) { 
-      gameUI.setBanner("INSUFFICIENT BALANCE!", true); return; 
+      gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
+      openDepositModal(); // Munculkan popup deposit otomatis
+      return; 
     }
     if (gameState.currentBet > gameState.balance && gameState.isAutoLoop) {
       gameState.isAutoLoop = false; gameUI.updateAutoLoopBtn();
       gameUI.setBanner("AUTO STOPPED: NO BALANCE", true);
-      gameUI.lockControls(false); return;
+      gameUI.lockControls(false); 
+      openDepositModal(); // Munculkan popup deposit otomatis
+      return;
     }
 
     gameUI.lockControls(true);
@@ -784,7 +981,7 @@ const gameEngine = {
 
 /**
  * ==============================================================
- * 5. CONFETTI ENGINE (Particle System)
+ * 6. CONFETTI ENGINE (Particle System)
  * ==============================================================
  */
 const confettiEngine = {
