@@ -135,13 +135,16 @@
   }
 
   .btn-edit { background: var(--info); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%; }
-  .btn-edit-rtp { background: var(--gold-dark); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%; }
+  .btn-edit-rtp { background: var(--gold-dark); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%; transition: 0.2s;}
+  .btn-edit-rtp:hover { background: var(--gold-main); color: #000; }
+  
   .btn-approve { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 5px;}
   .btn-reject { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
-  .badge-pending { background: #eab308; color: #000; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;}
-  .badge-approved { background: var(--success); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;}
-  .badge-rejected { background: var(--danger); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;}
+  .badge-status { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+  .badge-pending { background: #eab308; color: #000; }
+  .badge-approved { background: var(--success); color: #fff; }
+  .badge-rejected { background: var(--danger); color: #fff; }
 
   .loading {
     text-align: center;
@@ -235,7 +238,8 @@
       window.location.href = 'auth.html';
     } else {
       const user = JSON.parse(userJson);
-      if (user.username !== 'admin_casino') {
+      // Validasi ketat khusus admin
+      if (user.username !== 'admin_casino' && user.username !== 'admin') {
         alert('Akses Ditolak! Anda bukan admin.');
         window.location.href = 'index.html';
       }
@@ -252,10 +256,7 @@
       
       btnRefresh.textContent = "Memuat...";
       btnRefresh.disabled = true;
-      tbodyUsers.innerHTML = '<tr><td colspan="7" class="loading">Memuat data...</td></tr>';
-      tbodyDeposits.innerHTML = '<tr><td colspan="6" class="loading">Memuat data...</td></tr>';
-      tbodyWithdrawals.innerHTML = '<tr><td colspan="6" class="loading">Memuat data...</td></tr>';
-
+      
       const db = await api.getDatabase();
       
       if (db) {
@@ -265,8 +266,21 @@
         if (db.users) {
           tbodyUsers.innerHTML = '';
           db.users.forEach((u, index) => {
-            // HAPUS LOGIKA PENYEMBUNYIAN AKUN AGAR ADMIN BISA MENGETES RTP UNTUK AKUNNYA SENDIRI
-            const rtpDisplay = u.winRate !== undefined ? `${u.winRate}%` : '15% (Default)';
+            
+            // Format tampilan RTP
+            const rtpValue = u.winRate !== undefined ? parseFloat(u.winRate) : 15;
+            let rtpColor = "var(--gold-light)";
+            let borderRtp = "var(--gold-dark)";
+            
+            if (rtpValue === 100) {
+              rtpColor = "#22c55e"; // Hijau jika Pasti Menang
+              borderRtp = "#22c55e";
+            } else if (rtpValue === 0) {
+              rtpColor = "#ef4444"; // Merah jika Pasti Kalah
+              borderRtp = "#ef4444";
+            }
+
+            const rtpDisplay = u.winRate !== undefined ? `${rtpValue}%` : '15% (Def)';
             
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -274,7 +288,11 @@
               <td>${u.fullName || '-'}</td>
               <td>${u.phone || '-'}<br><span style="font-size:10px; color:gray;">${u.bank || '-'}</span></td>
               <td>Lvl ${u.level || 1}</td>
-              <td><span class="badge-pending" style="background:#1e293b; color:var(--gold-light); border: 1px solid var(--gold-dark);">${rtpDisplay}</span></td>
+              <td>
+                <span class="badge-status" style="background:#1e293b; color:${rtpColor}; border: 1px solid ${borderRtp};">
+                  ${rtpDisplay}
+                </span>
+              </td>
               <td class="balance-col">${(u.balance || 0).toLocaleString()}</td>
               <td style="display:flex; flex-direction:column; gap:6px;">
                 <button class="btn-edit" onclick="editBalance(${index}, '${u.username}')">Ubah Saldo</button>
@@ -283,11 +301,10 @@
             `;
             tbodyUsers.appendChild(tr);
           });
-          if (tbodyUsers.innerHTML === '') tbodyUsers.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Belum ada pemain.</td></tr>';
         }
 
         // --- RENDER TABEL DEPOSIT ---
-        if (db.deposits) {
+        if (db.deposits && db.deposits.length > 0) {
           tbodyDeposits.innerHTML = '';
           [...db.deposits].reverse().forEach((dep, reverseIndex) => {
             const originalIndex = db.deposits.length - 1 - reverseIndex;
@@ -295,15 +312,15 @@
             let actionButtons = '-';
 
             if (dep.status === 'pending') {
-              statusBadge = '<span class="badge-pending">PENDING</span>';
+              statusBadge = '<span class="badge-status badge-pending">PENDING</span>';
               actionButtons = `
                 <button class="btn-approve" onclick="processDeposit(${originalIndex}, 'approved')">Terima</button>
                 <button class="btn-reject" onclick="processDeposit(${originalIndex}, 'rejected')">Tolak</button>
               `;
             } else if (dep.status === 'approved') {
-              statusBadge = '<span class="badge-approved">BERHASIL</span>';
+              statusBadge = '<span class="badge-status badge-approved">BERHASIL</span>';
             } else {
-              statusBadge = '<span class="badge-rejected">DITOLAK</span>';
+              statusBadge = '<span class="badge-status badge-rejected">DITOLAK</span>';
             }
 
             const tr = document.createElement('tr');
@@ -317,14 +334,12 @@
             `;
             tbodyDeposits.appendChild(tr);
           });
-          if (tbodyDeposits.innerHTML === '') tbodyDeposits.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada riwayat deposit.</td></tr>';
         } else {
-          globalDatabase.deposits = [];
           tbodyDeposits.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada riwayat deposit.</td></tr>';
         }
 
         // --- RENDER TABEL WITHDRAWAL ---
-        if (db.withdrawals) {
+        if (db.withdrawals && db.withdrawals.length > 0) {
           tbodyWithdrawals.innerHTML = '';
           [...db.withdrawals].reverse().forEach((wd, reverseIndex) => {
             const originalIndex = db.withdrawals.length - 1 - reverseIndex;
@@ -332,15 +347,15 @@
             let actionButtons = '-';
 
             if (wd.status === 'pending') {
-              statusBadge = '<span class="badge-pending">PENDING</span>';
+              statusBadge = '<span class="badge-status badge-pending">PENDING</span>';
               actionButtons = `
                 <button class="btn-approve" onclick="processWithdrawal(${originalIndex}, 'approved')">Kirim</button>
                 <button class="btn-reject" onclick="processWithdrawal(${originalIndex}, 'rejected')">Tolak</button>
               `;
             } else if (wd.status === 'approved') {
-              statusBadge = '<span class="badge-approved">TERKIRIM</span>';
+              statusBadge = '<span class="badge-status badge-approved">TERKIRIM</span>';
             } else {
-              statusBadge = '<span class="badge-rejected">DITOLAK</span>';
+              statusBadge = '<span class="badge-status badge-rejected">DITOLAK</span>';
             }
 
             const tr = document.createElement('tr');
@@ -354,16 +369,12 @@
             `;
             tbodyWithdrawals.appendChild(tr);
           });
-          if (tbodyWithdrawals.innerHTML === '') tbodyWithdrawals.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada riwayat penarikan.</td></tr>';
         } else {
-          globalDatabase.withdrawals = [];
           tbodyWithdrawals.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada riwayat penarikan.</td></tr>';
         }
 
       } else {
         tbodyUsers.innerHTML = '<tr><td colspan="7" style="text-align:center; color: red;">Gagal memuat data dari server.</td></tr>';
-        tbodyDeposits.innerHTML = '<tr><td colspan="6" style="text-align:center; color: red;">Gagal memuat data.</td></tr>';
-        tbodyWithdrawals.innerHTML = '<tr><td colspan="6" style="text-align:center; color: red;">Gagal memuat data.</td></tr>';
       }
 
       btnRefresh.textContent = "🔄 Refresh Data";
@@ -475,24 +486,23 @@
       
       const currentRtp = globalDatabase.users[userIndex].winRate !== undefined ? globalDatabase.users[userIndex].winRate : 15;
       
-      // Prompt yang diperjelas agar tidak salah input 1 vs 100
-      const newRtpStr = prompt(`Atur Tingkat Kemenangan (RTP) untuk ${username}.\n\nKetik angka 0 sampai 100:\n(Contoh: 100 = Selalu Menang, 0 = Selalu Kalah, 15 = Normal)`, currentRtp);
+      const newRtpStr = prompt(`⚙️ ATUR TINGKAT KEMENANGAN (RTP) UNTUK: ${username}\n\nPANDUAN ANGKA:\n100 = Selalu Menang\n0 = Selalu Kalah (Zonk)\n15 = Normal / Bawaan Kasino\n\nMasukkan Angka Persentase (0 - 100):`, currentRtp);
       
       if (newRtpStr !== null && newRtpStr !== "") {
-        const newRtp = parseFloat(newRtpStr); // Menggunakan parseFloat untuk akurasi
+        const newRtp = parseFloat(newRtpStr);
         
         if (isNaN(newRtp) || newRtp < 0 || newRtp > 100) {
-          alert('Error: Masukkan angka yang valid antara 0 sampai 100!');
+          alert('GAGAL: Masukkan HANYA ANGKA BULAT antara 0 sampai 100!');
           return;
         }
 
-        if (confirm(`Yakin mengubah Win Rate / RTP ${username} menjadi ${newRtp}%?`)) {
+        if (confirm(`Yakin mengatur Kemenangan (RTP) ${username} menjadi ${newRtp}%?`)) {
           globalDatabase.users[userIndex].winRate = newRtp;
-          document.getElementById('btnRefresh').textContent = "Menyimpan...";
+          document.getElementById('btnRefresh').textContent = "Menyimpan RTP...";
           const result = await api.updateDatabase(globalDatabase);
           
           if (result) {
-            alert('Tingkat Kemenangan berhasil diubah!');
+            alert('Berhasil! Pengaturan RTP masuk ke Database.');
             loadData();
           } else {
             alert('Gagal menyimpan ke server!');
@@ -501,6 +511,7 @@
       }
     }
 
+    // Load data otomatis saat halaman dibuka
     window.onload = loadData;
   </script>
 </body>
