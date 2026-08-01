@@ -20,6 +20,7 @@
     --text-muted: #64748b;
     --danger: #ef4444;
     --success: #22c55e;
+    --info: #3b82f6;
     --font-title: 'Cinzel', serif;
     --font-ui: 'Montserrat', sans-serif;
     --font-digital: 'Orbitron', sans-serif;
@@ -101,6 +102,8 @@
     align-items: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
   }
 
   .user-info {
@@ -120,6 +123,7 @@
     justify-content: center;
     font-size: 30px;
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    flex-shrink: 0;
   }
 
   .user-details h2 {
@@ -137,6 +141,18 @@
     padding: 4px 10px;
     border-radius: 20px;
     display: inline-block;
+  }
+  
+  .btn-edit-profile {
+    display: block;
+    background: transparent;
+    border: none;
+    color: var(--info);
+    font-size: 11px;
+    font-family: var(--font-ui);
+    cursor: pointer;
+    margin-top: 8px;
+    text-decoration: underline;
   }
 
   .wallet-info {
@@ -158,23 +174,43 @@
     text-shadow: 0 0 10px rgba(255, 223, 115, 0.4);
   }
 
-  .btn-topup {
-    background: linear-gradient(135deg, var(--gold-main), var(--gold-dark));
-    color: #000;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
+  .wallet-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn-topup, .btn-withdraw {
+    padding: 8px 12px;
+    border-radius: 6px;
     font-size: 10px;
     font-weight: 800;
     cursor: pointer;
-    margin-top: 8px;
     transition: 0.2s;
     font-family: var(--font-ui);
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   }
 
+  .btn-topup {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-dark));
+    color: #000;
+    border: none;
+  }
+
   .btn-topup:hover {
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    transform: translateY(-2px);
+  }
+
+  .btn-withdraw {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+  }
+
+  .btn-withdraw:hover {
+    background: rgba(239, 68, 68, 0.1);
     transform: translateY(-2px);
   }
 
@@ -258,18 +294,19 @@
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
   }
 
-  /* MODAL DEPOSIT */
+  /* MODALS (DEPOSIT, WD, PROFILE) */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
     display: flex; justify-content: center; align-items: center; z-index: 2000;
-    opacity: 0; pointer-events: none; transition: 0.3s;
+    opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px;
   }
   .modal-overlay.show { opacity: 1; pointer-events: auto; }
   
   .modal-content {
     background: var(--bg-panel); border: 2px solid var(--gold-main);
-    border-radius: 16px; padding: 30px; width: 90%; max-width: 420px;
+    border-radius: 16px; padding: 30px; width: 100%; max-width: 420px;
     position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    max-height: 90vh; overflow-y: auto;
   }
 
   .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
@@ -288,6 +325,14 @@
     font-family: var(--font-digital); font-size: 16px;
   }
   .input-custom:focus { outline: none; border-color: var(--gold-main); }
+  
+  .input-text {
+    width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; 
+    color: #fff; border-radius: 8px; margin-bottom: 15px;
+    font-family: var(--font-ui); font-size: 14px; text-align: left;
+  }
+  .input-text:focus { outline: none; border-color: var(--gold-main); }
+  .input-label { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: 1px;}
 
   .btn-close-modal {
     position: absolute; top: 15px; right: 20px; background: transparent; border: none;
@@ -298,6 +343,31 @@
   #qrcode {
     background: white; padding: 15px; display: inline-block; 
     border-radius: 12px; margin: 15px 0; border: 3px solid var(--gold-main);
+  }
+
+  /* FLOATING CS BUTTON */
+  .floating-cs {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #25D366; /* Hijau WA */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-family: var(--font-ui);
+    font-weight: 800;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1000;
+    transition: 0.3s;
+  }
+  .floating-cs:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 25px rgba(37, 211, 102, 0.6);
   }
 </style>
 </head>
@@ -320,13 +390,16 @@
         <div class="user-details">
           <h2 id="displayUsername">Player</h2>
           <div class="user-level" id="displayLevel">LEVEL 1</div>
+          <button class="btn-edit-profile" onclick="openProfileModal()">✏️ Edit Info Profil</button>
         </div>
       </div>
       <div class="wallet-info">
         <div class="wallet-label">TOTAL CREDITS</div>
         <div class="wallet-balance" id="displayBalance">0</div>
-        <!-- Tombol Tambah Deposit -->
-        <button class="btn-topup" onclick="openDepositModal()">+ DEPOSIT QRIS</button>
+        <div class="wallet-actions">
+          <button class="btn-topup" onclick="openDepositModal()">+ DEPOSIT</button>
+          <button class="btn-withdraw" onclick="openWithdrawModal()">- TARIK DANA</button>
+        </div>
       </div>
     </div>
 
@@ -355,13 +428,19 @@
     </div>
   </main>
 
+  <!-- TOMBOL FLOATING CS -->
+  <a href="https://wa.me/6281234567890" target="_blank" class="floating-cs">
+    💬 HUBUNGI CS
+  </a>
+
+  <!-- ================= MODALS ================= -->
+
   <!-- MODAL DEPOSIT QRIS -->
   <div class="modal-overlay" id="depositModal">
     <div class="modal-content">
       <button class="btn-close-modal" onclick="closeDepositModal()">×</button>
       <h2 style="font-family: var(--font-title); color: var(--gold-main); text-align: center; margin-bottom: 25px;">TOP UP CREDITS</h2>
       
-      <!-- Langkah 1: Pilih Nominal -->
       <div id="depositStep1">
         <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Pilih Nominal Deposit</p>
         <div class="preset-grid">
@@ -374,7 +453,6 @@
         <button class="btn-play" onclick="generateQRIS()">GENERATE QRIS</button>
       </div>
 
-      <!-- Langkah 2: Scan QRIS -->
       <div id="depositStep2" style="display: none; text-align: center;">
         <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 5px;">Total Pembayaran:</p>
         <p style="font-size: 24px; color: var(--gold-light); margin-bottom: 10px; font-weight: bold; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
@@ -386,7 +464,43 @@
         <button class="btn-play" style="background: var(--success); color: white; margin-bottom: 10px;" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
         <button class="btn-logout" style="width: 100%; border: none; color: var(--text-muted);" onclick="resetDepositModal()">Batal / Ubah Nominal</button>
       </div>
+    </div>
+  </div>
 
+  <!-- MODAL WITHDRAWAL -->
+  <div class="modal-overlay" id="withdrawModal">
+    <div class="modal-content">
+      <button class="btn-close-modal" onclick="closeWithdrawModal()">×</button>
+      <h2 style="font-family: var(--font-title); color: var(--danger); text-align: center; margin-bottom: 25px;">TARIK DANA</h2>
+      
+      <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 15px;">Minimal Penarikan: 50.000 Credits</p>
+      
+      <span class="input-label">Nominal Penarikan</span>
+      <input type="number" id="wdAmount" class="input-custom" placeholder="Contoh: 100000" style="text-align: left;">
+      
+      <span class="input-label">Informasi Tujuan (Bank/E-Wallet & Nama)</span>
+      <input type="text" id="wdBankDetails" class="input-text" placeholder="Contoh: BCA 12345678 a.n Budi">
+      
+      <button class="btn-play" style="background: linear-gradient(180deg, var(--danger), #b91c1c); color: white;" id="btnConfirmWD" onclick="submitWithdraw()">AJUKAN PENARIKAN</button>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT PROFIL -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+      <button class="btn-close-modal" onclick="closeProfileModal()">×</button>
+      <h2 style="font-family: var(--font-title); color: var(--info); text-align: center; margin-bottom: 25px;">INFO PROFIL</h2>
+      
+      <span class="input-label">Nama Lengkap Sesuai Rekening</span>
+      <input type="text" id="profFullName" class="input-text" placeholder="Masukkan nama lengkap">
+      
+      <span class="input-label">Nomor HP / WhatsApp</span>
+      <input type="text" id="profPhone" class="input-text" placeholder="08xxxxxxxx">
+      
+      <span class="input-label">Akun Bank Utama (Opsional)</span>
+      <input type="text" id="profBank" class="input-text" placeholder="BCA / DANA / MANDIRI - No Rekening">
+      
+      <button class="btn-play" style="background: linear-gradient(180deg, var(--info), #1d4ed8); color: white;" id="btnSaveProfile" onclick="saveProfile()">SIMPAN PROFIL</button>
     </div>
   </div>
 
@@ -398,14 +512,43 @@
       window.location.href = 'auth.html';
     }
 
-    const user = JSON.parse(userJson);
+    let user = JSON.parse(userJson);
     let selectedAmount = 0;
     let qrEngine = null;
-    
-    // Tampilkan data ke UI
-    document.getElementById('displayUsername').textContent = user.username.toUpperCase();
-    document.getElementById('displayLevel').textContent = `LEVEL ${user.level || 1}`;
-    document.getElementById('displayBalance').textContent = (user.balance || 0).toLocaleString();
+
+    // 2. Fungsi inisialisasi / Render UI
+    function updateUI() {
+      document.getElementById('displayUsername').textContent = user.username.toUpperCase();
+      document.getElementById('displayLevel').textContent = `LEVEL ${user.level || 1}`;
+      document.getElementById('displayBalance').textContent = (user.balance || 0).toLocaleString();
+    }
+
+    // 3. Tarik data terbaru dari server saat meload halaman (sinkronisasi)
+    async function syncDataWithServer() {
+      try {
+        const db = await api.getDatabase();
+        if(db && db.users) {
+          const freshUser = db.users.find(u => u.username === user.username);
+          if(freshUser) {
+            // Update data lokal dengan data server
+            user.balance = freshUser.balance;
+            user.fullName = freshUser.fullName || user.fullName;
+            user.phone = freshUser.phone || user.phone;
+            user.bank = freshUser.bank || user.bank;
+            
+            // Simpan kembali ke localStorage
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateUI();
+          }
+        }
+      } catch(e) {
+        console.error("Gagal sinkronisasi data", e);
+      }
+    }
+
+    // Panggil saat pertama kali load
+    updateUI();
+    syncDataWithServer();
 
     function logout() {
       localStorage.removeItem('currentUser');
@@ -415,15 +558,9 @@
     /* =========================================
        LOGIKA DEPOSIT QRIS
        ========================================= */
-    function openDepositModal() {
-      document.getElementById('depositModal').classList.add('show');
-    }
-
-    function closeDepositModal() {
-      document.getElementById('depositModal').classList.remove('show');
-      setTimeout(resetDepositModal, 300);
-    }
-
+    function openDepositModal() { document.getElementById('depositModal').classList.add('show'); }
+    function closeDepositModal() { document.getElementById('depositModal').classList.remove('show'); setTimeout(resetDepositModal, 300); }
+    
     function resetDepositModal() {
       document.getElementById('depositStep1').style.display = 'block';
       document.getElementById('depositStep2').style.display = 'none';
@@ -439,7 +576,6 @@
       event.target.classList.add('active');
     }
 
-    // Fungsi CRC16 untuk Validasi String QRIS (Diadaptasi dari kode sistem Farid Store)
     function crc16(str) {
       let c = 0xFFFF;
       for(let i = 0; i < str.length; i++) { 
@@ -451,13 +587,9 @@
 
     function generateQRIS() {
       const inputVal = parseInt(document.getElementById('customAmount').value);
-      if (isNaN(inputVal) || inputVal < 10000) {
-        alert("Minimal deposit adalah 10.000 Credits!");
-        return;
-      }
+      if (isNaN(inputVal) || inputVal < 10000) return alert("Minimal deposit 10.000 Credits!");
       selectedAmount = inputVal;
 
-      // Merakit Payload QRIS
       const amountStr = selectedAmount.toString();
       const amountLen = amountStr.length.toString().padStart(2, '0');
       
@@ -469,75 +601,139 @@
       const postal = '28294';
       const postalLen = postal.length.toString().padStart(2, '0');
       
-      // Payload Dinamis Nasional
       let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
-      
       const qrisString = raw + crc16(raw);
 
-      // Render Barcode
       const qrcodeContainer = document.getElementById('qrcode');
       if (qrEngine) {
-        qrEngine.clear();
-        qrEngine.makeCode(qrisString);
+        qrEngine.clear(); qrEngine.makeCode(qrisString);
       } else {
         qrcodeContainer.innerHTML = '';
-        qrEngine = new QRCode(qrcodeContainer, {
-          text: qrisString,
-          width: 200,
-          height: 200,
-          colorDark: "#000000",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.M
-        });
+        qrEngine = new QRCode(qrcodeContainer, { text: qrisString, width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
       }
 
       document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
-      
-      // Transisi UI
       document.getElementById('depositStep1').style.display = 'none';
       document.getElementById('depositStep2').style.display = 'block';
     }
 
     async function submitDeposit() {
       const btn = document.getElementById('btnConfirmDeposit');
-      btn.textContent = "MEMPROSES...";
-      btn.disabled = true;
+      btn.textContent = "MEMPROSES..."; btn.disabled = true;
 
       try {
-        // Ambil Data Base melalui API
         const db = await api.getDatabase();
         if (!db) throw new Error("Koneksi gagal");
-
-        // Validasi ketersediaan array deposits
         if (!db.deposits) db.deposits = [];
 
-        // Buat record deposit baru
-        const newDeposit = {
+        db.deposits.push({
           date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
           username: user.username,
           method: 'QRIS',
           amount: selectedAmount,
-          status: 'pending' // Status wajib pending sampai disetujui Admin
-        };
+          status: 'pending'
+        });
 
-        db.deposits.push(newDeposit);
-
-        // Update database di server
-        const isSuccess = await api.updateDatabase(db);
-
-        if (isSuccess) {
-          alert("✅ Bukti Permintaan Deposit Berhasil Terkirim!\n\nSilakan tunggu beberapa saat hingga Admin menyetujui. Refresh halaman ini nanti untuk melihat saldo bertambah.");
+        if (await api.updateDatabase(db)) {
+          alert("✅ Bukti Deposit Terkirim!\nTunggu beberapa saat hingga Admin menyetujui.");
           closeDepositModal();
         } else {
-          alert("❌ Terjadi kesalahan saat menyimpan ke server.");
+          alert("❌ Terjadi kesalahan server.");
         }
-      } catch (error) {
-        console.error(error);
-        alert("Gagal terhubung ke server database.");
-      } finally {
-        btn.textContent = "SAYA SUDAH TRANSFER";
-        btn.disabled = false;
-      }
+      } catch (error) { alert("Gagal terhubung ke server database."); } 
+      finally { btn.textContent = "SAYA SUDAH TRANSFER"; btn.disabled = false; }
+    }
+
+    /* =========================================
+       LOGIKA WITHDRAWAL (PENARIKAN)
+       ========================================= */
+    function openWithdrawModal() {
+      // Set default input berdasarkan data profil jika ada
+      document.getElementById('wdBankDetails').value = user.bank || "";
+      document.getElementById('withdrawModal').classList.add('show');
+    }
+    
+    function closeWithdrawModal() {
+      document.getElementById('withdrawModal').classList.remove('show');
+      document.getElementById('wdAmount').value = '';
+    }
+
+    async function submitWithdraw() {
+      const wdAmount = parseInt(document.getElementById('wdAmount').value);
+      const wdBank = document.getElementById('wdBankDetails').value.trim();
+
+      if (isNaN(wdAmount) || wdAmount < 50000) return alert("Minimal penarikan adalah 50.000 Credits!");
+      if (!wdBank) return alert("Mohon lengkapi informasi rekening/E-Wallet tujuan!");
+      if (wdAmount > user.balance) return alert(`Saldo tidak mencukupi!\nSaldo Anda saat ini: ${user.balance.toLocaleString()}`);
+
+      const btn = document.getElementById('btnConfirmWD');
+      btn.textContent = "MEMPROSES..."; btn.disabled = true;
+
+      try {
+        const db = await api.getDatabase();
+        if (!db) throw new Error("Koneksi gagal");
+        if (!db.withdrawals) db.withdrawals = [];
+
+        db.withdrawals.push({
+          date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
+          username: user.username,
+          bankDetails: wdBank,
+          amount: wdAmount,
+          status: 'pending'
+        });
+
+        if (await api.updateDatabase(db)) {
+          alert("✅ Pengajuan Penarikan Dana Berhasil!\nSilakan tunggu Admin memproses dan mentransfer dana ke rekening Anda.");
+          closeWithdrawModal();
+        } else {
+          alert("❌ Terjadi kesalahan server.");
+        }
+      } catch (error) { alert("Gagal terhubung ke server database."); } 
+      finally { btn.textContent = "AJUKAN PENARIKAN"; btn.disabled = false; }
+    }
+
+    /* =========================================
+       LOGIKA EDIT PROFIL
+       ========================================= */
+    function openProfileModal() {
+      document.getElementById('profFullName').value = user.fullName || "";
+      document.getElementById('profPhone').value = user.phone || "";
+      document.getElementById('profBank').value = user.bank || "";
+      document.getElementById('profileModal').classList.add('show');
+    }
+    
+    function closeProfileModal() { document.getElementById('profileModal').classList.remove('show'); }
+
+    async function saveProfile() {
+      const fullName = document.getElementById('profFullName').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      const bank = document.getElementById('profBank').value.trim();
+
+      const btn = document.getElementById('btnSaveProfile');
+      btn.textContent = "MENYIMPAN..."; btn.disabled = true;
+
+      try {
+        const db = await api.getDatabase();
+        if (db && db.users) {
+          const userIndex = db.users.findIndex(u => u.username === user.username);
+          if (userIndex !== -1) {
+            db.users[userIndex].fullName = fullName;
+            db.users[userIndex].phone = phone;
+            db.users[userIndex].bank = bank;
+
+            if (await api.updateDatabase(db)) {
+              // Update local state
+              user.fullName = fullName; user.phone = phone; user.bank = bank;
+              localStorage.setItem('currentUser', JSON.stringify(user));
+              alert("✅ Profil berhasil diperbarui!");
+              closeProfileModal();
+            } else {
+              alert("❌ Gagal menyimpan profil ke server.");
+            }
+          }
+        }
+      } catch (error) { alert("Gagal terhubung ke server database."); } 
+      finally { btn.textContent = "SIMPAN PROFIL"; btn.disabled = false; }
     }
   </script>
 </body>
