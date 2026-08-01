@@ -131,21 +131,38 @@
     display: flex; flex-direction: column; gap: 16px;
   }
 
-  .info-banner { background: #000; border: 2px solid #222; border-radius: 8px; padding: 8px; text-align: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); }
+  /* Digital Info Banner */
+  .info-banner {
+    background: #000; border: 2px solid #222; border-radius: 8px;
+    padding: 8px; text-align: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+  }
   .info-text { font-family: var(--font-digital); font-size: 14px; color: var(--neon-blue); letter-spacing: 1px; }
   .info-text.win-alert { color: var(--gold-light); font-size: 16px; font-weight: bold; animation: flash 0.5s infinite alternate; }
   @keyframes flash { from { text-shadow: 0 0 5px var(--gold-main); } to { text-shadow: 0 0 20px var(--gold-light); } }
 
+  /* Bet Adjuster */
   .bet-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .bet-btn-ctrl { background: #1e293b; border: 1px solid #334155; color: #fff; width: 45px; height: 45px; border-radius: 12px; font-size: 24px; font-weight: 300; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+  .bet-btn-ctrl {
+    background: #1e293b; border: 1px solid #334155; color: #fff;
+    width: 45px; height: 45px; border-radius: 12px; font-size: 24px; font-weight: 300;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+  }
   .bet-btn-ctrl:active { transform: scale(0.9); background: var(--gold-dark); }
-  .bet-display-box { flex: 1; background: #000; height: 45px; border-radius: 12px; border: 1px solid var(--gold-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .bet-display-box {
+    flex: 1; background: #000; height: 45px; border-radius: 12px; border: 1px solid var(--gold-dark);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
   .bet-display-label { font-size: 9px; color: var(--gold-main); letter-spacing: 1px; }
   .bet-display-val { font-family: var(--font-digital); font-size: 16px; color: #fff; }
   .btn-max { background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); border: none; color: #000; font-weight: 800; font-size: 12px; }
 
+  /* Action Buttons */
   .actions-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; height: 60px; border-radius: 14px; border: none; font-family: var(--font-ui); cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+  .action-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    height: 60px; border-radius: 14px; border: none; font-family: var(--font-ui); cursor: pointer;
+    text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: relative; overflow: hidden;
+  }
   .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 5px rgba(0,0,0,0.5); }
   .action-btn:disabled { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
   .action-btn i { font-size: 18px; }
@@ -154,6 +171,7 @@
   .btn-info { background: #334155; color: #fff; }
   .btn-manual { background: linear-gradient(135deg, #1e293b, #0f172a); color: var(--gold-light); border: 1px solid var(--gold-dark); }
   .btn-auto { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+  
   .btn-spin-infinity { background: linear-gradient(135deg, var(--success), #16a34a); color: #fff; }
   .btn-spin-infinity.active { background: linear-gradient(135deg, var(--danger), #b91c1c); animation: pulseAlert 1s infinite alternate; }
   
@@ -199,15 +217,34 @@
 
   /* Deposit Modal Tambahan */
   .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-  .btn-preset { background: #1e293b; border: 1px solid #334155; color: var(--gold-light); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: var(--font-digital); transition: 0.2s; }
-  .btn-preset.active, .btn-preset:hover { background: var(--gold-dark); color: #fff; border-color: var(--gold-main); }
-  .input-custom { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 8px; text-align: center; margin-bottom: 15px; font-family: var(--font-digital); font-size: 16px; }
+  .btn-preset {
+    background: #1e293b; border: 1px solid #334155; color: var(--gold-light);
+    padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;
+    font-family: var(--font-digital); transition: 0.2s;
+  }
+  .btn-preset.active, .btn-preset:hover {
+    background: var(--gold-dark); color: #fff; border-color: var(--gold-main);
+  }
+  .input-custom {
+    width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
+    color: #fff; border-radius: 8px; text-align: center; margin-bottom: 15px;
+    font-family: var(--font-digital); font-size: 16px;
+  }
   .input-custom:focus { outline: none; border-color: var(--gold-main); }
   #qrcode { background: white; padding: 10px; border-radius: 10px; display: inline-block; border: 3px solid var(--gold-main); margin-bottom: 15px;}
   
-  .btn-action-primary { background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui); }
-  .btn-action-success { background: var(--success); color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui); }
-  .btn-action-cancel { background: transparent; color: var(--text-muted); width: 100%; padding: 10px; border: none; font-weight: bold; cursor: pointer; font-family: var(--font-ui); }
+  .btn-action-primary {
+    background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; width: 100%; padding: 12px;
+    border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui);
+  }
+  .btn-action-success {
+    background: var(--success); color: white; width: 100%; padding: 12px;
+    border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui);
+  }
+  .btn-action-cancel {
+    background: transparent; color: var(--text-muted); width: 100%; padding: 10px;
+    border: none; font-weight: bold; cursor: pointer; font-family: var(--font-ui);
+  }
 
   canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
 </style>
@@ -216,6 +253,7 @@
 
   <canvas id="confettiCanvas"></canvas>
 
+  <!-- TOP BAR: PROFILE, BALANCE & EXIT -->
   <header class="top-bar">
     <button onclick="saveAndExit()" id="btnExit" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 10px;">⬅ KEMBALI</button>
     
@@ -234,17 +272,21 @@
     </div>
   </header>
 
+  <!-- MAIN GAME BOARD -->
   <main class="machine-container">
     <div class="slot-frame">
       <div class="grid-5x5" id="board"></div>
     </div>
   </main>
 
+  <!-- BOTTOM CONTROL CONSOLE -->
   <footer class="control-console">
+    <!-- Digital Information Board -->
     <div class="info-banner">
       <div class="info-text" id="infoText">WELCOME TO ROYAL CASINO</div>
     </div>
 
+    <!-- Bet Controls -->
     <div class="bet-row">
       <button class="bet-btn-ctrl" onclick="gameUI.changeBet(-1)">-</button>
       <div class="bet-display-box">
@@ -255,6 +297,7 @@
       <button class="bet-btn-ctrl btn-max" onclick="gameUI.maxBet()">MAX</button>
     </div>
 
+    <!-- Action Buttons -->
     <div class="actions-row">
       <button class="action-btn btn-info" onclick="gameUI.showPaytable()">
         <i>ℹ️</i><span>INFO</span>
@@ -271,10 +314,13 @@
     </div>
   </footer>
 
+  <!-- MODAL: PAYTABLE -->
   <div class="overlay" id="paytableModal" onclick="this.classList.remove('show')">
     <div class="modal-panel" onclick="event.stopPropagation()">
       <h2 class="modal-title">PAYTABLE</h2>
-      <div class="paytable-grid" id="paytableGrid"></div>
+      <div class="paytable-grid" id="paytableGrid">
+        <!-- Diisi via JS sesuai CONFIG -->
+      </div>
       <div class="pt-info">
         <b>Match 3+ on any line (Horz, Vert, Diag)</b><br>
         Diagonal pays x0.5. <br>
@@ -284,10 +330,12 @@
     </div>
   </div>
 
+  <!-- MODAL: DEPOSIT QRIS -->
   <div class="overlay" id="depositModal" onclick="closeDepositModal()">
     <div class="modal-panel" onclick="event.stopPropagation()">
       <h2 class="modal-title" style="margin-bottom: 15px;">TOP UP CREDITS</h2>
       
+      <!-- Langkah 1: Pilih Nominal -->
       <div id="depositStep1">
         <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Pilih Nominal Deposit</p>
         <div class="preset-grid">
@@ -301,17 +349,22 @@
         <button class="btn-action-cancel" onclick="closeDepositModal()">TUTUP</button>
       </div>
 
+      <!-- Langkah 2: Scan QRIS -->
       <div id="depositStep2" style="display: none; text-align: center;">
         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">Total Pembayaran:</p>
         <p style="font-size: 20px; color: var(--gold-light); margin-bottom: 10px; font-weight: bold; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
+        
         <div id="qrcode"></div>
+        
         <p style="font-size: 10px; color: var(--danger); margin-bottom: 15px;">*Wajib transfer sesuai nominal agar diproses otomatis oleh Admin.</p>
+        
         <button class="btn-action-success" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
         <button class="btn-action-cancel" onclick="resetDepositModal()">Batal / Ubah Nominal</button>
       </div>
     </div>
   </div>
 
+  <!-- MODAL: JACKPOT -->
   <div class="overlay" id="jackpotModal" onclick="gameUI.closeJackpot()">
     <div class="jackpot-wrapper">
       <div class="jp-tier" id="jpTitle">SUPER</div>
@@ -320,6 +373,7 @@
     </div>
   </div>
 
+  <!-- MODAL: ZONK BOMB -->
   <div class="overlay" id="zonkModal" onclick="gameUI.closeZonk()">
     <div class="jackpot-wrapper">
       <div class="zonk-icon">💣</div>
@@ -332,7 +386,9 @@
 <script src="api.js"></script>
 <script>
 /**
+ * ==============================================================
  * 0. AUTHENTICATION & DATA BINDING
+ * ==============================================================
  */
 const userJson = localStorage.getItem('currentUser');
 if (!userJson) {
@@ -343,38 +399,43 @@ const currentUser = JSON.parse(userJson);
 // Variabel untuk menyimpan RTP spesifik pemain
 let playerWinRate = null;
 
-// Tarik data RTP terbaru dari server secara background tiap 5 detik
-async function syncRTP() {
-  try {
-    const db = await api.getDatabase();
-    if (db && db.users) {
-      const freshUser = db.users.find(u => u.username === currentUser.username);
-      if (freshUser && freshUser.winRate !== undefined) {
-        playerWinRate = parseFloat(freshUser.winRate) / 100; // Contoh: Admin input 100, dibaca 1.0
-      }
+// Tarik data RTP terbaru dari server saat game dimuat
+api.getDatabase().then(db => {
+  if (db && db.users) {
+    const freshUser = db.users.find(u => u.username === currentUser.username);
+    if (freshUser && freshUser.winRate !== undefined) {
+      playerWinRate = freshUser.winRate / 100; // Konversi persen ke desimal (misal 80 jadi 0.8)
     }
-  } catch(e) { }
-}
-
-syncRTP();
-setInterval(syncRTP, 5000); 
+  }
+});
 
 async function saveAndExit() {
   const btn = document.getElementById('btnExit');
   btn.disabled = true;
   btn.textContent = "SAVING...";
+  
   await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp);
+  
   window.location.href = 'index.html';
 }
 
 /**
+ * ==============================================================
  * 1. DEPOSIT SYSTEM LOGIC
+ * ==============================================================
  */
 let selectedAmount = 0;
 let qrEngine = null;
 
-function openDepositModal() { document.getElementById('depositModal').classList.add('show'); }
-function closeDepositModal() { document.getElementById('depositModal').classList.remove('show'); setTimeout(resetDepositModal, 300); }
+function openDepositModal() {
+  document.getElementById('depositModal').classList.add('show');
+}
+
+function closeDepositModal() {
+  document.getElementById('depositModal').classList.remove('show');
+  setTimeout(resetDepositModal, 300);
+}
+
 function resetDepositModal() {
   document.getElementById('depositStep1').style.display = 'block';
   document.getElementById('depositStep2').style.display = 'none';
@@ -382,12 +443,14 @@ function resetDepositModal() {
   document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
   selectedAmount = 0;
 }
+
 function setNominal(amount) {
   selectedAmount = amount;
   document.getElementById('customAmount').value = amount;
   document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
 }
+
 function crc16(str) {
   let c = 0xFFFF;
   for(let i = 0; i < str.length; i++) { 
@@ -396,9 +459,13 @@ function crc16(str) {
   }
   return c.toString(16).toUpperCase().padStart(4, '0');
 }
+
 function generateQRIS() {
   const inputVal = parseInt(document.getElementById('customAmount').value);
-  if (isNaN(inputVal) || inputVal < 10000) return alert("Minimal deposit adalah 10.000 Credits!");
+  if (isNaN(inputVal) || inputVal < 10000) {
+    alert("Minimal deposit adalah 10.000 Credits!");
+    return;
+  }
   selectedAmount = inputVal;
 
   const amountStr = selectedAmount.toString();
@@ -415,10 +482,15 @@ function generateQRIS() {
   const qrisString = raw + crc16(raw);
 
   const qrcodeContainer = document.getElementById('qrcode');
-  if (qrEngine) { qrEngine.clear(); qrEngine.makeCode(qrisString); } 
-  else {
+  if (qrEngine) {
+    qrEngine.clear();
+    qrEngine.makeCode(qrisString);
+  } else {
     qrcodeContainer.innerHTML = '';
-    qrEngine = new QRCode(qrcodeContainer, { text: qrisString, width: 160, height: 160, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+    qrEngine = new QRCode(qrcodeContainer, {
+      text: qrisString, width: 160, height: 160,
+      colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M
+    });
   }
 
   document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
@@ -428,25 +500,49 @@ function generateQRIS() {
 
 async function submitDeposit() {
   const btn = document.getElementById('btnConfirmDeposit');
-  btn.textContent = "MEMPROSES..."; btn.disabled = true;
+  btn.textContent = "MEMPROSES...";
+  btn.disabled = true;
+
   try {
     const db = await api.getDatabase();
     if (!db) throw new Error("Koneksi gagal");
     if (!db.deposits) db.deposits = [];
 
-    db.deposits.push({ date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}), username: currentUser.username, method: 'QRIS', amount: selectedAmount, status: 'pending' });
-    if (await api.updateDatabase(db)) { alert("✅ Deposit Terkirim!\nSilakan hubungi Admin atau tunggu disetujui."); closeDepositModal(); } 
-    else { alert("❌ Terjadi kesalahan server."); }
-  } catch (error) { alert("Gagal terhubung ke server database."); } 
-  finally { btn.textContent = "SAYA SUDAH TRANSFER"; btn.disabled = false; }
+    const newDeposit = {
+      date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
+      username: currentUser.username,
+      method: 'QRIS',
+      amount: selectedAmount,
+      status: 'pending'
+    };
+
+    db.deposits.push(newDeposit);
+    const isSuccess = await api.updateDatabase(db);
+
+    if (isSuccess) {
+      alert("✅ Deposit Terkirim!\nSilakan hubungi Admin atau tunggu beberapa saat hingga disetujui. Refresh halaman ini nanti untuk update saldo.");
+      closeDepositModal();
+    } else {
+      alert("❌ Terjadi kesalahan saat menyimpan ke server.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Gagal terhubung ke server database.");
+  } finally {
+    btn.textContent = "SAYA SUDAH TRANSFER";
+    btn.disabled = false;
+  }
 }
 
 /**
- * 2. GAME CONFIGURATION
+ * ==============================================================
+ * 2. GAME CONFIGURATION (PENGATURAN TERPUSAT)
+ * ==============================================================
  */
 const CONFIG = {
   initialBalance: 100000,
   betSteps: [100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000],
+  
   symbols: [
     { id: 'cherry', icon: '🍒', multiplier: 1, weight: 60 },
     { id: 'lemon',  icon: '🍋', multiplier: 2, weight: 40 },
@@ -455,24 +551,53 @@ const CONFIG = {
     { id: 'star',   icon: '⭐', multiplier: 20, weight: 5 },
     { id: 'crown',  icon: '👑', multiplier: 50, weight: 1 } 
   ],
-  mechanics: { pityChance: 0.15, zonkTriggerStreak: 4, zonkChance: 0.25, zonkPenaltyMinPct: 0.001, zonkPenaltyMaxPct: 0.01 },
-  leveling: { expPerBetRatio: 0.01, baseExpForLevel2: 100, expMultiplierPerLevel: 1.5 },
-  timings: { autoNormalDelay: 120, autoFastDelay: 30, revealPause: 500, autoSpinPause: 1000 }
+
+  mechanics: {
+    pityChance: 0.15,            
+    zonkTriggerStreak: 4,        
+    zonkChance: 0.25,            
+    zonkPenaltyMinPct: 0.001,    
+    zonkPenaltyMaxPct: 0.01      
+  },
+
+  leveling: {
+    expPerBetRatio: 0.01,        
+    baseExpForLevel2: 100,       
+    expMultiplierPerLevel: 1.5   
+  },
+
+  timings: {
+    autoNormalDelay: 120, 
+    autoFastDelay: 30,    
+    revealPause: 500,     
+    autoSpinPause: 1000   
+  }
 };
 
 /**
+ * ==============================================================
  * 3. GAME STATE & CORE LOGIC
+ * ==============================================================
  */
-const calcExpNeeded = (level) => { return Math.floor(CONFIG.leveling.baseExpForLevel2 * Math.pow(CONFIG.leveling.expMultiplierPerLevel, level - 1)); };
+const calcExpNeeded = (level) => {
+  return Math.floor(CONFIG.leveling.baseExpForLevel2 * Math.pow(CONFIG.leveling.expMultiplierPerLevel, level - 1));
+};
 
 const gameState = {
   balance: currentUser.balance !== undefined ? currentUser.balance : CONFIG.initialBalance,
   currentBet: CONFIG.betSteps[2],
   lossStreak: 0,
+  
   level: currentUser.level || 1,
   currentExp: currentUser.exp || 0,
   expNeeded: calcExpNeeded(currentUser.level || 1),
-  gridData: [], cardsFlipped: 0, canFlipManual: false, isSpinning: false, isAutoLoop: false, autoCloseTimer: null
+
+  gridData: [], 
+  cardsFlipped: 0,
+  canFlipManual: false,
+  isSpinning: false,
+  isAutoLoop: false,
+  autoCloseTimer: null
 };
 
 const PAYLINES = [
@@ -486,20 +611,32 @@ const PAYLINES = [
 ];
 
 /**
- * 4. UI CONTROLLER 
+ * ==============================================================
+ * 4. UI CONTROLLER (Mengatur Tampilan)
+ * ==============================================================
  */
 const gameUI = {
   elements: {
-    board: document.getElementById('board'), balance: document.getElementById('balanceDisplay'),
-    bet: document.getElementById('betDisplay'), info: document.getElementById('infoText'),
-    level: document.getElementById('levelDisplay'), expFill: document.getElementById('expFill'),
-    btnManual: document.getElementById('btnManual'), btnFast: document.getElementById('btnAutoFast'),
-    btnLoop: document.getElementById('btnAutoLoop'), paytableGrid: document.getElementById('paytableGrid'),
+    board: document.getElementById('board'),
+    balance: document.getElementById('balanceDisplay'),
+    bet: document.getElementById('betDisplay'),
+    info: document.getElementById('infoText'),
+    level: document.getElementById('levelDisplay'),
+    expFill: document.getElementById('expFill'),
+    btnManual: document.getElementById('btnManual'),
+    btnFast: document.getElementById('btnAutoFast'),
+    btnLoop: document.getElementById('btnAutoLoop'),
+    paytableGrid: document.getElementById('paytableGrid'),
     ctrlBtns: document.querySelectorAll('.bet-btn-ctrl, .btn-info')
   },
   cardsDOM: [],
 
-  init() { this.updateBalanceBet(); this.updateLevelUI(); this.buildBoard(); this.buildPaytable(); },
+  init() {
+    this.updateBalanceBet();
+    this.updateLevelUI();
+    this.buildBoard();
+    this.buildPaytable();
+  },
 
   updateBalanceBet() {
     this.elements.balance.textContent = gameState.balance.toLocaleString();
@@ -525,11 +662,14 @@ const gameUI = {
       const c = document.createElement('div');
       c.className = 'card'; c.dataset.index = i;
       c.innerHTML = `<div class="card-face card-back"></div><div class="card-face card-front"></div>`;
+      
       c.addEventListener('mouseenter', () => gameEngine.manualFlip(i));
       c.addEventListener('mousedown', () => gameEngine.manualFlip(i));
+      
       this.elements.board.appendChild(c);
       this.cardsDOM.push(c);
     }
+
     this.elements.board.addEventListener('touchmove', (e) => {
       if(!gameState.canFlipManual) return;
       e.preventDefault();
@@ -541,7 +681,10 @@ const gameUI = {
 
   buildPaytable() {
     this.elements.paytableGrid.innerHTML = CONFIG.symbols.map(s => `
-      <div class="pt-item"><div class="pt-icon">${s.icon}</div><div class="pt-val">x${s.multiplier}</div></div>
+      <div class="pt-item">
+        <div class="pt-icon">${s.icon}</div>
+        <div class="pt-val">x${s.multiplier}</div>
+      </div>
     `).join('');
   },
 
@@ -550,7 +693,10 @@ const gameUI = {
     let idx = CONFIG.betSteps.indexOf(gameState.currentBet);
     if (idx === -1) idx = 0;
     idx += dir;
-    if (idx >= 0 && idx < CONFIG.betSteps.length) { gameState.currentBet = CONFIG.betSteps[idx]; this.updateBalanceBet(); }
+    if (idx >= 0 && idx < CONFIG.betSteps.length) { 
+      gameState.currentBet = CONFIG.betSteps[idx]; 
+      this.updateBalanceBet(); 
+    }
   },
 
   maxBet() {
@@ -566,6 +712,7 @@ const gameUI = {
     this.elements.btnManual.disabled = locked;
     this.elements.btnFast.disabled = locked;
     this.elements.ctrlBtns.forEach(b => b.disabled = locked);
+    
     if (!gameState.isAutoLoop) this.elements.btnLoop.disabled = locked;
   },
 
@@ -606,13 +753,17 @@ const gameUI = {
     window.requestAnimationFrame(step);
 
     confettiEngine.start(40, 400); 
-    if (gameState.isAutoLoop) { gameState.autoCloseTimer = setTimeout(() => this.closeJackpot(), 3500); }
+
+    if (gameState.isAutoLoop) {
+      gameState.autoCloseTimer = setTimeout(() => this.closeJackpot(), 3500);
+    }
   },
 
   closeJackpot() {
     clearTimeout(gameState.autoCloseTimer);
     document.getElementById('jackpotModal').classList.remove('show');
     confettiEngine.stop();
+    
     if (gameState.isAutoLoop) setTimeout(() => gameEngine.startSpin('loop'), CONFIG.timings.autoSpinPause);
     else this.lockControls(false);
   },
@@ -621,19 +772,25 @@ const gameUI = {
     const modal = document.getElementById('zonkModal');
     document.getElementById('zonkAmount').textContent = `- ${amount.toLocaleString()}`;
     modal.classList.add('show');
-    if (gameState.isAutoLoop) { gameState.autoCloseTimer = setTimeout(() => this.closeZonk(), 2500); }
+    
+    if (gameState.isAutoLoop) {
+      gameState.autoCloseTimer = setTimeout(() => this.closeZonk(), 2500);
+    }
   },
 
   closeZonk() {
     clearTimeout(gameState.autoCloseTimer);
     document.getElementById('zonkModal').classList.remove('show');
+    
     if (gameState.isAutoLoop) setTimeout(() => gameEngine.startSpin('loop'), CONFIG.timings.autoSpinPause);
     else this.lockControls(false);
   }
 };
 
 /**
- * 5. GAME ENGINE (Logika Inti Permainan & ZONK FORCER)
+ * ==============================================================
+ * 5. GAME ENGINE (Logika Inti Permainan)
+ * ==============================================================
  */
 const gameEngine = {
   getRandomSymbol() {
@@ -642,57 +799,76 @@ const gameEngine = {
     for (let sym of CONFIG.symbols) { if (r < sym.weight) return sym; r -= sym.weight; }
     return CONFIG.symbols[0];
   },
-  
-  // Fungsi Pengecek Kombinasi Menang (Untuk mencegah RNG mencetak kemenangan bocor saat diset RTP 0)
-  checkIfGridHasWin(grid) {
+
+  // Fungsi Scrambler untuk mengecek apakah ada simbol yang sejajar
+  hasWin(grid) {
     for (let pl of PAYLINES) {
-      let currentSeq = 1; 
+      let maxSeq = 1; let currentSeq = 1;
       let currSym = grid[pl.line[0]];
       for(let i=1; i<5; i++) {
         if(grid[pl.line[i]].id === currSym.id) {
           currentSeq++;
-          if (currentSeq >= 3) return true; // Cukup 3 beruntun artinya menang
         } else {
-          currSym = grid[pl.line[i]];
-          currentSeq = 1;
+          if(currentSeq > maxSeq) maxSeq = currentSeq;
+          currSym = grid[pl.line[i]]; currentSeq = 1;
         }
       }
+      if(currentSeq > maxSeq) maxSeq = currentSeq;
+      if (maxSeq >= 3) return true; // Jika ada 3 atau lebih sejajar, berarti menang
     }
     return false;
   },
 
   generateGrid() {
     let grid = new Array(25).fill(null);
+    
+    // CEK RTP SPESIFIK PEMAIN
     let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
     
-    // LEMPAR DADU RTP: Tentukan apakah ronde ini MENANG atau KALAH
-    let isWinTurn = (Math.random() < currentChance);
+    // KALKULASI KEMENANGAN BERDASARKAN RTP
+    let forceWin = (Math.random() < currentChance);
     
-    if (isWinTurn) {
-      // Skenario MENANG: Tanam garis kemenangan ke dalam papan
+    if (forceWin) {
+      // --- FORCE WIN (PASTI MENANG) ---
       let tLine = PAYLINES[Math.floor(Math.random() * PAYLINES.length)];
       let sym = this.getRandomSymbol();
       let matchCount = Math.random() > 0.85 ? 5 : (Math.random() > 0.5 ? 4 : 3);
       let startIdx = Math.floor(Math.random() * (6 - matchCount));
       for(let i=0; i<matchCount; i++) { grid[tLine.line[startIdx + i]] = sym; }
       
-      // Isi kotak sisanya
+      // Isi sisanya secara acak
       for (let i = 0; i < 25; i++) { if (!grid[i]) grid[i] = this.getRandomSymbol(); }
     } else {
-      // Skenario KALAH (ZONK): Paksa agar mesin tidak menghasilkan kombinasi kemenangan sama sekali
-      let hasWin = true;
-      let attempts = 0;
-      let safeSymbols = [...CONFIG.symbols];
-      
-      while (hasWin && attempts < 100) {
-        for (let i = 0; i < 25; i++) {
-          // Pilih simbol dengan peluang merata agar susah terbentuk 3 beruntun
-          grid[i] = safeSymbols[Math.floor(Math.random() * safeSymbols.length)];
+      // --- FORCE LOSE (PASTI KALAH / ANTI-MENANG) ---
+      // Isi grid acak terlebih dahulu
+      for (let i = 0; i < 25; i++) { grid[i] = this.getRandomSymbol(); }
+
+      // Sistem Scrambler: Selama secara kebetulan ada garis yang menang, HANCURKAN!
+      let safetyCounter = 100; // Mencegah infinite loop
+      while (this.hasWin(grid) && safetyCounter > 0) {
+        for (let pl of PAYLINES) {
+          let currentSeq = 1;
+          let currSym = grid[pl.line[0]];
+          for(let i=1; i<5; i++) {
+            if(grid[pl.line[i]].id === currSym.id) {
+              currentSeq++;
+              if (currentSeq >= 3) {
+                // Jika terdeteksi 3 simbol sama sejajar, ganti simbol ke-3 dengan simbol yang berbeda
+                let newSym = this.getRandomSymbol();
+                while(newSym.id === currSym.id) { newSym = this.getRandomSymbol(); }
+                grid[pl.line[i]] = newSym;
+                currentSeq = 1; // Reset hitungan
+              }
+            } else {
+              currSym = grid[pl.line[i]];
+              currentSeq = 1;
+            }
+          }
         }
-        hasWin = this.checkIfGridHasWin(grid);
-        attempts++;
+        safetyCounter--;
       }
     }
+    
     return grid;
   },
 
@@ -872,15 +1048,28 @@ const gameEngine = {
 };
 
 /**
- * 6. CONFETTI ENGINE
+ * ==============================================================
+ * 6. CONFETTI ENGINE (Particle System)
+ * ==============================================================
  */
 const confettiEngine = {
   canvas: document.getElementById('confettiCanvas'),
-  ctx: null, particles: [], interval: null, isActive: false,
+  ctx: null,
+  particles: [],
+  interval: null,
+  isActive: false,
   colors: ['#d4af37', '#ffdf73', '#00e5ff', '#ff007f', '#ffffff'],
 
-  init() { this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); this.run(); },
-  resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
+  init() {
+    this.ctx = this.canvas.getContext('2d');
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.run();
+  },
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  },
   spawn(count) {
     for(let i=0; i<count; i++) {
       this.particles.push({
@@ -891,9 +1080,16 @@ const confettiEngine = {
       });
     }
   },
-  burst(count) { this.spawn(count); },
-  start(count, ms) { this.spawn(count); this.interval = setInterval(() => this.spawn(count), ms); },
-  stop() { clearInterval(this.interval); },
+  burst(count) {
+    this.spawn(count);
+  },
+  start(count, ms) {
+    this.spawn(count);
+    this.interval = setInterval(() => this.spawn(count), ms);
+  },
+  stop() {
+    clearInterval(this.interval);
+  },
   run() {
     if(this.particles.length > 0) {
       this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
@@ -904,13 +1100,17 @@ const confettiEngine = {
         this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); this.ctx.restore();
         if(p.y > this.canvas.height || p.life <= 0) this.particles.splice(i, 1);
       });
-    } else { this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height); }
+    } else {
+      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+    }
     requestAnimationFrame(() => this.run());
   }
 };
 
+// Initialize Application
 confettiEngine.init();
 gameUI.init();
+
 </script>
 </body>
 </html>
