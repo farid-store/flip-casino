@@ -396,6 +396,19 @@ if (!userJson) {
 }
 const currentUser = JSON.parse(userJson);
 
+// Variabel untuk menyimpan RTP spesifik pemain
+let playerWinRate = null;
+
+// Tarik data RTP terbaru dari server saat game dimuat
+api.getDatabase().then(db => {
+  if (db && db.users) {
+    const freshUser = db.users.find(u => u.username === currentUser.username);
+    if (freshUser && freshUser.winRate !== undefined) {
+      playerWinRate = freshUser.winRate / 100; // Konversi persen ke desimal (misal 80 jadi 0.8)
+    }
+  }
+});
+
 async function saveAndExit() {
   const btn = document.getElementById('btnExit');
   btn.disabled = true;
@@ -520,7 +533,6 @@ async function submitDeposit() {
     btn.disabled = false;
   }
 }
-
 
 /**
  * ==============================================================
@@ -790,7 +802,12 @@ const gameEngine = {
 
   generateGrid() {
     let grid = new Array(25).fill(null);
-    let forceWin = (Math.random() < CONFIG.mechanics.pityChance);
+    
+    // CEK RTP SPESIFIK PEMAIN
+    let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
+    
+    // KALKULASI KEMENANGAN BERDASARKAN RTP
+    let forceWin = (Math.random() < currentChance);
     
     if (forceWin) {
       let tLine = PAYLINES[Math.floor(Math.random() * PAYLINES.length)];
@@ -823,7 +840,7 @@ const gameEngine = {
     } else {
       if (gameState.currentBet > gameState.balance) { 
         gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
-        openDepositModal(); // Munculkan popup deposit
+        openDepositModal(); 
         return; 
       }
       gameState.isAutoLoop = true;
@@ -835,14 +852,14 @@ const gameEngine = {
   async startSpin(mode) {
     if (gameState.currentBet > gameState.balance && !gameState.isAutoLoop) { 
       gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
-      openDepositModal(); // Munculkan popup deposit otomatis
+      openDepositModal(); 
       return; 
     }
     if (gameState.currentBet > gameState.balance && gameState.isAutoLoop) {
       gameState.isAutoLoop = false; gameUI.updateAutoLoopBtn();
       gameUI.setBanner("AUTO STOPPED: NO BALANCE", true);
       gameUI.lockControls(false); 
-      openDepositModal(); // Munculkan popup deposit otomatis
+      openDepositModal(); 
       return;
     }
 
