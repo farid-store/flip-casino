@@ -2,493 +2,342 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Royal Casino - Lobby Utama</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Royal Casino: Fruit Flip 🎰</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 <!-- Tambahkan library QRCode -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
 <style>
-  /* Variabel Tema Kasino Konsisten */
+  /* =========================================
+     CSS VARIABLES - TEMA KASINO PROFESIONAL
+     ========================================= */
   :root {
     --bg-base: #06090e;
     --bg-panel: #11151e;
     --gold-light: #ffdf73;
     --gold-main: #d4af37;
     --gold-dark: #8a6d1c;
+    --neon-blue: #00e5ff;
+    --neon-pink: #ff007f;
     --text-light: #e2e8f0;
     --text-muted: #64748b;
     --danger: #ef4444;
     --success: #22c55e;
-    --info: #3b82f6;
+    
     --font-title: 'Cinzel', serif;
     --font-ui: 'Montserrat', sans-serif;
     --font-digital: 'Orbitron', sans-serif;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+  
   body {
     background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
-    color: var(--text-light);
-    font-family: var(--font-ui);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    color: var(--text-light); font-family: var(--font-ui);
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh; overflow: hidden; touch-action: none;
   }
 
-  /* Header / Navbar */
-  .lobby-header {
+  /* =========================================
+     TOP BAR & LEVEL SYSTEM
+     ========================================= */
+  .top-bar {
+    width: 100%; max-width: 600px; padding: 15px 20px;
+    display: flex; justify-content: space-between; align-items: center;
     background: linear-gradient(180deg, rgba(17,21,30,0.95), transparent);
     border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .brand-logo {
-    font-family: var(--font-title);
-    font-size: 20px;
-    color: var(--gold-main);
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-  }
-
-  .btn-logout {
-    background: transparent;
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-family: var(--font-ui);
-    font-weight: 600;
-    font-size: 12px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  .btn-logout:hover {
-    background: rgba(239, 68, 68, 0.1);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
-  }
-
-  /* 📢 TICKER KEMENANGAN */
-  .ticker-wrap {
-    background: rgba(15, 23, 42, 0.8); border-bottom: 1px solid var(--gold-dark);
-    padding: 8px 15px; overflow: hidden; display: flex; align-items: center;
-  }
-  .ticker-wrap span { color: var(--gold-main); margin-right: 15px; font-size: 14px; flex-shrink: 0; }
-  .ticker-content {
-    white-space: nowrap; animation: ticker 25s linear infinite;
-    font-family: var(--font-digital); font-size: 12px; color: var(--gold-light);
-    letter-spacing: 1px;
-  }
-  @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
-
-  /* Profil Player Dashboard */
-  .dashboard-section {
-    padding: 30px 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .profile-card {
-    background: var(--bg-panel);
-    border: 1px solid var(--gold-dark);
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-
-  .avatar-large {
-    width: 60px;
-    height: 60px;
-    background: var(--bg-base);
-    border: 2px solid var(--gold-main);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-    flex-shrink: 0;
-  }
-
-  .user-details h2 {
-    font-size: 20px;
-    color: #fff;
-    margin-bottom: 5px;
-  }
-
-  .user-level {
-    font-size: 12px;
-    color: var(--gold-light);
-    font-weight: 700;
-    letter-spacing: 1px;
-    background: rgba(212, 175, 55, 0.1);
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: inline-block;
+    z-index: 10;
   }
   
-  .btn-edit-profile {
-    display: block;
-    background: transparent;
-    border: none;
-    color: var(--info);
-    font-size: 11px;
-    font-family: var(--font-ui);
-    cursor: pointer;
-    margin-top: 8px;
-    text-decoration: underline;
+  .player-profile { display: flex; align-items: center; gap: 12px; }
+  .avatar { 
+    width: 44px; height: 44px; border-radius: 50%; background: var(--bg-base);
+    border: 2px solid var(--gold-main); display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
   }
+  .level-info { display: flex; flex-direction: column; gap: 4px; }
+  .level-text { font-size: 12px; color: var(--gold-light); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;}
+  .exp-bar-bg { width: 100px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden; }
+  .exp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold-light)); width: 0%; transition: width 0.3s ease; }
 
-  /* 🎁 TOMBOL BONUS HARIAN */
-  .btn-bonus {
-    display: block; background: linear-gradient(135deg, #a855f7, #7e22ce); color: white;
-    border: none; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;
-    font-family: var(--font-ui); cursor: pointer; margin-top: 10px; box-shadow: 0 4px 10px rgba(126, 34, 206, 0.4);
-    transition: 0.2s;
-  }
-  .btn-bonus:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(126, 34, 206, 0.6); }
-  .btn-bonus:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
-
-  .wallet-info {
-    text-align: right;
-  }
-
-  .wallet-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 600;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-  }
-
-  .wallet-balance {
-    font-family: var(--font-digital);
-    font-size: 24px;
-    color: var(--gold-light);
-    text-shadow: 0 0 10px rgba(255, 223, 115, 0.4);
-  }
-
-  .wallet-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-  }
-
-  .btn-topup, .btn-withdraw, .btn-history, .btn-leaderboard {
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: 0.2s;
-    font-family: var(--font-ui);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-  }
-
-  .btn-topup { background: linear-gradient(135deg, var(--gold-main), var(--gold-dark)); color: #000; border: none; }
-  .btn-topup:hover { box-shadow: 0 0 15px rgba(212, 175, 55, 0.6); transform: translateY(-2px); }
-
-  .btn-withdraw { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
-  .btn-withdraw:hover { background: rgba(239, 68, 68, 0.1); transform: translateY(-2px); }
+  .balance-display { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+  .balance-title { font-size: 10px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
+  .balance-amount { font-family: var(--font-digital); font-size: 20px; color: var(--gold-light); text-shadow: 0 0 10px rgba(255, 223, 115, 0.4); }
   
-  .btn-history { background: #1e293b; border: 1px solid #334155; color: var(--gold-light); }
-  .btn-history:hover { background: #334155; transform: translateY(-2px); }
-
-  /* 🏆 TOMBOL LEADERBOARD */
-  .btn-leaderboard { background: #000; border: 1px solid var(--gold-main); color: var(--gold-light); }
-  .btn-leaderboard:hover { background: var(--gold-dark); color: #fff; transform: translateY(-2px); }
-
-  /* Game Selection Grid */
-  .section-title {
-    font-family: var(--font-title);
-    font-size: 22px;
-    color: var(--gold-main);
-    margin-bottom: 20px;
-    text-align: center;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    padding-bottom: 10px;
+  .btn-topup {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-dark));
+    color: #000; border: none; padding: 4px 8px; border-radius: 4px;
+    font-size: 9px; font-weight: 800; cursor: pointer; margin-top: 4px;
+    font-family: var(--font-ui); box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   }
 
-  .games-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+  /* =========================================
+     MAIN GAME BOARD (SLOT MACHINE)
+     ========================================= */
+  .machine-container {
+    flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; padding: 10px;
   }
-
-  .game-card {
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    border: 1px solid #334155;
-    border-radius: 16px;
-    overflow: hidden;
-    transition: 0.3s;
-    cursor: pointer;
+  
+  .slot-frame {
+    background: var(--bg-panel); padding: 12px; border-radius: 16px;
+    border: 2px solid var(--gold-dark); box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
     position: relative;
   }
-
-  .game-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--gold-main);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 15px rgba(212, 175, 55, 0.2);
+  .slot-frame::before {
+    content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+    border-radius: 16px; background: linear-gradient(45deg, var(--gold-dark), transparent, var(--gold-main));
+    z-index: -1; opacity: 0.5;
   }
 
-  .game-thumb {
-    height: 150px;
-    background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 50px;
-    position: relative;
-  }
-
-  .game-thumb::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent, #0f172a);
-  }
-
-  .game-info {
-    padding: 20px;
-    text-align: center;
-  }
-
-  .game-title {
-    font-family: var(--font-title);
-    font-size: 18px;
-    color: #fff;
-    margin-bottom: 10px;
-  }
-
-  .btn-play {
-    background: linear-gradient(180deg, var(--gold-main), var(--gold-dark));
-    color: #000;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-family: var(--font-ui);
-    font-weight: 800;
-    font-size: 14px;
-    cursor: pointer;
-    width: 100%;
-    transition: 0.2s;
-  }
+  .grid-5x5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 95vw; max-width: 420px; }
   
-  .game-card:hover .btn-play {
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+  .card {
+    aspect-ratio: 1/1; position: relative; transform-style: preserve-3d; 
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
   }
-
-  /* MODALS GLOBAL STYLES */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-    display: flex; justify-content: center; align-items: center; z-index: 2000;
-    opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px;
-  }
-  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  .card.flipped { transform: rotateY(180deg); }
   
-  .modal-content {
-    background: var(--bg-panel); border: 2px solid var(--gold-main);
-    border-radius: 16px; padding: 30px; width: 100%; max-width: 420px;
-    position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.9);
-    max-height: 90vh; overflow-y: auto;
+  .card-face {
+    position: absolute; inset: 0; backface-visibility: hidden; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: clamp(1.8rem, 7vw, 2.8rem);
+  }
+  .card-back {
+    background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #334155;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  }
+  .card-back::after { content: '🂠'; color: var(--gold-dark); opacity: 0.3; font-size: 1.5rem; }
+  
+  .card-front {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 1px solid var(--gold-main);
+    transform: rotateY(180deg); box-shadow: 0 4px 10px rgba(0,0,0,0.4);
   }
 
-  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+  /* Animasi Menang & Redup */
+  .grid-5x5.has-win .card:not(.win) .card-front { filter: brightness(0.4) grayscale(0.5); }
+  .card.win .card-front {
+    background: #fff; border-color: var(--neon-pink);
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.6), inset 0 0 10px rgba(255, 0, 127, 0.2);
+    animation: winPulse 0.8s infinite alternate; z-index: 10;
+  }
+  @keyframes winPulse { 0% { transform: rotateY(180deg) scale(1); } 100% { transform: rotateY(180deg) scale(1.1); } }
+
+  /* =========================================
+     CONTROL CONSOLE
+     ========================================= */
+  .control-console {
+    width: 100%; max-width: 600px; background: var(--bg-panel);
+    border-top: 2px solid var(--gold-dark); padding: 20px 15px;
+    border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  /* Digital Info Banner */
+  .info-banner {
+    background: #000; border: 2px solid #222; border-radius: 8px;
+    padding: 8px; text-align: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+  }
+  .info-text { font-family: var(--font-digital); font-size: 14px; color: var(--neon-blue); letter-spacing: 1px; }
+  .info-text.win-alert { color: var(--gold-light); font-size: 16px; font-weight: bold; animation: flash 0.5s infinite alternate; }
+  @keyframes flash { from { text-shadow: 0 0 5px var(--gold-main); } to { text-shadow: 0 0 20px var(--gold-light); } }
+
+  /* Bet Adjuster */
+  .bet-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .bet-btn-ctrl {
+    background: #1e293b; border: 1px solid #334155; color: #fff;
+    width: 45px; height: 45px; border-radius: 12px; font-size: 24px; font-weight: 300;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+  }
+  .bet-btn-ctrl:active { transform: scale(0.9); background: var(--gold-dark); }
+  .bet-display-box {
+    flex: 1; background: #000; height: 45px; border-radius: 12px; border: 1px solid var(--gold-dark);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .bet-display-label { font-size: 9px; color: var(--gold-main); letter-spacing: 1px; }
+  .bet-display-val { font-family: var(--font-digital); font-size: 16px; color: #fff; }
+  .btn-max { background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); border: none; color: #000; font-weight: 800; font-size: 12px; }
+
+  /* Action Buttons */
+  .actions-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .action-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    height: 60px; border-radius: 14px; border: none; font-family: var(--font-ui); cursor: pointer;
+    text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: relative; overflow: hidden;
+  }
+  .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 5px rgba(0,0,0,0.5); }
+  .action-btn:disabled { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
+  .action-btn i { font-size: 18px; }
+  .action-btn span { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
+
+  .btn-info { background: #334155; color: #fff; }
+  .btn-manual { background: linear-gradient(135deg, #1e293b, #0f172a); color: var(--gold-light); border: 1px solid var(--gold-dark); }
+  .btn-auto { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+  
+  .btn-spin-infinity { background: linear-gradient(135deg, var(--success), #16a34a); color: #fff; }
+  .btn-spin-infinity.active { background: linear-gradient(135deg, var(--danger), #b91c1c); animation: pulseAlert 1s infinite alternate; }
+  
+  @keyframes pulseAlert { 100% { box-shadow: 0 0 20px var(--danger); } }
+
+  /* =========================================
+     OVERLAYS & MODALS
+     ========================================= */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(5px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 5000; opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px;
+  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
+
+  .modal-panel { background: var(--bg-panel); border: 2px solid var(--gold-main); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; position: relative; }
+  .modal-title { font-family: var(--font-title); color: var(--gold-light); text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
+  
+  /* Paytable */
+  .paytable-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .pt-item { background: #000; padding: 8px; border-radius: 8px; text-align: center; border: 1px solid #333; }
+  .pt-icon { font-size: 24px; }
+  .pt-val { color: var(--gold-light); font-family: var(--font-digital); font-size: 12px; margin-top: 4px; }
+  .pt-info { font-size: 11px; color: var(--text-muted); line-height: 1.5; text-align: center; }
+  .btn-close-modal { width: 100%; padding: 12px; background: var(--gold-main); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; }
+
+  /* Jackpot UI */
+  .jackpot-wrapper { text-align: center; transform: scale(0.5); opacity: 0; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .overlay.show .jackpot-wrapper { transform: scale(1); opacity: 1; }
+  .jp-tier { font-family: var(--font-title); font-size: clamp(3rem, 12vw, 5rem); font-weight: 800; text-transform: uppercase; line-height: 1; margin-bottom: 10px; }
+  .jp-tier.super { color: #ffeb3b; text-shadow: 0 0 20px #ff9800, 0 0 40px #ff3d00; animation: jpPulse 0.5s infinite alternate; }
+  .jp-tier.mega { color: #d500f9; text-shadow: 0 0 20px #aa00ff, 0 0 40px #d500f9; }
+  .jp-tier.mini { color: #00e5ff; text-shadow: 0 0 20px #00b0ff, 0 0 40px #00e5ff; }
+  .jp-win-amount { font-family: var(--font-digital); font-size: clamp(2rem, 8vw, 3.5rem); color: #fff; font-weight: 700; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+  
+  @keyframes jpPulse { 100% { transform: scale(1.05); } }
+
+  /* Zonk UI */
+  .zonk-icon { font-size: 5rem; animation: bombShake 0.4s infinite; }
+  .zonk-title { color: var(--danger); font-family: var(--font-title); font-size: 2.5rem; text-shadow: 0 0 20px red; margin: 10px 0; }
+  .zonk-loss { font-family: var(--font-digital); font-size: 2rem; color: #fff; }
+  @keyframes bombShake { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 75%{transform:rotate(10deg);} }
+
+  /* Deposit Modal Tambahan */
+  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
   .btn-preset {
     background: #1e293b; border: 1px solid #334155; color: var(--gold-light);
-    padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
-    transition: 0.2s; font-family: var(--font-digital);
+    padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;
+    font-family: var(--font-digital); transition: 0.2s;
   }
-  .btn-preset:hover, .btn-preset.active {
+  .btn-preset.active, .btn-preset:hover {
     background: var(--gold-dark); color: #fff; border-color: var(--gold-main);
   }
-
   .input-custom {
-    width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; 
-    color: #fff; border-radius: 8px; text-align: center; margin-bottom: 20px;
+    width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
+    color: #fff; border-radius: 8px; text-align: center; margin-bottom: 15px;
     font-family: var(--font-digital); font-size: 16px;
   }
   .input-custom:focus { outline: none; border-color: var(--gold-main); }
+  #qrcode { background: white; padding: 10px; border-radius: 10px; display: inline-block; border: 3px solid var(--gold-main); margin-bottom: 15px;}
   
-  .input-text {
-    width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; 
-    color: #fff; border-radius: 8px; margin-bottom: 15px;
-    font-family: var(--font-ui); font-size: 14px; text-align: left;
+  .btn-action-primary {
+    background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; width: 100%; padding: 12px;
+    border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui);
   }
-  .input-text:focus { outline: none; border-color: var(--gold-main); }
-  .input-label { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: 1px;}
-
-  .btn-close-modal {
-    position: absolute; top: 15px; right: 20px; background: transparent; border: none;
-    color: var(--text-muted); font-size: 28px; cursor: pointer;
+  .btn-action-success {
+    background: var(--success); color: white; width: 100%; padding: 12px;
+    border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-bottom: 10px; font-family: var(--font-ui);
   }
-  .btn-close-modal:hover { color: var(--danger); }
-  
-  #qrcode {
-    background: white; padding: 15px; display: inline-block; 
-    border-radius: 12px; margin: 15px 0; border: 3px solid var(--gold-main);
+  .btn-action-cancel {
+    background: transparent; color: var(--text-muted); width: 100%; padding: 10px;
+    border: none; font-weight: bold; cursor: pointer; font-family: var(--font-ui);
   }
 
-  /* LIST RIWAYAT TRANSAKSI */
-  .history-list {
-    max-height: 350px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .history-item {
-    background: #0f172a;
-    border: 1px solid #334155;
-    padding: 12px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .hist-details { display: flex; flex-direction: column; gap: 4px; }
-  .hist-title { font-size: 12px; font-weight: bold; color: #fff; }
-  .hist-date { font-size: 10px; color: var(--text-muted); }
-  .hist-amount { font-family: var(--font-digital); font-size: 14px; font-weight: bold; }
-  .amount-in { color: var(--success); }
-  .amount-out { color: var(--danger); }
-  .badge-pending { background: #eab308; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; width: max-content;}
-  .badge-approved { background: var(--success); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; width: max-content;}
-  .badge-rejected { background: var(--danger); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; width: max-content;}
-
-  /* 🏆 LEADERBOARD MODAL STYLES */
-  .leaderboard-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; }
-  .lb-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #0f172a; border-radius: 8px; border: 1px solid #1e293b;}
-  .lb-rank { font-family: var(--font-title); font-size: 16px; font-weight: bold; color: var(--text-muted); width: 35px; text-align: center; }
-  .lb-rank.rank-1 { color: #ffd700; font-size: 22px; text-shadow: 0 0 10px #ffd700; }
-  .lb-rank.rank-2 { color: #c0c0c0; font-size: 20px; text-shadow: 0 0 8px #c0c0c0; }
-  .lb-rank.rank-3 { color: #cd7f32; font-size: 18px; text-shadow: 0 0 8px #cd7f32; }
-  .lb-name { flex: 1; font-weight: bold; font-size: 14px; margin-left: 10px;}
-  .lb-score { font-family: var(--font-digital); color: var(--gold-light); font-weight: bold; }
-
-  /* FLOATING CS BUTTON */
-  .floating-cs {
-    position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white;
-    padding: 12px 20px; border-radius: 50px; font-family: var(--font-ui); font-weight: 800;
-    font-size: 14px; text-decoration: none; box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-    display: flex; align-items: center; gap: 8px; z-index: 1000; transition: 0.3s;
-  }
-  .floating-cs:hover { transform: scale(1.05); box-shadow: 0 5px 25px rgba(37, 211, 102, 0.6); }
+  canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
 </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="lobby-header">
-    <div class="brand-logo">🎰 ROYAL CASINO</div>
-    <div class="header-actions">
-      <button class="btn-logout" onclick="logout()">KELUAR</button>
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- TOP BAR: PROFILE, BALANCE & EXIT -->
+  <header class="top-bar">
+    <button onclick="saveAndExit()" id="btnExit" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 10px;">⬅ KEMBALI</button>
+    
+    <div class="player-profile" style="margin-left: 10px;">
+      <div class="avatar">👤</div>
+      <div class="level-info">
+        <div class="level-text" id="levelDisplay">LEVEL 1</div>
+        <div class="exp-bar-bg"><div class="exp-bar-fill" id="expFill"></div></div>
+      </div>
+    </div>
+    
+    <div class="balance-display" style="flex: 1;">
+      <div class="balance-title">CREDITS</div>
+      <div class="balance-amount" id="balanceDisplay">0</div>
+      <button class="btn-topup" onclick="openDepositModal()">+ DEPOSIT</button>
     </div>
   </header>
 
-  <!-- Ticker Kemenangan / Pengumuman -->
-  <div class="ticker-wrap">
-    <span>📢</span>
-    <div class="ticker-content">
-      🔥 Player_88 baru saja memenangkan SUPER JACKPOT 5.000.000 Credits dari Fruit Flip! &nbsp;&nbsp;&nbsp; 💸 SultanX baru saja melakukan Penarikan Dana 2.500.000! &nbsp;&nbsp;&nbsp; 🏆 Budi_Vip berhasil mencapai Level 10! &nbsp;&nbsp;&nbsp; 🎁 Klaim Bonus Harian Anda di Profil sekarang juga!
-    </div>
-  </div>
-
-  <!-- Main Dashboard -->
-  <main class="dashboard-section">
-    <!-- Profil Card -->
-    <div class="profile-card">
-      <div class="user-info">
-        <div class="avatar-large">👤</div>
-        <div class="user-details">
-          <h2 id="displayUsername">Player</h2>
-          <div class="user-level" id="displayLevel">LEVEL 1</div>
-          <button class="btn-edit-profile" onclick="openProfileModal()">✏️ Edit Info Profil</button>
-          
-          <!-- Tombol Klaim Bonus Harian -->
-          <button class="btn-bonus" id="btnDailyClaim" onclick="claimDailyBonus()">🎁 KLAIM BONUS (5.000)</button>
-        </div>
-      </div>
-      <div class="wallet-info">
-        <div class="wallet-label">TOTAL CREDITS</div>
-        <div class="wallet-balance" id="displayBalance">0</div>
-        <div class="wallet-actions">
-          <button class="btn-topup" onclick="openDepositModal()">+ DEPOSIT</button>
-          <button class="btn-withdraw" onclick="openWithdrawModal()">- TARIK DANA</button>
-          <button class="btn-history" onclick="openHistoryModal()">📜 RIWAYAT</button>
-          
-          <!-- Tombol Papan Peringkat -->
-          <button class="btn-leaderboard" onclick="openLeaderboardModal()">🏆 TOP GLOBAL</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pilihan Game -->
-    <h3 class="section-title">PERMAINAN EKSKLUSIF</h3>
-    <div class="games-grid">
-      <div class="game-card" onclick="window.location.href='game.html'">
-        <div class="game-thumb">🍒👑🍋</div>
-        <div class="game-info">
-          <div class="game-title">FRUIT FLIP SLOT</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">5x5 Grid Multiplier</p>
-          <button class="btn-play">MAIN SEKARANG</button>
-        </div>
-      </div>
-      
-      <div class="game-card" style="opacity: 0.6; cursor: not-allowed;">
-        <div class="game-thumb" style="filter: grayscale(1);">🃏</div>
-        <div class="game-info">
-          <div class="game-title">BLACKJACK VIP</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Segera Hadir</p>
-          <button class="btn-play" style="background: #334155; color: #94a3b8;" disabled>LOCKED</button>
-        </div>
-      </div>
+  <!-- MAIN GAME BOARD -->
+  <main class="machine-container">
+    <div class="slot-frame">
+      <div class="grid-5x5" id="board"></div>
     </div>
   </main>
 
-  <a href="https://wa.me/6281234567890" target="_blank" class="floating-cs">💬 HUBUNGI CS</a>
+  <!-- BOTTOM CONTROL CONSOLE -->
+  <footer class="control-console">
+    <!-- Digital Information Board -->
+    <div class="info-banner">
+      <div class="info-text" id="infoText">WELCOME TO ROYAL CASINO</div>
+    </div>
 
-  <!-- ================= MODALS ================= -->
+    <!-- Bet Controls -->
+    <div class="bet-row">
+      <button class="bet-btn-ctrl" onclick="gameUI.changeBet(-1)">-</button>
+      <div class="bet-display-box">
+        <span class="bet-display-label">CURRENT BET</span>
+        <span class="bet-display-val" id="betDisplay">0</span>
+      </div>
+      <button class="bet-btn-ctrl" onclick="gameUI.changeBet(1)">+</button>
+      <button class="bet-btn-ctrl btn-max" onclick="gameUI.maxBet()">MAX</button>
+    </div>
 
-  <!-- MODAL DEPOSIT QRIS -->
-  <div class="modal-overlay" id="depositModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeDepositModal()">×</button>
-      <h2 style="font-family: var(--font-title); color: var(--gold-main); text-align: center; margin-bottom: 25px;">TOP UP CREDITS</h2>
+    <!-- Action Buttons -->
+    <div class="actions-row">
+      <button class="action-btn btn-info" onclick="gameUI.showPaytable()">
+        <i>ℹ️</i><span>INFO</span>
+      </button>
+      <button class="action-btn btn-manual" id="btnManual" onclick="gameEngine.startSpin('manual')">
+        <i>👆</i><span>MANUAL</span>
+      </button>
+      <button class="action-btn btn-auto" id="btnAutoFast" onclick="gameEngine.startSpin('fast')">
+        <i>⚡</i><span>FAST</span>
+      </button>
+      <button class="action-btn btn-spin-infinity" id="btnAutoLoop" onclick="gameEngine.toggleAutoSpin()">
+        <i id="loopIcon">↻</i><span id="loopText">AUTO SPIN</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- MODAL: PAYTABLE -->
+  <div class="overlay" id="paytableModal" onclick="this.classList.remove('show')">
+    <div class="modal-panel" onclick="event.stopPropagation()">
+      <h2 class="modal-title">PAYTABLE</h2>
+      <div class="paytable-grid" id="paytableGrid">
+        <!-- Diisi via JS sesuai CONFIG -->
+      </div>
+      <div class="pt-info">
+        <b>Match 3+ on any line (Horz, Vert, Diag)</b><br>
+        Diagonal pays x0.5. <br>
+        Lose 4x in a row? Watch out for the Zonk Bomb! 💣
+      </div>
+      <button class="btn-close-modal" onclick="document.getElementById('paytableModal').classList.remove('show')">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- MODAL: DEPOSIT QRIS -->
+  <div class="overlay" id="depositModal" onclick="closeDepositModal()">
+    <div class="modal-panel" onclick="event.stopPropagation()">
+      <h2 class="modal-title" style="margin-bottom: 15px;">TOP UP CREDITS</h2>
       
+      <!-- Langkah 1: Pilih Nominal -->
       <div id="depositStep1">
-        <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Pilih Nominal Deposit</p>
+        <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Pilih Nominal Deposit</p>
         <div class="preset-grid">
           <button class="btn-preset" onclick="setNominal(25000)">25.000</button>
           <button class="btn-preset" onclick="setNominal(50000)">50.000</button>
@@ -496,420 +345,728 @@
           <button class="btn-preset" onclick="setNominal(500000)">500.000</button>
         </div>
         <input type="number" id="customAmount" class="input-custom" placeholder="Nominal Lain (Min. 10.000)">
-        <button class="btn-play" onclick="generateQRIS()">GENERATE QRIS</button>
+        <button class="btn-action-primary" onclick="generateQRIS()">GENERATE QRIS</button>
+        <button class="btn-action-cancel" onclick="closeDepositModal()">TUTUP</button>
       </div>
 
+      <!-- Langkah 2: Scan QRIS -->
       <div id="depositStep2" style="display: none; text-align: center;">
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 5px;">Total Pembayaran:</p>
-        <p style="font-size: 24px; color: var(--gold-light); margin-bottom: 10px; font-weight: bold; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">Total Pembayaran:</p>
+        <p style="font-size: 20px; color: var(--gold-light); margin-bottom: 10px; font-weight: bold; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
+        
         <div id="qrcode"></div>
-        <p style="font-size: 11px; color: var(--danger); margin-bottom: 20px;">*Wajib transfer sesuai nominal agar dapat diproses otomatis oleh Admin.</p>
-        <button class="btn-play" style="background: var(--success); color: white; margin-bottom: 10px;" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
-        <button class="btn-logout" style="width: 100%; border: none; color: var(--text-muted);" onclick="resetDepositModal()">Batal / Ubah Nominal</button>
+        
+        <p style="font-size: 10px; color: var(--danger); margin-bottom: 15px;">*Wajib transfer sesuai nominal agar diproses otomatis oleh Admin.</p>
+        
+        <button class="btn-action-success" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
+        <button class="btn-action-cancel" onclick="resetDepositModal()">Batal / Ubah Nominal</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL WITHDRAWAL -->
-  <div class="modal-overlay" id="withdrawModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeWithdrawModal()">×</button>
-      <h2 style="font-family: var(--font-title); color: var(--danger); text-align: center; margin-bottom: 25px;">TARIK DANA</h2>
-      <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 15px;">Minimal Penarikan: 50.000 Credits</p>
-      
-      <span class="input-label">Nominal Penarikan</span>
-      <input type="number" id="wdAmount" class="input-custom" placeholder="Contoh: 100000" style="text-align: left;">
-      <span class="input-label">Informasi Tujuan (Bank/E-Wallet & Nama)</span>
-      <input type="text" id="wdBankDetails" class="input-text" placeholder="Contoh: BCA 12345678 a.n Budi">
-      
-      <button class="btn-play" style="background: linear-gradient(180deg, var(--danger), #b91c1c); color: white;" id="btnConfirmWD" onclick="submitWithdraw()">AJUKAN PENARIKAN</button>
+  <!-- MODAL: JACKPOT -->
+  <div class="overlay" id="jackpotModal" onclick="gameUI.closeJackpot()">
+    <div class="jackpot-wrapper">
+      <div class="jp-tier" id="jpTitle">SUPER</div>
+      <div class="jp-win-amount" id="jpAmount">0</div>
+      <div style="color:#aaa; font-size:12px; margin-top:20px;">Tap anywhere to continue</div>
     </div>
   </div>
 
-  <!-- MODAL EDIT PROFIL -->
-  <div class="modal-overlay" id="profileModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeProfileModal()">×</button>
-      <h2 style="font-family: var(--font-title); color: var(--info); text-align: center; margin-bottom: 25px;">INFO PROFIL</h2>
-      
-      <span class="input-label">Nama Lengkap Sesuai Rekening</span>
-      <input type="text" id="profFullName" class="input-text" placeholder="Masukkan nama lengkap">
-      <span class="input-label">Nomor HP / WhatsApp</span>
-      <input type="text" id="profPhone" class="input-text" placeholder="08xxxxxxxx">
-      <span class="input-label">Akun Bank Utama (Opsional)</span>
-      <input type="text" id="profBank" class="input-text" placeholder="BCA / DANA / MANDIRI - No Rekening">
-      
-      <button class="btn-play" style="background: linear-gradient(180deg, var(--info), #1d4ed8); color: white;" id="btnSaveProfile" onclick="saveProfile()">SIMPAN PROFIL</button>
+  <!-- MODAL: ZONK BOMB -->
+  <div class="overlay" id="zonkModal" onclick="gameUI.closeZonk()">
+    <div class="jackpot-wrapper">
+      <div class="zonk-icon">💣</div>
+      <div class="zonk-title">ZONK BOMB</div>
+      <div class="zonk-loss" id="zonkAmount">- 0</div>
+      <div style="color:#aaa; font-size:12px; margin-top:20px;">Your balance took a hit!</div>
     </div>
   </div>
 
-  <!-- MODAL RIWAYAT TRANSAKSI -->
-  <div class="modal-overlay" id="historyModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeHistoryModal()">×</button>
-      <h2 style="font-family: var(--font-title); color: var(--gold-light); text-align: center; margin-bottom: 10px;">RIWAYAT TRANSAKSI</h2>
+<script src="api.js"></script>
+<script>
+/**
+ * ==============================================================
+ * 0. AUTHENTICATION & DATA BINDING
+ * ==============================================================
+ */
+const userJson = localStorage.getItem('currentUser');
+if (!userJson) {
+  window.location.href = 'auth.html';
+}
+const currentUser = JSON.parse(userJson);
+
+// Variabel untuk menyimpan RTP spesifik pemain
+let playerWinRate = null;
+
+// Tarik data RTP terbaru dari server dan sinkronkan terus secara background
+async function syncRTP() {
+  try {
+    const db = await api.getDatabase();
+    if (db && db.users) {
+      const freshUser = db.users.find(u => u.username === currentUser.username);
+      if (freshUser && freshUser.winRate !== undefined) {
+        playerWinRate = parseFloat(freshUser.winRate) / 100; // Konversi misal 80 jadi 0.8
+      }
+    }
+  } catch(e) { }
+}
+
+// Panggil saat pertama dimuat, dan jalankan interval agar admin bisa ganti RTP kapan saja tanpa refresh
+syncRTP();
+setInterval(syncRTP, 5000); 
+
+async function saveAndExit() {
+  const btn = document.getElementById('btnExit');
+  btn.disabled = true;
+  btn.textContent = "SAVING...";
+  
+  await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp);
+  
+  window.location.href = 'index.html';
+}
+
+/**
+ * ==============================================================
+ * 1. DEPOSIT SYSTEM LOGIC
+ * ==============================================================
+ */
+let selectedAmount = 0;
+let qrEngine = null;
+
+function openDepositModal() {
+  document.getElementById('depositModal').classList.add('show');
+}
+
+function closeDepositModal() {
+  document.getElementById('depositModal').classList.remove('show');
+  setTimeout(resetDepositModal, 300);
+}
+
+function resetDepositModal() {
+  document.getElementById('depositStep1').style.display = 'block';
+  document.getElementById('depositStep2').style.display = 'none';
+  document.getElementById('customAmount').value = '';
+  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+  selectedAmount = 0;
+}
+
+function setNominal(amount) {
+  selectedAmount = amount;
+  document.getElementById('customAmount').value = amount;
+  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function crc16(str) {
+  let c = 0xFFFF;
+  for(let i = 0; i < str.length; i++) { 
+    c ^= str.charCodeAt(i) << 8; 
+    for(let j = 0; j < 8; j++) { c = ((c & 0x8000) !== 0) ? (c << 1) ^ 0x1021 : c << 1; c &= 0xFFFF; } 
+  }
+  return c.toString(16).toUpperCase().padStart(4, '0');
+}
+
+function generateQRIS() {
+  const inputVal = parseInt(document.getElementById('customAmount').value);
+  if (isNaN(inputVal) || inputVal < 10000) {
+    alert("Minimal deposit adalah 10.000 Credits!");
+    return;
+  }
+  selectedAmount = inputVal;
+
+  const amountStr = selectedAmount.toString();
+  const amountLen = amountStr.length.toString().padStart(2, '0');
+  const mid = '93600915300002827902090000282790';
+  const merch = 'Royal Casino';
+  const merchLen = merch.length.toString().padStart(2, '0');
+  const city = 'Pekanbaru';
+  const cityLen = city.length.toString().padStart(2, '0');
+  const postal = '28294';
+  const postalLen = postal.length.toString().padStart(2, '0');
+  
+  let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
+  const qrisString = raw + crc16(raw);
+
+  const qrcodeContainer = document.getElementById('qrcode');
+  if (qrEngine) {
+    qrEngine.clear();
+    qrEngine.makeCode(qrisString);
+  } else {
+    qrcodeContainer.innerHTML = '';
+    qrEngine = new QRCode(qrcodeContainer, {
+      text: qrisString, width: 160, height: 160,
+      colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
+  document.getElementById('depositStep1').style.display = 'none';
+  document.getElementById('depositStep2').style.display = 'block';
+}
+
+async function submitDeposit() {
+  const btn = document.getElementById('btnConfirmDeposit');
+  btn.textContent = "MEMPROSES...";
+  btn.disabled = true;
+
+  try {
+    const db = await api.getDatabase();
+    if (!db) throw new Error("Koneksi gagal");
+    if (!db.deposits) db.deposits = [];
+
+    const newDeposit = {
+      date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
+      username: currentUser.username,
+      method: 'QRIS',
+      amount: selectedAmount,
+      status: 'pending'
+    };
+
+    db.deposits.push(newDeposit);
+    const isSuccess = await api.updateDatabase(db);
+
+    if (isSuccess) {
+      alert("✅ Deposit Terkirim!\nSilakan hubungi Admin atau tunggu beberapa saat hingga disetujui. Refresh halaman ini nanti untuk update saldo.");
+      closeDepositModal();
+    } else {
+      alert("❌ Terjadi kesalahan saat menyimpan ke server.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Gagal terhubung ke server database.");
+  } finally {
+    btn.textContent = "SAYA SUDAH TRANSFER";
+    btn.disabled = false;
+  }
+}
+
+/**
+ * ==============================================================
+ * 2. GAME CONFIGURATION (PENGATURAN TERPUSAT)
+ * ==============================================================
+ */
+const CONFIG = {
+  initialBalance: 100000,
+  betSteps: [100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000],
+  
+  symbols: [
+    { id: 'cherry', icon: '🍒', multiplier: 1, weight: 60 },
+    { id: 'lemon',  icon: '🍋', multiplier: 2, weight: 40 },
+    { id: 'melon',  icon: '🍉', multiplier: 4, weight: 25 },
+    { id: 'grape',  icon: '🍇', multiplier: 8, weight: 12 },
+    { id: 'star',   icon: '⭐', multiplier: 20, weight: 5 },
+    { id: 'crown',  icon: '👑', multiplier: 50, weight: 1 } 
+  ],
+
+  mechanics: {
+    pityChance: 0.15,            
+    zonkTriggerStreak: 4,        
+    zonkChance: 0.25,            
+    zonkPenaltyMinPct: 0.001,    
+    zonkPenaltyMaxPct: 0.01      
+  },
+
+  leveling: {
+    expPerBetRatio: 0.01,        
+    baseExpForLevel2: 100,       
+    expMultiplierPerLevel: 1.5   
+  },
+
+  timings: {
+    autoNormalDelay: 120, 
+    autoFastDelay: 30,    
+    revealPause: 500,     
+    autoSpinPause: 1000   
+  }
+};
+
+/**
+ * ==============================================================
+ * 3. GAME STATE & CORE LOGIC
+ * ==============================================================
+ */
+const calcExpNeeded = (level) => {
+  return Math.floor(CONFIG.leveling.baseExpForLevel2 * Math.pow(CONFIG.leveling.expMultiplierPerLevel, level - 1));
+};
+
+const gameState = {
+  balance: currentUser.balance !== undefined ? currentUser.balance : CONFIG.initialBalance,
+  currentBet: CONFIG.betSteps[2],
+  lossStreak: 0,
+  
+  level: currentUser.level || 1,
+  currentExp: currentUser.exp || 0,
+  expNeeded: calcExpNeeded(currentUser.level || 1),
+
+  gridData: [], 
+  cardsFlipped: 0,
+  canFlipManual: false,
+  isSpinning: false,
+  isAutoLoop: false,
+  autoCloseTimer: null
+};
+
+const PAYLINES = [
+  { line: [0,1,2,3,4], type: 'H' }, { line: [5,6,7,8,9], type: 'H' },
+  { line: [10,11,12,13,14], type: 'H' }, { line: [15,16,17,18,19], type: 'H' },
+  { line: [20,21,22,23,24], type: 'H' },
+  { line: [0,5,10,15,20], type: 'V' }, { line: [1,6,11,16,21], type: 'V' },
+  { line: [2,7,12,17,22], type: 'V' }, { line: [3,8,13,18,23], type: 'V' },
+  { line: [4,9,14,19,24], type: 'V' },
+  { line: [0,6,12,18,24], type: 'D' }, { line: [4,8,12,16,20], type: 'D' }
+];
+
+/**
+ * ==============================================================
+ * 4. UI CONTROLLER (Mengatur Tampilan)
+ * ==============================================================
+ */
+const gameUI = {
+  elements: {
+    board: document.getElementById('board'),
+    balance: document.getElementById('balanceDisplay'),
+    bet: document.getElementById('betDisplay'),
+    info: document.getElementById('infoText'),
+    level: document.getElementById('levelDisplay'),
+    expFill: document.getElementById('expFill'),
+    btnManual: document.getElementById('btnManual'),
+    btnFast: document.getElementById('btnAutoFast'),
+    btnLoop: document.getElementById('btnAutoLoop'),
+    paytableGrid: document.getElementById('paytableGrid'),
+    ctrlBtns: document.querySelectorAll('.bet-btn-ctrl, .btn-info')
+  },
+  cardsDOM: [],
+
+  init() {
+    this.updateBalanceBet();
+    this.updateLevelUI();
+    this.buildBoard();
+    this.buildPaytable();
+  },
+
+  updateBalanceBet() {
+    this.elements.balance.textContent = gameState.balance.toLocaleString();
+    this.elements.bet.textContent = gameState.currentBet.toLocaleString();
+  },
+
+  updateLevelUI() {
+    this.elements.level.textContent = `LEVEL ${gameState.level}`;
+    const pct = Math.min((gameState.currentExp / gameState.expNeeded) * 100, 100);
+    this.elements.expFill.style.width = `${pct}%`;
+  },
+
+  setBanner(text, isWin = false) {
+    this.elements.info.textContent = text;
+    if (isWin) this.elements.info.classList.add('win-alert');
+    else this.elements.info.classList.remove('win-alert');
+  },
+
+  buildBoard() {
+    this.elements.board.innerHTML = '';
+    this.cardsDOM = [];
+    for (let i = 0; i < 25; i++) {
+      const c = document.createElement('div');
+      c.className = 'card'; c.dataset.index = i;
+      c.innerHTML = `<div class="card-face card-back"></div><div class="card-face card-front"></div>`;
       
-      <div class="history-list" id="historyListContainer">
-        <div style="text-align: center; color: var(--gold-main); font-size: 12px; padding: 20px;">Memuat data...</div>
+      c.addEventListener('mouseenter', () => gameEngine.manualFlip(i));
+      c.addEventListener('mousedown', () => gameEngine.manualFlip(i));
+      
+      this.elements.board.appendChild(c);
+      this.cardsDOM.push(c);
+    }
+
+    this.elements.board.addEventListener('touchmove', (e) => {
+      if(!gameState.canFlipManual) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (elem && elem.closest('.card')) { gameEngine.manualFlip(elem.closest('.card').dataset.index); }
+    }, { passive: false });
+  },
+
+  buildPaytable() {
+    this.elements.paytableGrid.innerHTML = CONFIG.symbols.map(s => `
+      <div class="pt-item">
+        <div class="pt-icon">${s.icon}</div>
+        <div class="pt-val">x${s.multiplier}</div>
       </div>
-    </div>
-  </div>
+    `).join('');
+  },
 
-  <!-- MODAL TOP GLOBAL (LEADERBOARD) -->
-  <div class="modal-overlay" id="leaderboardModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeLeaderboardModal()">×</button>
-      <h2 style="font-family: var(--font-title); color: #ffd700; text-align: center; margin-bottom: 10px;">🏆 TOP SULTAN GLOBAL</h2>
-      <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 20px;">10 Pemain dengan Saldo Tertinggi</p>
-      
-      <div class="leaderboard-list" id="leaderboardContainer">
-        <div style="text-align: center; color: var(--gold-main); font-size: 12px; padding: 20px;">Mencari Sultan...</div>
-      </div>
-    </div>
-  </div>
-
-  <script src="api.js"></script>
-  <script>
-    const userJson = localStorage.getItem('currentUser');
-    if (!userJson) window.location.href = 'auth.html';
-    let user = JSON.parse(userJson);
-    let selectedAmount = 0;
-    let qrEngine = null;
-
-    function updateUI() {
-      document.getElementById('displayUsername').textContent = user.username.toUpperCase();
-      document.getElementById('displayLevel').textContent = `LEVEL ${user.level || 1}`;
-      document.getElementById('displayBalance').textContent = (user.balance || 0).toLocaleString();
+  changeBet(dir) {
+    if (gameState.isSpinning) return;
+    let idx = CONFIG.betSteps.indexOf(gameState.currentBet);
+    if (idx === -1) idx = 0;
+    idx += dir;
+    if (idx >= 0 && idx < CONFIG.betSteps.length) { 
+      gameState.currentBet = CONFIG.betSteps[idx]; 
+      this.updateBalanceBet(); 
     }
+  },
 
-    async function syncDataWithServer() {
-      try {
-        const db = await api.getDatabase();
-        if(db && db.users) {
-          const freshUser = db.users.find(u => u.username === user.username);
-          if(freshUser) {
-            user.balance = freshUser.balance;
-            user.fullName = freshUser.fullName || user.fullName;
-            user.phone = freshUser.phone || user.phone;
-            user.bank = freshUser.bank || user.bank;
-            user.level = freshUser.level || user.level;
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            updateUI();
-          }
-        }
-      } catch(e) { console.error("Gagal sinkronisasi data", e); }
+  maxBet() {
+    if (gameState.isSpinning) return;
+    gameState.currentBet = CONFIG.betSteps[CONFIG.betSteps.length - 1]; 
+    this.updateBalanceBet();
+  },
+
+  showPaytable() { document.getElementById('paytableModal').classList.add('show'); },
+
+  lockControls(locked) {
+    gameState.isSpinning = locked;
+    this.elements.btnManual.disabled = locked;
+    this.elements.btnFast.disabled = locked;
+    this.elements.ctrlBtns.forEach(b => b.disabled = locked);
+    
+    if (!gameState.isAutoLoop) this.elements.btnLoop.disabled = locked;
+  },
+
+  updateAutoLoopBtn() {
+    const icon = document.getElementById('loopIcon');
+    const text = document.getElementById('loopText');
+    if (gameState.isAutoLoop) {
+      this.elements.btnLoop.classList.add('active');
+      icon.style.animation = "spinLogo 1s linear infinite";
+      text.textContent = 'STOP AUTO';
+    } else {
+      this.elements.btnLoop.classList.remove('active');
+      icon.style.animation = "none";
+      text.textContent = 'AUTO SPIN';
     }
+  },
 
-    /* --- BONUS HARIAN --- */
-    function checkDailyBonus() {
-      const lastClaim = localStorage.getItem('lastClaimDate_' + user.username);
-      const today = new Date().toDateString();
-      const btn = document.getElementById('btnDailyClaim');
-      
-      if (lastClaim === today) {
-        btn.disabled = true;
-        btn.innerHTML = '✅ BONUS DIAMBIL';
-      } else {
-        btn.disabled = false;
-        btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
-      }
+  resetBoardVisuals() {
+    this.elements.board.classList.remove('has-win');
+    this.cardsDOM.forEach(c => c.classList.remove('flipped', 'win'));
+  },
+
+  showJackpot(type, amount, cssClass) {
+    const modal = document.getElementById('jackpotModal');
+    document.getElementById('jpTitle').className = `jp-tier ${cssClass}`;
+    document.getElementById('jpTitle').textContent = type;
+    modal.classList.add('show');
+    
+    const amtEl = document.getElementById('jpAmount');
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / 1500, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      amtEl.textContent = "+ " + Math.floor(ease * amount).toLocaleString();
+      if (progress < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+
+    confettiEngine.start(40, 400); 
+
+    if (gameState.isAutoLoop) {
+      gameState.autoCloseTimer = setTimeout(() => this.closeJackpot(), 3500);
     }
+  },
 
-    async function claimDailyBonus() {
-      const btn = document.getElementById('btnDailyClaim');
-      btn.disabled = true;
-      btn.innerHTML = 'MEMPROSES...';
+  closeJackpot() {
+    clearTimeout(gameState.autoCloseTimer);
+    document.getElementById('jackpotModal').classList.remove('show');
+    confettiEngine.stop();
+    
+    if (gameState.isAutoLoop) setTimeout(() => gameEngine.startSpin('loop'), CONFIG.timings.autoSpinPause);
+    else this.lockControls(false);
+  },
 
-      try {
-        const db = await api.getDatabase();
-        if(db && db.users) {
-          const userIndex = db.users.findIndex(u => u.username === user.username);
-          if (userIndex !== -1) {
-            let currentBal = parseInt(db.users[userIndex].balance) || 0;
-            db.users[userIndex].balance = currentBal + 5000; // Bonus 5K
-            
-            if (await api.updateDatabase(db)) {
-              user.balance = db.users[userIndex].balance;
-              localStorage.setItem('currentUser', JSON.stringify(user));
-              localStorage.setItem('lastClaimDate_' + user.username, new Date().toDateString());
-              
-              alert("🎉 Selamat! Anda mendapatkan 5.000 Credits Bonus Harian!");
-              updateUI();
-              checkDailyBonus();
-            } else {
-              alert("Gagal klaim bonus dari server.");
-              btn.disabled = false;
-              btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
-            }
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        btn.disabled = false;
-        btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
-      }
+  showZonk(amount) {
+    const modal = document.getElementById('zonkModal');
+    document.getElementById('zonkAmount').textContent = `- ${amount.toLocaleString()}`;
+    modal.classList.add('show');
+    
+    if (gameState.isAutoLoop) {
+      gameState.autoCloseTimer = setTimeout(() => this.closeZonk(), 2500);
     }
+  },
 
-    // Inisialisasi awal
-    updateUI();
-    syncDataWithServer();
-    checkDailyBonus();
+  closeZonk() {
+    clearTimeout(gameState.autoCloseTimer);
+    document.getElementById('zonkModal').classList.remove('show');
+    
+    if (gameState.isAutoLoop) setTimeout(() => gameEngine.startSpin('loop'), CONFIG.timings.autoSpinPause);
+    else this.lockControls(false);
+  }
+};
 
-    function logout() { localStorage.removeItem('currentUser'); window.location.href = 'auth.html'; }
+/**
+ * ==============================================================
+ * 5. GAME ENGINE (Logika Inti Permainan)
+ * ==============================================================
+ */
+const gameEngine = {
+  getRandomSymbol() {
+    const totalW = CONFIG.symbols.reduce((s, sym) => s + sym.weight, 0);
+    let r = Math.random() * totalW;
+    for (let sym of CONFIG.symbols) { if (r < sym.weight) return sym; r -= sym.weight; }
+    return CONFIG.symbols[0];
+  },
 
-    /* --- DEPOSIT --- */
-    function openDepositModal() { document.getElementById('depositModal').classList.add('show'); }
-    function closeDepositModal() { document.getElementById('depositModal').classList.remove('show'); setTimeout(resetDepositModal, 300); }
-    function resetDepositModal() {
-      document.getElementById('depositStep1').style.display = 'block';
-      document.getElementById('depositStep2').style.display = 'none';
-      document.getElementById('customAmount').value = '';
-      document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
-      selectedAmount = 0;
-    }
-    function setNominal(amount) {
-      selectedAmount = amount;
-      document.getElementById('customAmount').value = amount;
-      document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-    function crc16(str) {
-      let c = 0xFFFF;
-      for(let i = 0; i < str.length; i++) { 
-        c ^= str.charCodeAt(i) << 8; 
-        for(let j = 0; j < 8; j++) { c = ((c & 0x8000) !== 0) ? (c << 1) ^ 0x1021 : c << 1; c &= 0xFFFF; } 
-      }
-      return c.toString(16).toUpperCase().padStart(4, '0');
-    }
-    function generateQRIS() {
-      const inputVal = parseInt(document.getElementById('customAmount').value);
-      if (isNaN(inputVal) || inputVal < 10000) return alert("Minimal deposit 10.000 Credits!");
-      selectedAmount = inputVal;
-      const amountStr = selectedAmount.toString();
-      const amountLen = amountStr.length.toString().padStart(2, '0');
-      const mid = '93600915300002827902090000282790';
-      const merch = 'Royal Casino';
-      const merchLen = merch.length.toString().padStart(2, '0');
-      const city = 'Pekanbaru';
-      const cityLen = city.length.toString().padStart(2, '0');
-      const postal = '28294';
-      const postalLen = postal.length.toString().padStart(2, '0');
-      
-      let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
-      const qrisString = raw + crc16(raw);
-
-      const qrcodeContainer = document.getElementById('qrcode');
-      if (qrEngine) { qrEngine.clear(); qrEngine.makeCode(qrisString); } 
-      else { qrcodeContainer.innerHTML = ''; qrEngine = new QRCode(qrcodeContainer, { text: qrisString, width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M }); }
-
-      document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
-      document.getElementById('depositStep1').style.display = 'none';
-      document.getElementById('depositStep2').style.display = 'block';
-    }
-    async function submitDeposit() {
-      const btn = document.getElementById('btnConfirmDeposit');
-      btn.textContent = "MEMPROSES..."; btn.disabled = true;
-      try {
-        const db = await api.getDatabase();
-        if (!db) throw new Error("Koneksi gagal");
-        if (!db.deposits) db.deposits = [];
-        db.deposits.push({ date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}), username: user.username, method: 'QRIS', amount: selectedAmount, status: 'pending' });
-        if (await api.updateDatabase(db)) { alert("✅ Bukti Deposit Terkirim!\nTunggu beberapa saat hingga Admin menyetujui."); closeDepositModal(); } 
-        else { alert("❌ Terjadi kesalahan server."); }
-      } catch (error) { alert("Gagal terhubung ke server database."); } 
-      finally { btn.textContent = "SAYA SUDAH TRANSFER"; btn.disabled = false; }
-    }
-
-    /* --- WITHDRAWAL --- */
-    function openWithdrawModal() { document.getElementById('wdBankDetails').value = user.bank || ""; document.getElementById('withdrawModal').classList.add('show'); }
-    function closeWithdrawModal() { document.getElementById('withdrawModal').classList.remove('show'); document.getElementById('wdAmount').value = ''; }
-    async function submitWithdraw() {
-      const wdAmount = parseInt(document.getElementById('wdAmount').value);
-      const wdBank = document.getElementById('wdBankDetails').value.trim();
-      if (isNaN(wdAmount) || wdAmount < 50000) return alert("Minimal penarikan adalah 50.000 Credits!");
-      if (!wdBank) return alert("Mohon lengkapi informasi rekening/E-Wallet tujuan!");
-      if (wdAmount > user.balance) return alert(`Saldo tidak mencukupi!\nSaldo Anda saat ini: ${user.balance.toLocaleString()}`);
-
-      const btn = document.getElementById('btnConfirmWD');
-      btn.textContent = "MEMPROSES..."; btn.disabled = true;
-      try {
-        const db = await api.getDatabase();
-        if (!db) throw new Error("Koneksi gagal");
-        if (!db.withdrawals) db.withdrawals = [];
-        db.withdrawals.push({ date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}), username: user.username, bankDetails: wdBank, amount: wdAmount, status: 'pending' });
-        if (await api.updateDatabase(db)) { alert("✅ Pengajuan Penarikan Dana Berhasil!\nSilakan tunggu Admin memproses dan mentransfer dana ke rekening Anda."); closeWithdrawModal(); } 
-        else { alert("❌ Terjadi kesalahan server."); }
-      } catch (error) { alert("Gagal terhubung ke server database."); } 
-      finally { btn.textContent = "AJUKAN PENARIKAN"; btn.disabled = false; }
-    }
-
-    /* --- EDIT PROFIL --- */
-    function openProfileModal() {
-      document.getElementById('profFullName').value = user.fullName || "";
-      document.getElementById('profPhone').value = user.phone || "";
-      document.getElementById('profBank').value = user.bank || "";
-      document.getElementById('profileModal').classList.add('show');
-    }
-    function closeProfileModal() { document.getElementById('profileModal').classList.remove('show'); }
-    async function saveProfile() {
-      const fullName = document.getElementById('profFullName').value.trim();
-      const phone = document.getElementById('profPhone').value.trim();
-      const bank = document.getElementById('profBank').value.trim();
-      const btn = document.getElementById('btnSaveProfile');
-      btn.textContent = "MENYIMPAN..."; btn.disabled = true;
-      try {
-        const db = await api.getDatabase();
-        if (db && db.users) {
-          const userIndex = db.users.findIndex(u => u.username === user.username);
-          if (userIndex !== -1) {
-            db.users[userIndex].fullName = fullName; db.users[userIndex].phone = phone; db.users[userIndex].bank = bank;
-            if (await api.updateDatabase(db)) {
-              user.fullName = fullName; user.phone = phone; user.bank = bank;
-              localStorage.setItem('currentUser', JSON.stringify(user));
-              alert("✅ Profil berhasil diperbarui!"); closeProfileModal();
-            } else { alert("❌ Gagal menyimpan profil ke server."); }
-          }
-        }
-      } catch (error) { alert("Gagal terhubung ke server database."); } 
-      finally { btn.textContent = "SIMPAN PROFIL"; btn.disabled = false; }
-    }
-
-    /* --- RIWAYAT TRANSAKSI --- */
-    function openHistoryModal() {
-      document.getElementById('historyModal').classList.add('show');
-      loadHistory();
-    }
-    function closeHistoryModal() {
-      document.getElementById('historyModal').classList.remove('show');
+  generateGrid() {
+    let grid = new Array(25).fill(null);
+    
+    // CEK RTP SPESIFIK PEMAIN
+    let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
+    
+    // KALKULASI KEMENANGAN BERDASARKAN RTP
+    let forceWin = (Math.random() < currentChance);
+    
+    if (forceWin) {
+      let tLine = PAYLINES[Math.floor(Math.random() * PAYLINES.length)];
+      let sym = this.getRandomSymbol();
+      let matchCount = Math.random() > 0.85 ? 5 : (Math.random() > 0.5 ? 4 : 3);
+      let startIdx = Math.floor(Math.random() * (6 - matchCount));
+      for(let i=0; i<matchCount; i++) { grid[tLine.line[startIdx + i]] = sym; }
     }
     
-    // Fungsi sederhana parsing tanggal string "DD/MM/YYYY, HH.mm.ss"
-    function parseIdDate(dateStr) {
-      if(!dateStr) return 0;
-      let parts = dateStr.split(',');
-      if(parts.length < 2) return 0;
-      let datePart = parts[0].trim().split('/');
-      let timePart = parts[1].replace('WIB','').trim().replace(/\./g, ':');
-      if(datePart.length === 3) {
-        let d = datePart[0]; let m = datePart[1]; let y = datePart[2];
-        return new Date(`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T${timePart}`).getTime();
+    for (let i = 0; i < 25; i++) { if (!grid[i]) grid[i] = this.getRandomSymbol(); }
+    return grid;
+  },
+
+  addExp() {
+    let expGained = Math.floor(gameState.currentBet * CONFIG.leveling.expPerBetRatio);
+    gameState.currentExp += expGained;
+    if (gameState.currentExp >= gameState.expNeeded) {
+      gameState.level++;
+      gameState.currentExp -= gameState.expNeeded;
+      gameState.expNeeded = Math.floor(gameState.expNeeded * CONFIG.leveling.expMultiplierPerLevel);
+    }
+    gameUI.updateLevelUI();
+  },
+
+  toggleAutoSpin() {
+    if (gameState.isAutoLoop) {
+      gameState.isAutoLoop = false;
+      gameUI.updateAutoLoopBtn();
+      gameUI.setBanner("STOPPING AFTER SPIN...");
+    } else {
+      if (gameState.currentBet > gameState.balance) { 
+        gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
+        openDepositModal(); 
+        return; 
       }
-      return 0;
+      gameState.isAutoLoop = true;
+      gameUI.updateAutoLoopBtn();
+      this.startSpin('loop');
+    }
+  },
+
+  async startSpin(mode) {
+    if (gameState.currentBet > gameState.balance && !gameState.isAutoLoop) { 
+      gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
+      openDepositModal(); 
+      return; 
+    }
+    if (gameState.currentBet > gameState.balance && gameState.isAutoLoop) {
+      gameState.isAutoLoop = false; gameUI.updateAutoLoopBtn();
+      gameUI.setBanner("AUTO STOPPED: NO BALANCE", true);
+      gameUI.lockControls(false); 
+      openDepositModal(); 
+      return;
     }
 
-    async function loadHistory() {
-      const container = document.getElementById('historyListContainer');
-      container.innerHTML = '<div style="text-align: center; color: var(--gold-main); font-size: 12px; padding: 20px;">Memuat data dari server...</div>';
+    gameUI.lockControls(true);
+    gameState.balance -= gameState.currentBet; 
+    this.addExp();
+    gameUI.updateBalanceBet();
+    
+    gameUI.setBanner(gameState.isAutoLoop ? "AUTO SPINNING..." : "GOOD LUCK!");
+    gameUI.resetBoardVisuals();
 
-      try {
-        const db = await api.getDatabase();
-        if (!db) throw new Error("Gagal memuat db");
+    await new Promise(r => setTimeout(r, 250));
 
-        let history = [];
+    gameState.gridData = this.generateGrid();
+    gameUI.cardsDOM.forEach((c, i) => c.querySelector('.card-front').textContent = gameState.gridData[i].icon);
+    
+    gameState.cardsFlipped = 0;
 
-        if (db.deposits) {
-          const myDeposits = db.deposits.filter(d => d.username === user.username).map(d => ({ ...d, type: 'DEPOSIT', amountType: 'in' }));
-          history = history.concat(myDeposits);
-        }
-
-        if (db.withdrawals) {
-          const myWithdrawals = db.withdrawals.filter(w => w.username === user.username).map(w => ({ ...w, type: 'PENARIKAN', amountType: 'out' }));
-          history = history.concat(myWithdrawals);
-        }
-
-        // Urutkan berdasarkan waktu paling baru
-        history.sort((a, b) => parseIdDate(b.date) - parseIdDate(a.date));
-
-        if (history.length === 0) {
-          container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">Belum ada riwayat transaksi.</div>';
-          return;
-        }
-
-        container.innerHTML = history.map(item => {
-          let badgeClass = 'badge-pending';
-          let statusText = 'PENDING';
-          
-          if (item.status === 'approved') {
-            badgeClass = 'badge-approved';
-            statusText = item.type === 'DEPOSIT' ? 'BERHASIL' : 'TERKIRIM';
-          } else if (item.status === 'rejected') {
-            badgeClass = 'badge-rejected';
-            statusText = 'DITOLAK';
-          }
-
-          const sign = item.amountType === 'in' ? '+' : '-';
-          const amountClass = item.amountType === 'in' ? 'amount-in' : 'amount-out';
-
-          return `
-            <div class="history-item">
-              <div class="hist-details">
-                <span class="hist-title">${item.type} ${item.method ? `(${item.method})` : ''}</span>
-                <span class="hist-date">${item.date || '-'}</span>
-                <span class="${badgeClass}">${statusText}</span>
-              </div>
-              <div class="hist-amount ${amountClass}">
-                ${sign}${parseInt(item.amount).toLocaleString()}
-              </div>
-            </div>
-          `;
-        }).join('');
-
-      } catch (error) {
-        console.error(error);
-        container.innerHTML = '<div style="text-align: center; color: var(--danger); font-size: 12px; padding: 20px;">Gagal memuat riwayat.</div>';
+    if (mode === 'manual') {
+      gameState.canFlipManual = true;
+      gameUI.setBanner("SWIPE OR TAP TO REVEAL!");
+    } else {
+      let delay = (mode === 'fast' || mode === 'loop') ? CONFIG.timings.autoFastDelay : CONFIG.timings.autoNormalDelay;
+      for(let i=0; i<25; i++) { 
+        await new Promise(r => setTimeout(r, delay)); 
+        this.autoFlipCard(i); 
       }
     }
+  },
 
-    /* --- LEADERBOARD (PAPAN PERINGKAT) --- */
-    function openLeaderboardModal() {
-      document.getElementById('leaderboardModal').classList.add('show');
-      loadLeaderboard();
+  manualFlip(idx) {
+    if (!gameState.canFlipManual || gameUI.cardsDOM[idx].classList.contains('flipped')) return;
+    gameUI.cardsDOM[idx].classList.add('flipped'); 
+    gameState.cardsFlipped++;
+    if (gameState.cardsFlipped === 25) { 
+      gameState.canFlipManual = false; 
+      setTimeout(() => this.evaluateWin(), CONFIG.timings.revealPause); 
     }
-    function closeLeaderboardModal() { document.getElementById('leaderboardModal').classList.remove('show'); }
+  },
 
-    async function loadLeaderboard() {
-      const container = document.getElementById('leaderboardContainer');
-      container.innerHTML = '<div style="text-align: center; color: var(--gold-main); font-size: 12px; padding: 20px;">Mencari Sultan...</div>';
+  autoFlipCard(idx) {
+    gameUI.cardsDOM[idx].classList.add('flipped'); 
+    gameState.cardsFlipped++;
+    if (gameState.cardsFlipped === 25) { 
+      setTimeout(() => this.evaluateWin(), CONFIG.timings.revealPause); 
+    }
+  },
 
-      try {
-        const db = await api.getDatabase();
-        if (db && db.users) {
-          // Hilangkan admin dan urutkan berdasarkan saldo terbanyak (Top 10)
-          let topUsers = db.users
-            .filter(u => u.username !== 'admin_casino' && u.username !== 'admin')
-            .sort((a, b) => (parseInt(b.balance) || 0) - (parseInt(a.balance) || 0))
-            .slice(0, 10);
-            
-          if (topUsers.length === 0) {
-            container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada pemain.</div>';
-            return;
-          }
+  evaluateWin() {
+    let totalWin = 0;
+    let winningIndices = new Set();
 
-          container.innerHTML = topUsers.map((u, index) => {
-            const rank = index + 1;
-            let rankClass = 'lb-rank';
-            let rankDisplay = `#${rank}`;
-            
-            if (rank === 1) { rankClass += ' rank-1'; rankDisplay = '🥇'; }
-            else if (rank === 2) { rankClass += ' rank-2'; rankDisplay = '🥈'; }
-            else if (rank === 3) { rankClass += ' rank-3'; rankDisplay = '🥉'; }
+    PAYLINES.forEach(pl => {
+      let maxSeq = 1; let currentSeq = 1; 
+      let bestSym = gameState.gridData[pl.line[0]]; 
+      let currSym = gameState.gridData[pl.line[0]];
+      let bestIndices = [pl.line[0]]; let currIndices = [pl.line[0]];
 
-            // Privasi: Sensor sebagian nama (Contoh: Budi => Bud***)
-            const maskedName = u.username.length > 3 ? u.username.substring(0, 3) + '***' : u.username + '***';
-
-            return `
-              <div class="lb-item">
-                <div class="${rankClass}">${rankDisplay}</div>
-                <div class="lb-name">${maskedName} <span style="font-size:9px; color:var(--text-muted); font-weight:normal; margin-left:5px;">Lvl ${u.level || 1}</span></div>
-                <div class="lb-score">${(parseInt(u.balance)||0).toLocaleString()}</div>
-              </div>
-            `;
-          }).join('');
+      for(let i=1; i<5; i++) {
+        if(gameState.gridData[pl.line[i]].id === currSym.id) {
+          currentSeq++; currIndices.push(pl.line[i]);
+        } else {
+          if(currentSeq > maxSeq) { maxSeq = currentSeq; bestSym = currSym; bestIndices = [...currIndices]; }
+          currSym = gameState.gridData[pl.line[i]]; currentSeq = 1; currIndices = [pl.line[i]];
         }
-      } catch (e) {
-        container.innerHTML = '<div style="text-align: center; color: var(--danger); font-size: 12px;">Gagal memuat papan peringkat.</div>';
       }
+      if(currentSeq > maxSeq) { maxSeq = currentSeq; bestSym = currSym; bestIndices = [...currIndices]; }
+
+      if (maxSeq >= 3) {
+        let lengthMult = maxSeq === 5 ? 10 : (maxSeq === 4 ? 3 : 1);
+        let diagPenalty = pl.type === 'D' ? 0.5 : 1;
+        let lineWin = Math.floor(gameState.currentBet * bestSym.multiplier * lengthMult * diagPenalty);
+        
+        totalWin += lineWin;
+        bestIndices.forEach(idx => winningIndices.add(idx));
+      }
+    });
+
+    if (totalWin > 0) {
+      this.handleWin(totalWin, winningIndices);
+    } else {
+      this.handleLoss();
     }
-  </script>
+  },
+
+  handleWin(amount, winningIndices) {
+    gameState.lossStreak = 0;
+    gameState.balance += amount; 
+    gameUI.updateBalanceBet();
+    
+    gameUI.elements.board.classList.add('has-win');
+    winningIndices.forEach(idx => gameUI.cardsDOM[idx].classList.add('win'));
+    
+    let ratio = amount / gameState.currentBet;
+    
+    if (ratio >= 100) gameUI.showJackpot('SUPER', amount, 'super');
+    else if (ratio >= 50) gameUI.showJackpot('MEGA', amount, 'mega');
+    else if (ratio >= 20) gameUI.showJackpot('MINI', amount, 'mini');
+    else {
+      gameUI.setBanner(`WIN: +${amount.toLocaleString()}!`, true);
+      confettiEngine.burst(50);
+      
+      if (gameState.isAutoLoop) setTimeout(() => this.startSpin('loop'), CONFIG.timings.autoSpinPause);
+      else gameUI.lockControls(false);
+    }
+  },
+
+  handleLoss() {
+    gameState.lossStreak++;
+    gameUI.setBanner("NO WIN. TRY AGAIN.");
+    
+    if (gameState.lossStreak >= CONFIG.mechanics.zonkTriggerStreak && Math.random() < CONFIG.mechanics.zonkChance) {
+      setTimeout(() => this.triggerZonk(), 500);
+    } else {
+      if (gameState.isAutoLoop) setTimeout(() => this.startSpin('loop'), CONFIG.timings.autoSpinPause - 200);
+      else gameUI.lockControls(false);
+    }
+  },
+
+  triggerZonk() {
+    let pMin = CONFIG.mechanics.zonkPenaltyMinPct;
+    let pMax = CONFIG.mechanics.zonkPenaltyMaxPct;
+    let penaltyPct = (Math.random() * (pMax - pMin)) + pMin;
+    let penalty = Math.floor(gameState.balance * penaltyPct);
+    if (penalty < 100) penalty = 100;
+    
+    gameState.balance -= penalty; 
+    if(gameState.balance < 0) gameState.balance = 0;
+    
+    gameUI.updateBalanceBet();
+    gameState.lossStreak = 0; 
+    
+    gameUI.showZonk(penalty);
+  }
+};
+
+/**
+ * ==============================================================
+ * 6. CONFETTI ENGINE (Particle System)
+ * ==============================================================
+ */
+const confettiEngine = {
+  canvas: document.getElementById('confettiCanvas'),
+  ctx: null,
+  particles: [],
+  interval: null,
+  isActive: false,
+  colors: ['#d4af37', '#ffdf73', '#00e5ff', '#ff007f', '#ffffff'],
+
+  init() {
+    this.ctx = this.canvas.getContext('2d');
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.run();
+  },
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  },
+  spawn(count) {
+    for(let i=0; i<count; i++) {
+      this.particles.push({
+        x: this.canvas.width / 2, y: this.canvas.height / 2,
+        vx: (Math.random()-0.5) * 35, vy: (Math.random()-1) * 35,
+        size: Math.random()*12 + 6, color: this.colors[Math.floor(Math.random()*this.colors.length)],
+        rot: Math.random()*360, rotSpd: (Math.random()-0.5)*20, life: 1
+      });
+    }
+  },
+  burst(count) {
+    this.spawn(count);
+  },
+  start(count, ms) {
+    this.spawn(count);
+    this.interval = setInterval(() => this.spawn(count), ms);
+  },
+  stop() {
+    clearInterval(this.interval);
+  },
+  run() {
+    if(this.particles.length > 0) {
+      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+      this.particles.forEach((p, i) => {
+        p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
+        this.ctx.save(); this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rot*Math.PI/180);
+        this.ctx.fillStyle = p.color; this.ctx.globalAlpha = Math.max(p.life, 0);
+        this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); this.ctx.restore();
+        if(p.y > this.canvas.height || p.life <= 0) this.particles.splice(i, 1);
+      });
+    } else {
+      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+    }
+    requestAnimationFrame(() => this.run());
+  }
+};
+
+// Initialize Application
+confettiEngine.init();
+gameUI.init();
+
+</script>
 </body>
 </html>
