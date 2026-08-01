@@ -400,23 +400,32 @@ const currentUser = JSON.parse(userJson);
 let playerWinRate = null;
 
 // Tarik data RTP terbaru dari server saat game dimuat
-api.getDatabase().then(db => {
-  if (db && db.users) {
-    const freshUser = db.users.find(u => u.username === currentUser.username);
-    if (freshUser && freshUser.winRate !== undefined) {
-      playerWinRate = freshUser.winRate / 100; // Konversi persen ke desimal (misal 80 jadi 0.8)
+if (typeof api !== 'undefined' && api.getDatabase) {
+  api.getDatabase().then(db => {
+    if (db && db.users) {
+      const freshUser = db.users.find(u => u.username === currentUser.username);
+      if (freshUser && freshUser.winRate !== undefined) {
+        playerWinRate = parseFloat(freshUser.winRate) / 100;
+        console.log("RTP berhasil diload:", freshUser.winRate, "%");
+      }
     }
-  }
-});
+  }).catch(e => console.error("Gagal load RTP", e));
+}
 
 async function saveAndExit() {
   const btn = document.getElementById('btnExit');
   btn.disabled = true;
   btn.textContent = "SAVING...";
   
-  await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp);
-  
-  window.location.href = 'index.html';
+  try {
+    if (typeof api !== 'undefined' && api.saveProgress) {
+      await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp);
+    }
+  } catch(error) {
+    console.error("Gagal menyimpan progress:", error);
+  } finally {
+    window.location.href = 'index.html'; // Pindah halaman secara paksa walau error
+  }
 }
 
 /**
@@ -800,21 +809,28 @@ const gameEngine = {
     return CONFIG.symbols[0];
   },
 
-  // Fungsi Scrambler untuk mengecek apakah ada simbol yang sejajar
-  hasWin(grid) {
+  // PENGECEKAN KEMENANGAN REAL-TIME (SCRAMBLER BARU)
+  hasWinPartial(grid) {
     for (let pl of PAYLINES) {
-      let maxSeq = 1; let currentSeq = 1;
-      let currSym = grid[pl.line[0]];
-      for(let i=1; i<5; i++) {
-        if(grid[pl.line[i]].id === currSym.id) {
+      let currentSeq = 0;
+      let lastSymId = null;
+      for(let i=0; i<5; i++) {
+        let cell = grid[pl.line[i]];
+        // Jika kotak belum terisi, abaikan pengecekan beruntun dan reset
+        if (!cell) { 
+            currentSeq = 0; 
+            lastSymId = null; 
+            continue; 
+        }
+        // Jika simbol sama dengan sebelumnya, tambah urutan
+        if (cell.id === lastSymId) {
           currentSeq++;
+          if (currentSeq >= 3) return true; // Dilarang keras ada 3 sejajar
         } else {
-          if(currentSeq > maxSeq) maxSeq = currentSeq;
-          currSym = grid[pl.line[i]]; currentSeq = 1;
+          currentSeq = 1;
+          lastSymId = cell.id;
         }
       }
-      if(currentSeq > maxSeq) maxSeq = currentSeq;
-      if (maxSeq >= 3) return true; // Jika ada 3 atau lebih sejajar, berarti menang
     }
     return false;
   },
@@ -829,43 +845,37 @@ const gameEngine = {
     let forceWin = (Math.random() < currentChance);
     
     if (forceWin) {
-      // --- FORCE WIN (PASTI MENANG) ---
+      // --- MODE MENANG ---
       let tLine = PAYLINES[Math.floor(Math.random() * PAYLINES.length)];
       let sym = this.getRandomSymbol();
       let matchCount = Math.random() > 0.85 ? 5 : (Math.random() > 0.5 ? 4 : 3);
       let startIdx = Math.floor(Math.random() * (6 - matchCount));
       for(let i=0; i<matchCount; i++) { grid[tLine.line[startIdx + i]] = sym; }
       
-      // Isi sisanya secara acak
+      // Isi sisa slot yang kosong dengan acak
       for (let i = 0; i < 25; i++) { if (!grid[i]) grid[i] = this.getRandomSymbol(); }
     } else {
-      // --- FORCE LOSE (PASTI KALAH / ANTI-MENANG) ---
-      // Isi grid acak terlebih dahulu
-      for (let i = 0; i < 25; i++) { grid[i] = this.getRandomSymbol(); }
-
-      // Sistem Scrambler: Selama secara kebetulan ada garis yang menang, HANCURKAN!
-      let safetyCounter = 100; // Mencegah infinite loop
-      while (this.hasWin(grid) && safetyCounter > 0) {
-        for (let pl of PAYLINES) {
-          let currentSeq = 1;
-          let currSym = grid[pl.line[0]];
-          for(let i=1; i<5; i++) {
-            if(grid[pl.line[i]].id === currSym.id) {
-              currentSeq++;
-              if (currentSeq >= 3) {
-                // Jika terdeteksi 3 simbol sama sejajar, ganti simbol ke-3 dengan simbol yang berbeda
-                let newSym = this.getRandomSymbol();
-                while(newSym.id === currSym.id) { newSym = this.getRandomSymbol(); }
-                grid[pl.line[i]] = newSym;
-                currentSeq = 1; // Reset hitungan
-              }
-            } else {
-              currSym = grid[pl.line[i]];
-              currentSeq = 1;
-            }
+      // --- MODE ZONK (ANTI-MENANG MUTLAK) ---
+      for (let i = 0; i < 25; i++) {
+        let allowedSymbols = [...CONFIG.symbols];
+        grid[i] = this.getRandomSymbol();
+        
+        let attempts = 0;
+        // Jika simbol yang baru saja dimasukkan membentuk 3 sejajar, GANTI SIMBOLNYA!
+        while (this.hasWinPartial(grid) && attempts < 10) {
+          // Buang simbol yang bikin menang dari opsi
+          allowedSymbols = allowedSymbols.filter(s => s.id !== grid[i].id);
+          
+          if (allowedSymbols.length > 0) {
+            // Pilih simbol lain secara acak dari yang tersisa
+            let randomIdx = Math.floor(Math.random() * allowedSymbols.length);
+            grid[i] = allowedSymbols[randomIdx];
+          } else {
+            // Fallback jika tidak ada opsi (langka terjadi)
+            grid[i] = this.getRandomSymbol();
           }
+          attempts++;
         }
-        safetyCounter--;
       }
     }
     
