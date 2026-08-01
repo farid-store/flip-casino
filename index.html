@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Casino - Lobby Utama</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* Variabel Tema Kasino Konsisten */
+  :root {
+    --bg-base: #06090e;
+    --bg-panel: #11151e;
+    --gold-light: #ffdf73;
+    --gold-main: #d4af37;
+    --gold-dark: #8a6d1c;
+    --text-light: #e2e8f0;
+    --text-muted: #64748b;
+    --danger: #ef4444;
+    --font-title: 'Cinzel', serif;
+    --font-ui: 'Montserrat', sans-serif;
+    --font-digital: 'Orbitron', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
+    color: var(--text-light);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header / Navbar */
+  .lobby-header {
+    background: linear-gradient(180deg, rgba(17,21,30,0.95), transparent);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .brand-logo {
+    font-family: var(--font-title);
+    font-size: 20px;
+    color: var(--gold-main);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .btn-logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+  }
+
+  /* Profil Player Dashboard */
+  .dashboard-section {
+    padding: 30px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .profile-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--gold-dark);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin-bottom: 30px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .avatar-large {
+    width: 60px;
+    height: 60px;
+    background: var(--bg-base);
+    border: 2px solid var(--gold-main);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+  }
+
+  .user-details h2 {
+    font-size: 20px;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+
+  .user-level {
+    font-size: 12px;
+    color: var(--gold-light);
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: rgba(212, 175, 55, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  .wallet-info {
+    text-align: right;
+  }
+
+  .wallet-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+
+  .wallet-balance {
+    font-family: var(--font-digital);
+    font-size: 24px;
+    color: var(--gold-light);
+    text-shadow: 0 0 10px rgba(255, 223, 115, 0.4);
+  }
+
+  /* Game Selection Grid */
+  .section-title {
+    font-family: var(--font-title);
+    font-size: 22px;
+    color: var(--gold-main);
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 10px;
+  }
+
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .game-card {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid #334155;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: 0.3s;
+    cursor: pointer;
+    position: relative;
+    group: hover;
+  }
+
+  .game-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold-main);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 15px rgba(212, 175, 55, 0.2);
+  }
+
+  .game-thumb {
+    height: 150px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    position: relative;
+  }
+
+  .game-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent, #0f172a);
+  }
+
+  .game-info {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .game-title {
+    font-family: var(--font-title);
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .btn-play {
+    background: linear-gradient(180deg, var(--gold-main), var(--gold-dark));
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    transition: 0.2s;
+  }
+  
+  .game-card:hover .btn-play {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+  }
+
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="lobby-header">
+    <div class="brand-logo">🎰 ROYAL CASINO</div>
+    <div class="header-actions">
+      <button class="btn-logout" onclick="logout()">KELUAR</button>
+    </div>
+  </header>
+
+  <!-- Main Dashboard -->
+  <main class="dashboard-section">
+    <!-- Profil Card -->
+    <div class="profile-card">
+      <div class="user-info">
+        <div class="avatar-large">👤</div>
+        <div class="user-details">
+          <h2 id="displayUsername">Player</h2>
+          <div class="user-level" id="displayLevel">LEVEL 1</div>
+        </div>
+      </div>
+      <div class="wallet-info">
+        <div class="wallet-label">TOTAL CREDITS</div>
+        <div class="wallet-balance" id="displayBalance">0</div>
+      </div>
+    </div>
+
+    <!-- Pilihan Game -->
+    <h3 class="section-title">PERMAINAN EKSKLUSIF</h3>
+    <div class="games-grid">
+      <!-- Game 1: Fruit Flip (Web Simulator aslinya) -->
+      <div class="game-card" onclick="window.location.href='game.html'">
+        <div class="game-thumb">🍒👑🍋</div>
+        <div class="game-info">
+          <div class="game-title">FRUIT FLIP SLOT</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">5x5 Grid Multiplier</p>
+          <button class="btn-play">MAIN SEKARANG</button>
+        </div>
+      </div>
+      
+      <!-- Slot Kosong (Coming Soon) -->
+      <div class="game-card" style="opacity: 0.6; cursor: not-allowed;">
+        <div class="game-thumb" style="filter: grayscale(1);">🃏</div>
+        <div class="game-info">
+          <div class="game-title">BLACKJACK VIP</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Segera Hadir</p>
+          <button class="btn-play" style="background: #334155; color: #94a3b8;" disabled>LOCKED</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 1. Cek Autentikasi: Tolak akses jika tidak ada data login
+    const userJson = localStorage.getItem('currentUser');
+    if (!userJson) {
+      window.location.href = 'auth.html';
+    }
+
+    // 2. Parse data JSON dan render ke antarmuka
+    const user = JSON.parse(userJson);
+    
+    document.getElementById('displayUsername').textContent = user.username.toUpperCase();
+    document.getElementById('displayLevel').textContent = `LEVEL ${user.level}`;
+    document.getElementById('displayBalance').textContent = user.balance.toLocaleString();
+
+    // 3. Fungsi Logout
+    function logout() {
+      // Hapus data sesi dari browser
+      localStorage.removeItem('currentUser');
+      // Arahkan kembali ke halaman login
+      window.location.href = 'auth.html';
+    }
+  </script>
+</body>
+</html>
