@@ -48,7 +48,7 @@
   /* Desktop/Mobile Flexible Wrapper */
   #app-wrapper {
     width: 100%;
-    max-width: 1200px; /* Diperlebar untuk Desktop Full View */
+    max-width: 1200px;
     height: 100%;
     max-height: 100dvh;
     background: var(--bg-base);
@@ -692,12 +692,13 @@ function drawChart(now) {
     ctx.fill();
 
   } else {
-    // Draw Candlestick Chart
-    const numCandles = 30; // Max candles visible
+    // Draw Candlestick Chart bergaya SmartAlgo
+    const numCandles = 40; 
     const interval = windowSize / numCandles;
-    const candleWidth = (canvas.width / numCandles) * 0.7; // 70% width
     
-    // Group ticks into candle buckets
+    const padding = 3; 
+    const candleWidth = Math.max((canvas.width / numCandles) - padding, 2);
+    
     let candles = [];
     for(let i=0; i<numCandles; i++) candles.push(null);
 
@@ -715,13 +716,13 @@ function drawChart(now) {
       }
     });
 
-    // Render Candles
+    // Render Candles ala SmartAlgo
     candles.forEach((c) => {
       if (!c) return;
       const isGreen = c.c >= c.o;
-      const color = isGreen ? '#10b981' : '#ef4444';
+      const color = isGreen ? '#10b981' : '#ef4444'; 
       
-      const x = c.x - candleWidth/2;
+      const x = c.x;
       const yOpen = scaleY(c.o);
       const yClose = scaleY(c.c);
       const yHigh = scaleY(c.h);
@@ -729,19 +730,20 @@ function drawChart(now) {
 
       ctx.strokeStyle = color;
       ctx.fillStyle = color;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.5;
 
-      // Wick
+      // Gambar Wick (Ekor)
       ctx.beginPath();
-      ctx.moveTo(c.x, yHigh);
-      ctx.lineTo(c.x, yLow);
+      ctx.moveTo(x, yHigh);
+      ctx.lineTo(x, yLow);
       ctx.stroke();
 
-      // Body
+      // Gambar Body (Tubuh Candle)
       const bodyY = Math.min(yOpen, yClose);
       let bodyH = Math.abs(yOpen - yClose);
-      if (bodyH < 2) bodyH = 2; // Min height for doji
-      ctx.fillRect(x, bodyY, candleWidth, bodyH);
+      if (bodyH < 2) bodyH = 2; // Memastikan Doji (harga open=close) tetap terlihat
+      
+      ctx.fillRect(x - candleWidth/2, bodyY, candleWidth, bodyH);
     });
   }
 
@@ -772,24 +774,27 @@ function gameLoop(now) {
   
   // Create a new price tick roughly every 50ms (20 ticks per second) for smooth history
   if (dt > 50) {
+    // Kurangi pengali volatilitas dari 6 menjadi 1.2 agar pergerakan lebih halus
+    let volatility = 1.2; 
+    
     if (gameState === 'IDLE') {
-      currentPrice += (Math.random() - 0.5) * 6; // Random walk
+      currentPrice += (Math.random() - 0.5) * volatility; 
     } 
     else if (gameState === 'TRADING') {
       let elapsed = now - tradeStartTime;
       if (elapsed >= tradeDuration) {
         finishTrade();
-        return; // Stop current loop, finishTrade handles reset
+        return; 
       }
 
       // RTP Logic: Force price to destination based on duration
       let progress = elapsed / tradeDuration;
-      // Target difference scales by duration so it doesn't look flat. (e.g. 5s = 15 diff, 60s = 180 diff)
       let targetMagnitude = (tradeDuration / 1000) * 4; 
       let targetDiff = isWinRound ? (tradeDirection === 'CALL' ? targetMagnitude : -targetMagnitude) : (tradeDirection === 'CALL' ? -targetMagnitude : targetMagnitude);
       
       let bias = targetDiff * progress;
-      let noise = (Math.random() - 0.5) * 8; // Random noise over the trend
+      // Kurangi juga noise saat trading berlangsung agar tidak melompat-lompat
+      let noise = (Math.random() - 0.5) * (volatility * 1.5); 
       
       currentPrice = tradeEntryPrice + bias + noise;
     }
@@ -813,11 +818,10 @@ function gameLoop(now) {
 // Initialize initial history so chart isn't empty
 let initTime = performance.now();
 for(let i=0; i<100; i++) {
-  currentPrice += (Math.random() - 0.5) * 6;
+  currentPrice += (Math.random() - 0.5) * 1.2; // Match the new volatility
   addTick(currentPrice, initTime - (100-i)*50);
 }
 animFrame = requestAnimationFrame(gameLoop);
-
 
 /**
  * ==============================================================
