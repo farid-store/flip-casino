@@ -7,22 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-base: #02040a;
-    --bg-panel: #0a0e14;
-    --bg-panel-2: #0e1420;
-    --bg-glass: rgba(10, 14, 20, 0.85);
-
+    /* Color Palette */
+    --bg-body: #050507;
+    --bg-app: #0b0e14;
+    --bg-panel: rgba(15, 23, 42, 0.6);
+    --bg-glass: rgba(11, 14, 20, 0.75);
+    
     --gold-light: #fef08a;
-    --gold-main: #eab308;
-    --gold-dark: #a16207;
+    --gold-main: #fbbf24;
+    --gold-dark: #b45309;
+    
     --text-light: #f8fafc;
-    --text-muted: #64748b;
-
+    --text-muted: #94a3b8;
+    
     --danger: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.5);
     --success: #10b981;
-    --info: #3b82f6;
+    --success-glow: rgba(16, 185, 129, 0.5);
+    --info: #0ea5e9;
+    --info-glow: rgba(14, 165, 233, 0.5);
     --epic: #a855f7;
-    --orange: #f97316;
 
     --font-title: 'Cinzel', serif;
     --font-ui: 'Montserrat', sans-serif;
@@ -32,94 +36,106 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
 
   html, body {
-    background: var(--bg-base);
+    background: var(--bg-body);
     color: var(--text-light);
     font-family: var(--font-ui);
     height: 100dvh;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  body { display: flex; flex-direction: column; position: relative; }
+  /* Desktop wrapper */
+  #app-wrapper {
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    max-height: 100dvh;
+    background: var(--bg-app);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    overflow: hidden;
+  }
 
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
+  ::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
 
   /* =========================================
-     TOP BAR
+     TOP BAR (Glassmorphism)
      ========================================= */
   .top-bar {
-    background: var(--bg-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(234, 179, 8, 0.15);
-    padding: calc(10px + env(safe-area-inset-top)) 14px 10px; 
-    display: flex; justify-content: space-between; align-items: center; z-index: 100;
-    flex-shrink: 0; gap: 8px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: calc(12px + env(safe-area-inset-top)) 16px 12px; 
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100; flex-shrink: 0;
   }
   
   .btn-back { 
-    background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); 
-    padding: 6px 10px; border-radius: 6px; font-weight: 800; font-size: 10px; cursor: pointer; 
-    text-transform: uppercase; transition: 0.3s; font-family: var(--font-ui); display: flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-light); 
+    padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; 
+    text-transform: uppercase; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;
   }
-  .btn-back:hover { background: var(--danger); color: white; box-shadow: 0 0 10px rgba(239,68,68,0.5);}
+  .btn-back:hover, .btn-back:active { background: rgba(255,255,255,0.05); border-color: var(--text-muted); }
 
-  .stats-group { display: flex; gap: 12px; align-items: center; }
-  .stat-box { text-align: right; display: flex; flex-direction: column; align-items: flex-end; min-width: 44px; }
-  .stat-title { font-size: 8.5px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; }
-  .stat-amount { font-family: var(--font-digital); font-size: 15px; color: var(--gold-main); text-shadow: 0 0 15px rgba(234, 179, 8, 0.4); font-weight: bold; transition: transform 0.15s;}
-  .stat-amount.best { color: var(--epic); text-shadow: 0 0 15px rgba(168,85,247,0.4); }
+  .stats-group { display: flex; gap: 14px; align-items: center; }
+  .stat-box { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+  .stat-title { font-size: 9px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  .stat-amount { font-family: var(--font-digital); font-size: 16px; color: var(--gold-main); font-weight: bold; transition: transform 0.15s;}
+  .stat-amount.best { color: var(--epic); }
   .stat-amount.bump { animation: bumpNum 0.35s ease; }
-  @keyframes bumpNum { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes bumpNum { 0% { transform: scale(1); } 50% { transform: scale(1.2); color: #fff;} 100% { transform: scale(1); } }
 
   .icon-btn {
-    background: rgba(255,255,255,0.04); border: 1px solid #1e293b; color: var(--text-light);
-    width: 32px; height: 32px; border-radius: 8px; font-size: 14px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: var(--text-light);
+    width: 36px; height: 36px; border-radius: 10px; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: 0.2s;
   }
-  .icon-btn:hover { border-color: var(--gold-main); background: rgba(234,179,8,0.08); }
-  .icon-btn.muted { opacity: 0.45; }
+  .icon-btn:hover, .icon-btn:active { border-color: var(--gold-main); background: rgba(251, 191, 36, 0.1); }
+  .icon-btn.muted { opacity: 0.5; }
 
   /* =========================================
      ROUND HISTORY STRIP
      ========================================= */
   .history-strip {
-    display: flex; gap: 6px; padding: 8px 14px; overflow-x: auto; flex-shrink: 0;
-    background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; gap: 8px; padding: 10px 16px; overflow-x: auto; flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%);
+    scroll-behavior: smooth; z-index: 90; position: absolute; width: 100%; top: 65px;
   }
-  .history-strip::-webkit-scrollbar { display: none; }
   .hist-pill {
-    font-family: var(--font-digital); font-size: 10.5px; font-weight: 700; padding: 4px 9px;
-    border-radius: 20px; white-space: nowrap; flex-shrink: 0; border: 1px solid transparent;
-    animation: pillIn 0.3s ease;
+    font-family: var(--font-digital); font-size: 11px; font-weight: 700; padding: 5px 12px;
+    border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+    animation: pillIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px);
   }
-  @keyframes pillIn { from { opacity: 0; transform: translateX(-8px) scale(0.8); } to { opacity: 1; transform: translateX(0) scale(1); } }
-  .hist-low { background: rgba(100,116,139,0.15); color: #94a3b8; border-color: rgba(148,163,184,0.2); }
-  .hist-mid { background: rgba(59,130,246,0.15); color: #60a5fa; border-color: rgba(59,130,246,0.3); }
-  .hist-high { background: rgba(168,85,247,0.15); color: #c084fc; border-color: rgba(168,85,247,0.3); }
-  .hist-epic { background: rgba(234,179,8,0.18); color: var(--gold-light); border-color: rgba(234,179,8,0.4); }
-  .hist-placeholder { color: var(--text-muted); font-size: 10px; padding: 4px 2px; }
+  @keyframes pillIn { from { opacity: 0; transform: translateX(-15px) scale(0.8); } to { opacity: 1; transform: translateX(0) scale(1); } }
+  .hist-low { color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+  .hist-mid { color: var(--info); border: 1px solid var(--info-glow); box-shadow: 0 0 10px rgba(14,165,233,0.15); }
+  .hist-high { color: var(--epic); border: 1px solid rgba(168, 85, 247, 0.5); box-shadow: 0 0 10px rgba(168,85,247,0.2); }
+  .hist-epic { color: var(--gold-main); border: 1px solid var(--gold-main); box-shadow: 0 0 15px rgba(251,191,36,0.3); }
+  .hist-placeholder { color: rgba(255,255,255,0.2); font-size: 11px; padding: 5px 0; font-style: italic;}
 
   /* =========================================
      CHART AREA
      ========================================= */
   .chart-container {
     flex: 1; position: relative; display: flex; justify-content: center; align-items: center;
-    background: radial-gradient(circle at center, #0a1128 0%, #000000 100%);
-    border-bottom: 2px solid #1e293b; overflow: hidden; min-height: 0;
-    box-shadow: inset 0 0 80px rgba(0,0,0,1);
+    background: radial-gradient(circle at center 30%, #151e2d 0%, #05080c 100%);
+    overflow: hidden;
   }
 
-  #starCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
-
-  .space-object { position: absolute; z-index: 1; opacity: 0.55; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); animation: floatObj 15s infinite ease-in-out alternate; pointer-events: none; }
-  @keyframes floatObj { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-30px) rotate(10deg); } }
+  #starCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.6; }
 
   .grid-overlay {
-    position: absolute; inset: 0; z-index: 1; opacity: 0.08;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
-    background-size: 40px 40px;
-    background-position: center bottom;
+    position: absolute; inset: 0; z-index: 2; opacity: 0.05;
+    background-image: 
+      linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px);
+    background-size: 50px 50px; background-position: center bottom;
   }
 
   #crashCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
@@ -127,216 +143,242 @@
   .flash-overlay {
     position: absolute; inset: 0; z-index: 6; background: var(--danger); opacity: 0; pointer-events: none;
   }
-  .flash-overlay.hit { animation: flashHit 0.4s ease; }
-  @keyframes flashHit { 0% { opacity: 0.55; } 100% { opacity: 0; } }
+  .flash-overlay.hit { animation: flashHit 0.5s ease-out; }
+  @keyframes flashHit { 0% { opacity: 0.4; } 100% { opacity: 0; } }
 
-  .multiplier-display { position: relative; z-index: 10; text-align: center; }
+  .multiplier-display { position: relative; z-index: 10; text-align: center; margin-bottom: 40px; }
   .multiplier-text {
-    font-family: var(--font-digital); font-size: clamp(3.2rem, 15vw, 6rem);
-    font-weight: 900; transition: color 0.3s, text-shadow 0.3s;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.9);
+    font-family: var(--font-digital); font-size: clamp(4rem, 15vw, 6.5rem);
+    font-weight: 900; transition: all 0.3s;
+    text-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    letter-spacing: -2px;
   }
 
-  .mult-tier-1 { color: #f8fafc; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
-  .mult-tier-2 { color: var(--info); text-shadow: 0 0 30px rgba(59,130,246,0.6); }
-  .mult-tier-3 { color: var(--epic); text-shadow: 0 0 40px rgba(168,85,247,0.8); }
-  .mult-tier-4 { color: var(--gold-main); text-shadow: 0 0 50px rgba(234,179,8,1); }
-  .crashed-text { color: var(--danger); text-shadow: 0 0 30px rgba(239, 68, 68, 0.8); animation: shakeScreen 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+  .mult-tier-1 { color: #fff; }
+  .mult-tier-2 { color: var(--info); text-shadow: 0 0 40px var(--info-glow); }
+  .mult-tier-3 { color: var(--epic); text-shadow: 0 0 50px rgba(168,85,247,0.6); }
+  .mult-tier-4 { color: var(--gold-main); text-shadow: 0 0 60px rgba(251,191,36,0.7); }
+  .crashed-text { color: var(--danger); text-shadow: 0 0 40px var(--danger-glow); animation: shakeScreen 0.4s cubic-bezier(.36,.07,.19,.97) both; }
 
   .status-text {
-    font-family: var(--font-title); font-size: 11.5px; color: var(--text-muted);
-    letter-spacing: 3px; margin-top: 8px; text-transform: uppercase; font-weight: 800;
+    font-family: var(--font-ui); font-size: 13px; color: var(--text-muted);
+    letter-spacing: 2px; margin-top: 10px; text-transform: uppercase; font-weight: 700;
   }
 
   @keyframes shakeScreen {
     0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    20% { transform: translate(-15px, 5px) rotate(-1deg); }
-    40% { transform: translate(10px, -10px) rotate(1deg); }
-    60% { transform: translate(-10px, 15px) rotate(0deg); }
-    80% { transform: translate(15px, -5px) rotate(-1deg); }
+    20% { transform: translate(-8px, 3px) rotate(-1deg); }
+    40% { transform: translate(6px, -6px) rotate(1deg); }
+    60% { transform: translate(-6px, 8px) rotate(0deg); }
+    80% { transform: translate(8px, -3px) rotate(-1deg); }
   }
 
+  /* Badges */
+  .badge-container {
+    position: absolute; top: 110px; width: 100%; display: flex; justify-content: space-between; padding: 0 16px; z-index: 15; pointer-events: none;
+  }
   .countdown-badge {
-    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
-    background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4);
-    color: var(--success); font-family: var(--font-digital); font-size: 11px;
-    padding: 5px 14px; border-radius: 20px; z-index: 15; opacity: 0; transition: opacity 0.2s; letter-spacing: 1px;
+    position: absolute; left: 50%; transform: translateX(-50%);
+    background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);
+    color: var(--success); font-family: var(--font-digital); font-size: 13px; font-weight: bold;
+    padding: 6px 18px; border-radius: 30px; opacity: 0; transition: opacity 0.3s;
+    backdrop-filter: blur(4px);
   }
   .countdown-badge.show { opacity: 1; }
 
-  .auto-badge {
-    position: absolute; top: 14px; right: 14px;
-    background: rgba(234,179,8,0.12); border: 1px solid rgba(234,179,8,0.4);
-    color: var(--gold-light); font-family: var(--font-digital); font-size: 10px;
-    padding: 5px 10px; border-radius: 20px; z-index: 15; opacity: 0; transition: opacity 0.2s;
+  .side-badge {
+    font-family: var(--font-digital); font-size: 11px; padding: 6px 12px; border-radius: 20px;
+    opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(4px); display: flex; align-items: center;
   }
-  .auto-badge.show { opacity: 1; }
-
-  .streak-badge {
-    position: absolute; top: 14px; left: 14px;
-    font-family: var(--font-digital); font-size: 10px; padding: 5px 10px; border-radius: 20px;
-    z-index: 15; opacity: 0; transition: opacity 0.2s;
-  }
-  .streak-badge.show { opacity: 1; }
-  .streak-badge.win { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); color: var(--success); }
-  .streak-badge.loss { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: var(--danger); }
+  .side-badge.show { opacity: 1; }
+  
+  .streak-badge.win { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
+  .streak-badge.loss { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+  .auto-badge { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: var(--gold-main); }
 
   /* =========================================
      CONTROL CONSOLE
      ========================================= */
   .control-console {
-    background: var(--bg-panel); padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-    box-shadow: 0 -15px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column; gap: 10px;
-    position: relative; z-index: 20; border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
+    background: var(--bg-app);
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    position: relative; z-index: 20; 
+    border-top: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 -20px 40px rgba(0,0,0,0.5);
+    flex-shrink: 0; display: flex; flex-direction: column; gap: 14px;
   }
 
   .tab-switch {
-    display: flex; background: #0f172a; border-radius: 10px; padding: 3px; border: 1px solid #1e293b;
+    display: flex; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 4px; border: 1px solid rgba(255,255,255,0.05);
   }
   .tab-btn {
-    flex: 1; padding: 8px 0; text-align: center; font-size: 10.5px; font-weight: 800; letter-spacing: 0.5px;
-    color: var(--text-muted); background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s;
-    text-transform: uppercase; font-family: var(--font-ui);
+    flex: 1; padding: 10px 0; text-align: center; font-size: 12px; font-weight: 700;
+    color: var(--text-muted); background: transparent; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s;
   }
-  .tab-btn.active { background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; }
+  .tab-btn.active { background: rgba(255,255,255,0.08); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
 
   .auto-row {
-    display: none; align-items: center; gap: 8px;
-    background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 10px 12px;
+    display: none; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px;
   }
-  .auto-row.show { display: flex; }
-  .auto-row label { font-size: 9.5px; color: var(--text-muted); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
-  .auto-row input[type="number"] {
-    flex: 1; background: #030507; border: 1px solid var(--gold-dark); color: #fff; border-radius: 8px;
-    padding: 8px 10px; font-family: var(--font-digital); font-size: 14px; text-align: center; min-width: 0;
+  .auto-row.show { display: flex; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(-5px);} to{opacity:1; transform:translateY(0);} }
+  
+  .auto-target-group { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .auto-target-group label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;}
+  .auto-target-group input {
+    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;
+    padding: 8px 12px; font-family: var(--font-digital); font-size: 16px; width: 80px; text-align: center;
+    transition: 0.3s; outline: none;
   }
-  .auto-row input[type="number"]:focus { outline: none; border-color: var(--gold-main); }
+  .auto-target-group input:focus { border-color: var(--info); box-shadow: 0 0 10px var(--info-glow); }
+  
   .auto-toggle {
-    width: 40px; height: 22px; border-radius: 12px; background: #1e293b; position: relative; cursor: pointer;
-    border: 1px solid #334155; flex-shrink: 0; transition: 0.2s;
+    width: 48px; height: 26px; border-radius: 15px; background: rgba(0,0,0,0.5); position: relative; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
   }
-  .auto-toggle.on { background: rgba(16,185,129,0.3); border-color: var(--success); }
+  .auto-toggle.on { background: rgba(16,185,129,0.2); border-color: var(--success); }
   .auto-toggle::after {
-    content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
-    background: #94a3b8; transition: 0.2s;
+    content: ''; position: absolute; top: 2px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--text-muted); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  .auto-toggle.on::after { transform: translateX(18px); background: var(--success); }
+  .auto-toggle.on::after { transform: translateX(20px); background: var(--success); box-shadow: 0 0 10px var(--success-glow);}
 
-  .bet-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .bet-control-grid { display: flex; flex-direction: column; gap: 12px; }
+  
+  .bet-input-row { display: flex; gap: 10px; height: 54px; }
   .bet-btn-ctrl {
-    background: #0f172a; border: 1px solid #1e293b; color: #fff;
-    width: 48px; height: 48px; border-radius: 12px; font-size: 15px; font-weight: 800;
-    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0;
+    width: 54px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #fff;
+    border-radius: 12px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; 
+    cursor: pointer; transition: 0.15s; flex-shrink: 0;
   }
-  .bet-btn-ctrl:active { transform: scale(0.9); background: var(--gold-dark); border-color: var(--gold-main);}
-  .bet-btn-ctrl:disabled { opacity: 0.4; pointer-events: none; }
+  .bet-btn-ctrl:active { transform: scale(0.92); background: rgba(255,255,255,0.1); }
+  .bet-btn-ctrl:disabled { opacity: 0.3; pointer-events: none; }
+  
   .bet-display-box {
-    flex: 1; background: #030507; height: 48px; border-radius: 12px; border: 1px solid var(--gold-dark);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
-    min-width: 0;
+    flex: 1; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
-  .bet-display-label { font-size: 8.5px; color: var(--gold-main); letter-spacing: 1px; font-weight: 800; text-transform: uppercase;}
-  .bet-display-val { font-family: var(--font-digital); font-size: 17px; color: #fff; font-weight: bold;}
+  .bet-display-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px;}
+  .bet-display-val { font-family: var(--font-digital); font-size: 20px; color: #fff; font-weight: bold; letter-spacing: 1px;}
 
   .chip-selector { display: flex; justify-content: space-between; gap: 6px; }
   .chip-btn {
-    flex: 1; padding: 10px 0; border-radius: 9px; border: 1px solid #1e293b;
-    background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-digital); font-size: 11.5px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    flex: 1; padding: 10px 0; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.02); color: var(--text-muted); font-family: var(--font-digital); 
+    font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
   }
-  .chip-btn:active, .chip-btn.active { background: rgba(234,179,8,0.1); border-color: var(--gold-main); color: var(--gold-main); }
-  .chip-btn:disabled { opacity: 0.4; pointer-events: none; }
-  .chip-btn.chip-max { border-color: rgba(168,85,247,0.4); color: var(--epic); }
-  .chip-btn.chip-max.active { background: rgba(168,85,247,0.12); border-color: var(--epic); color: var(--epic); }
+  .chip-btn:active { transform: scale(0.9); }
+  .chip-btn.active { background: rgba(14,165,233,0.1); border-color: var(--info); color: var(--info); }
+  .chip-btn:disabled { opacity: 0.3; pointer-events: none; }
+  .chip-btn.chip-max { color: var(--epic); border-color: rgba(168,85,247,0.3); }
+  .chip-btn.chip-max.active { background: rgba(168,85,247,0.15); border-color: var(--epic); box-shadow: 0 0 10px rgba(168,85,247,0.2);}
 
   .btn-action-main {
-    background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; border: none;
-    padding: 16px; border-radius: 14px; font-family: var(--font-ui); font-weight: 900; font-size: 17px;
-    cursor: pointer; box-shadow: 0 8px 25px rgba(234, 179, 8, 0.4); text-transform: uppercase; letter-spacing: 1px;
-    transition: 0.15s; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;
-    position: relative; overflow: hidden;
+    width: 100%; border: none; padding: 18px; border-radius: 14px; font-family: var(--font-ui); font-weight: 800; 
+    font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
+    transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.3;
+    position: relative; overflow: hidden; color: #fff;
   }
   .btn-action-main:active { transform: scale(0.97); }
 
-  .btn-bet { background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; }
-  .btn-cashout { background: linear-gradient(180deg, var(--orange), #c2410c); color: #fff; box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5); animation: pulseBtn 0.8s infinite alternate;}
-  .btn-disabled { background: #0f172a !important; color: #475569 !important; border: 1px solid #1e293b; pointer-events: none; box-shadow: none !important;}
-  .btn-success { background: linear-gradient(180deg, var(--success), #059669); color: white; pointer-events: none; box-shadow: 0 0 20px rgba(16,185,129,0.5);}
-  .btn-auto-armed { background: linear-gradient(180deg, #0f172a, #0a0e14); color: var(--gold-light); border: 1px dashed var(--gold-dark); box-shadow: none; pointer-events: none; }
+  .btn-bet { 
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+    box-shadow: 0 8px 25px rgba(16,185,129,0.3), inset 0 2px 0 rgba(255,255,255,0.2); 
+  }
+  .btn-cashout { 
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.4), inset 0 2px 0 rgba(255,255,255,0.3); 
+    animation: pulseBtn 1s infinite alternate; 
+  }
+  .btn-disabled { 
+    background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.2) !important; 
+    border: 1px solid rgba(255,255,255,0.05); pointer-events: none; box-shadow: none !important;
+  }
+  .btn-success { 
+    background: #064e3b; color: var(--success); pointer-events: none; border: 1px solid var(--success);
+    box-shadow: 0 0 30px var(--success-glow);
+  }
+  .btn-auto-armed { 
+    background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px dashed var(--danger); 
+    pointer-events: none; box-shadow: none;
+  }
 
-  .cashout-profit { font-family: var(--font-digital); font-size: 12.5px; opacity: 0.9; margin-top: 4px; font-weight: bold; text-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+  .cashout-profit { font-family: var(--font-digital); font-size: 14px; opacity: 0.9; margin-top: 4px; font-weight: bold; }
 
   @keyframes pulseBtn {
-    0% { transform: scale(1); box-shadow: 0 0 15px rgba(249, 115, 22, 0.5); }
-    100% { transform: scale(1.03); box-shadow: 0 0 35px rgba(249, 115, 22, 0.8); }
+    0% { transform: scale(1); box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+    100% { transform: scale(1.02); box-shadow: 0 0 35px rgba(245, 158, 11, 0.7); }
   }
 
   canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
 
-  /* Toast */
+  /* =========================================
+     MODALS & TOAST
+     ========================================= */
   .toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--bg-panel-2); border: 1px solid var(--gold-dark); color: var(--gold-light);
-    padding: 12px 20px; border-radius: 10px; font-size: 12px; font-weight: 700; z-index: 500;
-    opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; max-width: 85vw;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    position: absolute; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(15,23,42,0.95); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+    padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 600; z-index: 500;
+    opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; 
+    text-align: center; white-space: nowrap; box-shadow: 0 15px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* Modal (Stats / Cara Main) */
   .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
     display: flex; justify-content: center; align-items: center; z-index: 3000;
-    opacity: 0; pointer-events: none; transition: 0.25s; padding: 20px;
+    opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px;
   }
   .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  
   .modal-box {
-    background: var(--bg-panel); border: 1px solid var(--gold-dark); border-radius: 16px;
-    padding: 24px; width: 100%; max-width: 380px; position: relative;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8); max-height: 85vh; overflow-y: auto;
+    background: var(--bg-app); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+    padding: 24px; width: 100%; max-width: 400px; position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.9); transform: translateY(20px); transition: 0.3s;
   }
-  .modal-box h2 { font-family: var(--font-title); font-size: 18px; color: var(--gold-main); text-align: center; margin-bottom: 18px; }
+  .modal-overlay.show .modal-box { transform: translateY(0); }
+  
+  .modal-box h2 { font-family: var(--font-title); font-size: 18px; color: #fff; text-align: center; margin-bottom: 20px; letter-spacing: 1px;}
   .btn-close-modal {
-    position: absolute; top: 12px; right: 14px; background: transparent; border: none;
-    color: var(--text-muted); font-size: 24px; cursor: pointer; line-height: 1;
+    position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.05); border: none; border-radius: 50%;
+    color: var(--text-muted); width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
   }
-  .btn-close-modal:hover { color: var(--danger); }
+  .btn-close-modal:hover { background: rgba(239,68,68,0.1); color: var(--danger); }
 
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .stat-tile { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 12px; text-align: center; }
-  .stat-tile-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 6px; }
-  .stat-tile-val { font-family: var(--font-digital); font-size: 17px; color: var(--gold-light); font-weight: bold; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .stat-tile { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px 10px; text-align: center; }
+  .stat-tile-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+  .stat-tile-val { font-family: var(--font-digital); font-size: 18px; color: #fff; font-weight: bold; }
   .stat-tile-val.pos { color: var(--success); }
   .stat-tile-val.neg { color: var(--danger); }
 
-  .how-to-list { font-size: 12.5px; color: #cbd5e1; line-height: 1.7; padding-left: 18px; margin-bottom: 8px; }
-  .how-to-list li { margin-bottom: 8px; }
+  .how-to-list { font-size: 13px; color: var(--text-muted); line-height: 1.8; padding-left: 20px; margin-bottom: 20px; }
+  .how-to-list li { margin-bottom: 12px; }
+  .how-to-list b { color: #fff; }
 
   .btn-modal-action {
-    width: 100%; background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000;
-    border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; margin-top: 6px;
+    width: 100%; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);
+    padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s;
   }
-
-  @media (max-width: 360px) {
-    .stat-box { min-width: 38px; }
-    .stat-amount { font-size: 13px; }
-  }
+  .btn-modal-action:active { background: rgba(255,255,255,0.1); }
 </style>
 </head>
 <body>
+<canvas id="confettiCanvas" class="confetti"></canvas>
 
-  <canvas id="confettiCanvas" class="confetti"></canvas>
-
+<div id="app-wrapper">
   <!-- TOP BAR -->
   <header class="top-bar">
-    <button class="btn-back" id="btnExit" onclick="saveAndExit()">⬅ LOBBY</button>
+    <button class="btn-back" id="btnExit" onclick="saveAndExit()">◀ LOBBY</button>
     <div class="stats-group">
       <div class="stat-box">
         <div class="stat-title">TERBAIK</div>
         <div class="stat-amount best" id="displayBest">—</div>
       </div>
       <div class="stat-box">
-        <div class="stat-title">TOTAL CREDITS</div>
+        <div class="stat-title">SALDO</div>
         <div class="stat-amount" id="displayBalance">0</div>
       </div>
       <button class="icon-btn" id="btnSound" onclick="toggleSound()" title="Suara">🔊</button>
@@ -347,123 +389,127 @@
 
   <!-- HISTORY STRIP -->
   <div class="history-strip" id="historyStrip">
-    <span class="hist-placeholder">Riwayat multiplier akan muncul di sini...</span>
+    <span class="hist-placeholder">Menunggu peluncuran...</span>
   </div>
 
   <!-- CHART -->
   <main class="chart-container" id="chartArea">
     <canvas id="starCanvas"></canvas>
     <div class="grid-overlay"></div>
-    <div class="space-object" style="top: 15%; left: 80%; font-size: 46px;">🌕</div>
-    <div class="space-object" style="top: 60%; left: 10%; font-size: 36px; animation-delay: 2s; animation-duration: 20s;">🧑‍🚀</div>
-    <div class="space-object" style="top: 25%; left: 20%; font-size: 28px; animation-delay: 1s; animation-duration: 18s;">🛰️</div>
-
     <canvas id="crashCanvas"></canvas>
     <div class="flash-overlay" id="flashOverlay"></div>
 
+    <div class="badge-container">
+      <div class="side-badge streak-badge" id="streakBadge">—</div>
+      <div class="side-badge auto-badge" id="autoBadge">AUTO ON</div>
+    </div>
+    
     <div class="countdown-badge" id="countdownBadge">BERSIAP...</div>
-    <div class="streak-badge" id="streakBadge">—</div>
-    <div class="auto-badge" id="autoBadge">AUTO AKTIF</div>
 
     <div class="multiplier-display">
       <div class="multiplier-text mult-tier-1" id="multText">1.00x</div>
-      <div class="status-text" id="statusText">SIAPKAN ROKET...</div>
+      <div class="status-text" id="statusText">SIAPKAN PELUNCURAN</div>
     </div>
   </main>
 
   <!-- CONTROLS -->
   <footer class="control-console">
     <div class="tab-switch">
-      <button class="tab-btn active" id="tabManual" onclick="switchMode('manual')">Manual</button>
-      <button class="tab-btn" id="tabAuto" onclick="switchMode('auto')">Auto Cashout</button>
+      <button class="tab-btn active" id="tabManual" onclick="switchMode('manual')">MANUAL</button>
+      <button class="tab-btn" id="tabAuto" onclick="switchMode('auto')">AUTO CASHOUT</button>
     </div>
 
     <div class="auto-row" id="autoRow">
-      <label>Target</label>
-      <input type="number" id="autoTarget" value="2.00" min="1.01" step="0.01" inputmode="decimal">
-      <span style="font-family: var(--font-digital); font-size: 12px; color: var(--gold-main);">x</span>
+      <div class="auto-target-group">
+        <label>TARGET:</label>
+        <input type="number" id="autoTarget" value="2.00" min="1.01" step="0.01" inputmode="decimal">
+        <span style="font-family: var(--font-digital); font-size: 14px; color: var(--text-muted);">x</span>
+      </div>
       <div class="auto-toggle" id="autoToggle" onclick="toggleAuto()"></div>
     </div>
 
-    <div class="chip-selector">
-      <button class="chip-btn active" onclick="setBetAmount(100, this)">100</button>
-      <button class="chip-btn" onclick="setBetAmount(1000, this)">1K</button>
-      <button class="chip-btn" onclick="setBetAmount(5000, this)">5K</button>
-      <button class="chip-btn" onclick="setBetAmount(10000, this)">10K</button>
-      <button class="chip-btn" onclick="setBetAmount(50000, this)">50K</button>
-      <button class="chip-btn chip-max" onclick="setMaxBet(this)">MAX</button>
-    </div>
-
-    <div class="bet-row">
-      <button class="bet-btn-ctrl" id="btnHalf" onclick="adjustBet(0.5)">½</button>
-      <div class="bet-display-box">
-        <span class="bet-display-label">TARUHAN CREDITS</span>
-        <span class="bet-display-val" id="betDisplay">100</span>
+    <div class="bet-control-grid">
+      <div class="bet-input-row">
+        <button class="bet-btn-ctrl" id="btnHalf" onclick="adjustBet(0.5)">/2</button>
+        <div class="bet-display-box">
+          <span class="bet-display-label">JUMLAH TARUHAN</span>
+          <span class="bet-display-val" id="betDisplay">100</span>
+        </div>
+        <button class="bet-btn-ctrl" id="btnDouble" onclick="adjustBet(2)">x2</button>
       </div>
-      <button class="bet-btn-ctrl" id="btnDouble" onclick="adjustBet(2)">x2</button>
+
+      <div class="chip-selector">
+        <button class="chip-btn active" onclick="setBetAmount(100, this)">100</button>
+        <button class="chip-btn" onclick="setBetAmount(1000, this)">1K</button>
+        <button class="chip-btn" onclick="setBetAmount(5000, this)">5K</button>
+        <button class="chip-btn" onclick="setBetAmount(10000, this)">10K</button>
+        <button class="chip-btn" onclick="setBetAmount(50000, this)">50K</button>
+        <button class="chip-btn chip-max" onclick="setMaxBet(this)">MAX</button>
+      </div>
     </div>
 
     <button class="btn-action-main btn-bet" id="mainBtn" onclick="handleAction()">
-      MULAI
+      MULAI TARUHAN
     </button>
   </footer>
 
   <div class="toast" id="toast"></div>
+</div>
 
-  <!-- STATS MODAL -->
-  <div class="modal-overlay" id="statsModal">
-    <div class="modal-box">
-      <button class="btn-close-modal" onclick="closeStatsModal()">×</button>
-      <h2>📊 STATISTIK KAMU</h2>
-      <div class="stat-grid">
-        <div class="stat-tile">
-          <div class="stat-tile-label">Ronde Dimainkan</div>
-          <div class="stat-tile-val" id="statGames">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-tile-label">Menang</div>
-          <div class="stat-tile-val pos" id="statWins">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-tile-label">Kalah</div>
-          <div class="stat-tile-val neg" id="statLosses">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-tile-label">Win Rate</div>
-          <div class="stat-tile-val" id="statWinRate">0%</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-tile-label">Multiplier Terbaik</div>
-          <div class="stat-tile-val" id="statBest">—</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-tile-label">Streak Terpanjang</div>
-          <div class="stat-tile-val" id="statStreak">0</div>
-        </div>
+<!-- STATS MODAL -->
+<div class="modal-overlay" id="statsModal">
+  <div class="modal-box">
+    <button class="btn-close-modal" onclick="closeStatsModal()">×</button>
+    <h2>STATISTIK PEMAIN</h2>
+    <div class="stat-grid">
+      <div class="stat-tile">
+        <div class="stat-tile-label">Total Main</div>
+        <div class="stat-tile-val" id="statGames">0</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">Menang</div>
+        <div class="stat-tile-val pos" id="statWins">0</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">Kalah</div>
+        <div class="stat-tile-val neg" id="statLosses">0</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">Win Rate</div>
+        <div class="stat-tile-val" id="statWinRate">0%</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">Multiplier Max</div>
+        <div class="stat-tile-val" id="statBest">—</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">Streak Terbaik</div>
+        <div class="stat-tile-val" id="statStreak">0</div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- HELP MODAL -->
-  <div class="modal-overlay" id="helpModal">
-    <div class="modal-box">
-      <button class="btn-close-modal" onclick="closeHelpModal()">×</button>
-      <h2>❓ CARA MAIN</h2>
-      <ol class="how-to-list">
-        <li>Pilih jumlah taruhan credits, lalu tekan <b>MULAI</b> untuk meluncurkan roket.</li>
-        <li>Multiplier akan terus naik selagi roket terbang. Tekan <b>AMBIL SEKARANG</b> sebelum roket meledak untuk mengunci kemenangan.</li>
-        <li>Kalau roket meledak sebelum kamu klaim, taruhanmu hangus untuk ronde itu.</li>
-        <li>Mode <b>Auto Cashout</b>: tentukan target multiplier, dan sistem otomatis klaim begitu tercapai.</li>
-      </ol>
-      <button class="btn-modal-action" onclick="closeHelpModal()">MENGERTI</button>
-    </div>
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal-box">
+    <button class="btn-close-modal" onclick="closeHelpModal()">×</button>
+    <h2>CARA BERMAIN</h2>
+    <ol class="how-to-list">
+      <li>Pilih jumlah taruhan, lalu tekan <b>MULAI TARUHAN</b> sebelum waktu habis.</li>
+      <li>Perhatikan grafik Multiplier yang terus naik. Tekan <b>AMBIL SEKARANG</b> untuk mengamankan kemenanganmu.</li>
+      <li>Jangan serakah! Jika grafik meledak sebelum kamu menarik dana, taruhanmu akan hangus.</li>
+      <li>Gunakan <b>Auto Cashout</b> untuk penarikan otomatis saat mencapai target yang ditentukan.</li>
+    </ol>
+    <button class="btn-modal-action" onclick="closeHelpModal()">SAYA MENGERTI</button>
   </div>
+</div>
 
 <script src="api.js"></script>
 <script>
 /**
  * ==============================================================
- * 1. AUTH, SETUP & API INTEGRATION
+ * 1. AUTH, SETUP & API INTEGRATION (LOGIKA UTUH)
  * ==============================================================
  */
 const userJson = localStorage.getItem('currentUser');
@@ -472,7 +518,6 @@ let currentUser = JSON.parse(userJson);
 let playerWinRate = 0.15; 
 const MIN_BET = 100;
 
-// Local stats untuk kosmetik UI History (Tidak mempengaruhi saldo central)
 const BEST_KEY = 'crash_best_' + currentUser.username;
 const STATS_KEY = 'crash_stats_' + currentUser.username;
 const SOUND_KEY = 'crash_sound';
@@ -483,7 +528,6 @@ let currentStreak = 0;
 let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
 let roundHistory = []; 
 
-// Tarik data RTP JSON Bin
 if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
     if (db && db.users) {
@@ -554,10 +598,10 @@ function beep(freq, duration, type, gainVal) {
   gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
   osc.stop(audioCtx.currentTime + duration);
 }
-function sfxLaunch() { beep(220, 0.15, 'square', 0.04); }
-function sfxTick() { beep(880, 0.03, 'sine', 0.015); }
-function sfxWin() { beep(660, 0.12, 'triangle', 0.05); setTimeout(() => beep(990, 0.18, 'triangle', 0.05), 90); }
-function sfxCrash() { beep(120, 0.3, 'sawtooth', 0.07); }
+function sfxLaunch() { beep(300, 0.2, 'square', 0.04); }
+function sfxTick() { beep(900, 0.03, 'sine', 0.01); }
+function sfxWin() { beep(600, 0.1, 'triangle', 0.05); setTimeout(() => beep(1000, 0.2, 'triangle', 0.05), 80); }
+function sfxCrash() { beep(100, 0.4, 'sawtooth', 0.08); }
 
 function toggleSound() {
   soundOn = !soundOn;
@@ -638,19 +682,19 @@ function pushHistory(mult) {
   pill.textContent = mult.toFixed(2) + 'x';
   if (strip.querySelector('.hist-placeholder')) strip.innerHTML = '';
   strip.prepend(pill);
-  while (strip.children.length > 20) strip.removeChild(strip.lastChild);
+  while (strip.children.length > 15) strip.removeChild(strip.lastChild);
 }
 
 function updateStreakBadge() {
   const badge = document.getElementById('streakBadge');
   if (currentStreak >= 2) {
-    badge.textContent = '🔥 MENANG x' + currentStreak;
-    badge.className = 'streak-badge win show';
+    badge.textContent = '🔥 WIN STREAK x' + currentStreak;
+    badge.className = 'side-badge streak-badge win show';
   } else if (currentStreak <= -2) {
-    badge.textContent = '💧 KALAH x' + Math.abs(currentStreak);
-    badge.className = 'streak-badge loss show';
+    badge.textContent = '💧 LOSE x' + Math.abs(currentStreak);
+    badge.className = 'side-badge streak-badge loss show';
   } else {
-    badge.className = 'streak-badge';
+    badge.className = 'side-badge streak-badge';
   }
 }
 
@@ -660,7 +704,7 @@ function updateStreakBadge() {
  * ==============================================================
  */
 let currentBet = 100;
-let gameState = 'IDLE'; // IDLE, BET_PLACED, PLAYING, CASHED_OUT, CRASHED
+let gameState = 'IDLE'; 
 let currentMultiplier = 1.00;
 let crashPoint = 1.00;
 let autoTriggered = false;
@@ -680,7 +724,7 @@ function setBetAmount(amount, btnEl) {
 
 function setMaxBet(btnEl) {
   if (gameState !== 'IDLE') return;
-  if (currentUser.balance < MIN_BET) { showToast('Saldo tidak cukup untuk taruhan minimum (' + MIN_BET + ').'); return; }
+  if (currentUser.balance < MIN_BET) { showToast('Saldo tidak cukup untuk taruhan (' + MIN_BET + ').'); return; }
   currentBet = currentUser.balance;
   document.getElementById('betDisplay').textContent = currentBet.toLocaleString();
   clearChipActive();
@@ -713,8 +757,8 @@ function handleAction() {
 
   if (gameState === 'IDLE') {
     if (currentUser.balance < MIN_BET) { showToast('Saldo habis! Silakan lakukan Deposit.'); return; }
-    if (currentBet > currentUser.balance) { showToast('Saldo tidak cukup untuk taruhan ini!'); return; }
-    if (currentBet < MIN_BET) { showToast('Taruhan minimum adalah ' + MIN_BET + ' credits.'); return; }
+    if (currentBet > currentUser.balance) { showToast('Saldo tidak cukup!'); return; }
+    if (currentBet < MIN_BET) { showToast('Minimum ' + MIN_BET + ' credits.'); return; }
 
     currentUser.balance -= currentBet;
     updateStatsUI(true);
@@ -725,19 +769,19 @@ function handleAction() {
     btn.className = mode === 'auto' && autoEnabled ? 'btn-action-main btn-auto-armed' : 'btn-action-main btn-disabled';
     btn.innerHTML = mode === 'auto' && autoEnabled
       ? `AUTO ARMED @ ${getAutoTarget().toFixed(2)}x`
-      : 'BERSIAP LUNCUR...';
+      : 'MENUNGGU GILIRAN...';
 
     const badge = document.getElementById('countdownBadge');
     badge.classList.add('show');
-    let count = 1.5;
-    badge.textContent = 'MELUNCUR DALAM ' + count.toFixed(1) + 'S';
+    let count = 2.0;
+    badge.textContent = count.toFixed(1) + 's';
     const cdInterval = setInterval(() => {
       count -= 0.1;
       if (count <= 0) { clearInterval(cdInterval); badge.classList.remove('show'); return; }
-      badge.textContent = 'MELUNCUR DALAM ' + count.toFixed(1) + 'S';
+      badge.textContent = count.toFixed(1) + 's';
     }, 100);
 
-    setTimeout(() => { if (gameState === 'BET_PLACED') { sfxLaunch(); startRound(); } }, 1500);
+    setTimeout(() => { if (gameState === 'BET_PLACED') { sfxLaunch(); startRound(); } }, 2000);
 
   } else if (gameState === 'PLAYING') {
     cashOut();
@@ -746,29 +790,27 @@ function handleAction() {
 
 /**
  * ==============================================================
- * STRICT RTP ENGINE (ANTI-FARMING)
+ * STRICT RTP ENGINE (LOGIKA UTUH)
  * ==============================================================
  */
 function calculateCrashPoint() {
   let isWinRound = Math.random() < playerWinRate;
-  
   if (isWinRound) {
     let r = Math.random();
-    if (r < 0.6) return 2.00 + (Math.random() * 3.00); // 2x - 5x
-    else if (r < 0.9) return 5.00 + (Math.random() * 10.00); // 5x - 15x
-    else return 15.00 + (Math.random() * 35.00); // Epic 15x - 50x
+    if (r < 0.6) return 2.00 + (Math.random() * 3.00); 
+    else if (r < 0.9) return 5.00 + (Math.random() * 10.00); 
+    else return 15.00 + (Math.random() * 35.00); 
   } else {
-    // ZONK ROUND (Anti-Cashout Cepat)
     let r = Math.random();
-    if (r < 0.40) return 1.00; // 40% chance Meledak Instan di base
-    else if (r < 0.85) return 1.01 + (Math.random() * 0.19); // Sangat pendek (1.01 - 1.20)
-    else return 1.21 + (Math.random() * 0.40); // Max 1.60x agar bandar menang
+    if (r < 0.40) return 1.00; 
+    else if (r < 0.85) return 1.01 + (Math.random() * 0.19); 
+    else return 1.21 + (Math.random() * 0.40); 
   }
 }
 
 /**
  * ==============================================================
- * STARFIELD BACKGROUND (twinkling parallax stars)
+ * STARFIELD BACKGROUND (Sleek Canvas)
  * ==============================================================
  */
 const starCanvas = document.getElementById('starCanvas');
@@ -778,28 +820,26 @@ function initStars() {
   const area = starCanvas.parentElement;
   starCanvas.width = area.clientWidth;
   starCanvas.height = area.clientHeight;
-  const count = Math.floor((starCanvas.width * starCanvas.height) / 6000);
+  const count = Math.floor((starCanvas.width * starCanvas.height) / 4000);
   stars = [];
   for (let i = 0; i < count; i++) {
     stars.push({
       x: Math.random() * starCanvas.width,
       y: Math.random() * starCanvas.height,
-      r: Math.random() * 1.4 + 0.3,
-      speed: Math.random() * 0.15 + 0.02,
-      phase: Math.random() * Math.PI * 2,
-      twinkleSpeed: Math.random() * 0.02 + 0.005
+      r: Math.random() * 1.5 + 0.5,
+      speed: Math.random() * 0.2 + 0.05,
+      alpha: Math.random()
     });
   }
 }
-function renderStars(t) {
+function renderStars() {
   starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
   for (const s of stars) {
     s.y += s.speed;
     if (s.y > starCanvas.height) { s.y = 0; s.x = Math.random() * starCanvas.width; }
-    const alpha = 0.35 + Math.sin(t * s.twinkleSpeed + s.phase) * 0.35;
     starCtx.beginPath();
     starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    starCtx.fillStyle = `rgba(255,255,255,${Math.max(alpha, 0.05)})`;
+    starCtx.fillStyle = `rgba(14, 165, 233, ${Math.max(s.alpha * (s.y / starCanvas.height), 0.1)})`;
     starCtx.fill();
   }
   requestAnimationFrame(renderStars);
@@ -809,7 +849,7 @@ requestAnimationFrame(renderStars);
 
 /**
  * ==============================================================
- * CANVAS ANIMATION: ROCKET, PLANET, TRAILS
+ * CANVAS ANIMATION: SLEEK CHART & GLOWING LINE
  * ==============================================================
  */
 const canvas = document.getElementById('crashCanvas');
@@ -826,71 +866,75 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-function renderParticles() {
-  for (let i = particles.length - 1; i >= 0; i--) {
-    let p = particles[i];
-    p.life -= 0.03;
-    p.size *= 0.95;
-    if (p.life <= 0) { particles.splice(i, 1); continue; }
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(234, 179, 8, ${p.life})`;
-    ctx.fill();
-  }
-}
-
 function drawGraph(elapsedMs) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  renderParticles();
-
-  let progressX = Math.min(elapsedMs / 10000, 1) * canvas.width * 0.9;
+  
+  let progressX = Math.min(elapsedMs / 10000, 1) * canvas.width * 0.85;
   let yMax = 10;
   let rawYProgress = Math.min((currentMultiplier - 1) / yMax, 1);
-  let progressY = canvas.height - (rawYProgress * canvas.height * 0.7) - 30;
+  let progressY = canvas.height - (rawYProgress * canvas.height * 0.6) - 50;
+  
+  if (gameState !== 'IDLE' && progressX > 0) {
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height);
 
-  ctx.beginPath();
-  ctx.moveTo(0, canvas.height);
+    let cpX = progressX * 0.5;
+    let cpY = canvas.height;
+    ctx.quadraticCurveTo(cpX, cpY, progressX, progressY);
 
-  let cpX = progressX * 0.4;
-  let cpY = canvas.height;
-  ctx.quadraticCurveTo(cpX, cpY, progressX, progressY);
+    // Style Garis Utama
+    if (gameState === 'CRASHED') ctx.strokeStyle = 'transparent';
+    else if (gameState === 'CASHED_OUT') ctx.strokeStyle = '#94a3b8';
+    else ctx.strokeStyle = '#0ea5e9'; // Info / Neon Blue
 
-  if (gameState === 'CRASHED') ctx.strokeStyle = 'transparent';
-  else if (gameState === 'CASHED_OUT') ctx.strokeStyle = '#94a3b8';
-  else ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.stroke();
 
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-
-  let angle = Math.atan2(progressY - cpY, progressX - cpX);
-
-  ctx.save();
-  ctx.translate(progressX, progressY);
-
-  if (gameState === 'CRASHED') {
-    ctx.font = '48px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText("🪐", 30, -10);
-    ctx.fillText("💥", 0, 0);
-  } else {
-    ctx.rotate(angle);
-    ctx.font = '38px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText("🚀", 0, 0);
-
-    if (Math.random() > 0.3) {
-      particles.push({
-        x: progressX - Math.cos(angle) * 20 + (Math.random() * 10 - 5),
-        y: progressY - Math.sin(angle) * 20 + (Math.random() * 10 - 5),
-        size: Math.random() * 8 + 4,
-        life: 1
-      });
+    // Fill Gradien dibawah garis
+    if (gameState !== 'CRASHED') {
+      ctx.lineTo(progressX, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.closePath();
+      
+      let gradient = ctx.createLinearGradient(0, progressY, 0, canvas.height);
+      let colorType = gameState === 'CASHED_OUT' ? 'rgba(148, 163, 184, ' : 'rgba(14, 165, 233, ';
+      gradient.addColorStop(0, colorType + '0.4)');
+      gradient.addColorStop(1, colorType + '0.0)');
+      
+      ctx.fillStyle = gradient;
+      ctx.fill();
     }
+
+    // Rocket / Point Animation
+    let angle = Math.atan2(progressY - cpY, progressX - cpX);
+    ctx.save();
+    ctx.translate(progressX, progressY);
+
+    if (gameState === 'CRASHED') {
+      ctx.font = '40px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("💥", 0, 0);
+    } else {
+      ctx.rotate(angle);
+      // Glow dot at the end
+      ctx.beginPath();
+      ctx.arc(0, 0, 6, 0, Math.PI*2);
+      ctx.fillStyle = gameState === 'CASHED_OUT' ? '#cbd5e1' : '#fff';
+      ctx.fill();
+      ctx.shadowColor = gameState === 'CASHED_OUT' ? '#94a3b8' : '#0ea5e9';
+      ctx.shadowBlur = 15;
+      ctx.fill();
+      ctx.shadowBlur = 0; // reset
+      
+      ctx.font = '28px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("🚀", 10, -5);
+    }
+    ctx.restore();
   }
-  ctx.restore();
 }
 
 function updateMultiplierColor() {
@@ -913,7 +957,6 @@ function startRound() {
   crashPoint = calculateCrashPoint();
   currentMultiplier = 1.00;
   startTime = performance.now();
-  particles = [];
   lastTickSecond = -1;
 
   const multText = document.getElementById('multText');
@@ -921,7 +964,7 @@ function startRound() {
   const btn = document.getElementById('mainBtn');
 
   updateMultiplierColor();
-  statText.textContent = 'ROKET SEDANG TERBANG...';
+  statText.textContent = 'TERBANG KE LUAR ANGKASA...';
 
   const autoArmed = mode === 'auto' && autoEnabled;
   if (!autoArmed) {
@@ -984,9 +1027,9 @@ function cashOut() {
 
   const btn = document.getElementById('mainBtn');
   btn.className = 'btn-action-main btn-success';
-  btn.innerHTML = `BERHASIL<div class="cashout-profit">+${winAmount.toLocaleString()}</div>`;
+  btn.innerHTML = `BERHASIL DITARIK<div class="cashout-profit">+${winAmount.toLocaleString()}</div>`;
 
-  document.getElementById('statusText').textContent = 'AMAN! MENUNGGU RONDE BERAKHIR...';
+  document.getElementById('statusText').textContent = 'AMAN! MENUNGGU JATUH...';
   confettiEngine.burst(50);
 }
 
@@ -1010,53 +1053,57 @@ function crashRound() {
   }
 
   updateStatsUI(false);
-  saveToServer(); // SIMPAN PROGRES KE DATABASE SETIAP ROUND SELESAI
+  saveToServer(); 
 
   document.getElementById('multText').textContent = crashPoint.toFixed(2) + 'x';
   updateMultiplierColor();
-  document.getElementById('statusText').textContent = 'MENABRAK PLANET!';
+  document.getElementById('statusText').textContent = 'CRASHED!';
 
   if (currentUser.balance < MIN_BET) {
-    setTimeout(() => showToast('Saldo hampir habis! Silakan lakukan Deposit.'), 1600);
+    setTimeout(() => showToast('Saldo hampir habis! Silakan Deposit.'), 1600);
   }
 
-  setTimeout(resetBoard, 3200);
+  setTimeout(resetBoard, 3000);
 }
 
 function resetBoard() {
   gameState = 'IDLE';
   currentMultiplier = 1.00;
-  particles = [];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const multText = document.getElementById('multText');
   multText.className = 'multiplier-text mult-tier-1';
   multText.textContent = '1.00x';
-  document.getElementById('statusText').textContent = 'SIAPKAN ROKET...';
+  document.getElementById('statusText').textContent = 'SIAPKAN PELUNCURAN';
   document.getElementById('streakBadge').classList.remove('show');
 
   setControlsEnabled(true);
 
   const btn = document.getElementById('mainBtn');
   btn.className = 'btn-action-main btn-bet';
-  btn.innerHTML = 'MULAI';
+  btn.innerHTML = 'MULAI TARUHAN';
 }
 
 /**
  * ==============================================================
- * CONFETTI ENGINE
+ * CONFETTI ENGINE (Menyebar di dalam wrapper)
  * ==============================================================
  */
 const confettiEngine = {
   canvas: document.getElementById('confettiCanvas'), ctx: null, parts: [],
   colors: ['#10b981', '#34d399', '#fef08a', '#ffffff'],
   init() { this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); this.run(); },
-  resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
+  resize() { 
+    const wrapper = document.getElementById('app-wrapper');
+    this.canvas.width = wrapper.clientWidth; 
+    this.canvas.height = wrapper.clientHeight; 
+    this.canvas.style.left = wrapper.offsetLeft + 'px';
+  },
   burst(count) {
     for (let i = 0; i < count; i++) {
       this.parts.push({
-        x: this.canvas.width / 2, y: this.canvas.height / 2, vx: (Math.random() - 0.5) * 35, vy: (Math.random() - 1) * 35,
-        size: Math.random() * 12 + 6, color: this.colors[Math.floor(Math.random() * this.colors.length)], rot: Math.random() * 360, rotSpd: (Math.random() - 0.5) * 20, life: 1
+        x: this.canvas.width / 2, y: this.canvas.height / 2, vx: (Math.random() - 0.5) * 25, vy: (Math.random() - 1) * 25,
+        size: Math.random() * 10 + 5, color: this.colors[Math.floor(Math.random() * this.colors.length)], rot: Math.random() * 360, rotSpd: (Math.random() - 0.5) * 20, life: 1
       });
     }
   },
@@ -1064,7 +1111,7 @@ const confettiEngine = {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     for (let i = this.parts.length - 1; i >= 0; i--) {
       let p = this.parts[i];
-      p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
+      p.vy += 0.6; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
       this.ctx.save(); this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rot * Math.PI / 180);
       this.ctx.fillStyle = p.color; this.ctx.globalAlpha = Math.max(p.life, 0);
       this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size); this.ctx.restore();
@@ -1075,11 +1122,6 @@ const confettiEngine = {
 };
 confettiEngine.init();
 
-/**
- * ==============================================================
- * MODAL CLOSE ON OVERLAY CLICK
- * ==============================================================
- */
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
 });
