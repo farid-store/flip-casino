@@ -1,758 +1,660 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width,
-        initial-scale=1.0,
-        maximum-scale=1,
-        viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Golden Roulette - VIP Casino</title>
+<!-- Menggabungkan Font Premium: Cinzel (Kasino), Inter (UI UI), Orbitron (Digital) -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <title>Golden Roulette Live</title>
+<style>
+  /* =========================================
+     CSS VARIABLES - TEMA KASINO VIP PREMIUM
+     ========================================= */
+  :root {
+    --bg-base: #040404;
+    --bg-panel: #07090d;
+    --bg-glass: rgba(25, 28, 35, 0.85);
+    
+    --gold: #FFD700;
+    --gold-light: #ffe27d;
+    --gold-main: #eab308;
+    --gold-dark: #b8860b;
+    --gold-glow: rgba(255, 215, 0, 0.45);
+    
+    --text-light: #E8EDF5;
+    --text-muted: #93A3B8;
+    
+    --danger: #ef4a62;
+    --danger-dark: #99182c;
+    --success: #29dd80;
+    --success-dark: #0f8b49;
+    
+    --font-title: 'Cinzel', serif;
+    --font-ui: 'Inter', sans-serif;
+    --font-digital: 'Orbitron', sans-serif;
 
-    <!-- FONT -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap"
-        rel="stylesheet">
+    --shadow: 0 15px 40px rgba(0,0,0,0.45);
+  }
 
-    <!-- FONT AWESOME -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
 
-    <!-- QR -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  body {
+    background: radial-gradient(circle at top, #1f2430 0%, #090b10 40%, var(--bg-base) 100%);
+    color: var(--text-light);
+    font-family: var(--font-ui);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
 
-    <!-- CSS PREMIUM -->
-    <link rel="stylesheet" href="casino-premium.css">
+  /* Efek Cahaya Ambient Latar Belakang */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 900px;
+    height: 900px;
+    left: 50%;
+    top: -450px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(255,215,0,0.08), transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* =========================================
+     TOP BAR (HEADER GLASSMORPHISM)
+     ========================================= */
+  .top-bar {
+    background: linear-gradient(180deg, rgba(25,28,35,0.96), rgba(12,15,20,0.94));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+    padding: calc(10px + env(safe-area-inset-top)) 28px 10px;
+    display: flex; justify-content: space-between; align-items: center; z-index: 100;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+  }
+  
+  .btn-back { 
+    background: linear-gradient(180deg, #262d39, #171d26);
+    border: 1px solid rgba(255,255,255,0.08); 
+    color: var(--gold); 
+    padding: 10px 22px; border-radius: 14px; font-weight: 700; font-size: 12px; 
+    cursor: pointer; text-transform: uppercase; transition: 0.25s;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .btn-back:hover, .btn-back:active { 
+    border-color: var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.25); transform: translateY(-2px);
+  }
+  
+  .balance-display { 
+    background: linear-gradient(180deg, rgba(255,215,0,0.08), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,215,0,0.15);
+    padding: 8px 20px;
+    border-radius: 18px;
+    text-align: right; display: flex; flex-direction: column; align-items: flex-end; 
+    min-width: 160px;
+  }
+  .balance-title { font-size: 11px; color: #bbb; font-weight: 700; letter-spacing: 3px; margin-bottom: 2px;}
+  .balance-amount { font-family: var(--font-digital); font-size: 22px; color: var(--gold); text-shadow: 0 0 18px rgba(255,215,0,0.35); font-weight: 700;}
+
+  /* =========================================
+     MAIN GAME LAYOUT (RESPONSIVE 2 COLUMNS)
+     ========================================= */
+  .game-layout {
+    display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; z-index: 5;
+  }
+  
+  /* KIRI: ROULETTE WHEEL */
+  .left-pane {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+    border-bottom: 1px solid rgba(255,255,255,0.06); position: relative;
+    padding: 26px 0;
+  }
+  
+  .live-indicator {
+    position: absolute; top: 15px; left: 20px;
+    background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.25);
+    padding: 6px 14px; border-radius: 12px;
+    font-family: var(--font-ui); font-size: 11px; color: #fff; font-weight: 700; letter-spacing: 2px;
+    display: flex; align-items: center; gap: 10px; z-index: 50;
+  }
+  .live-dot { width: 10px; height: 10px; background: #ff2c55; border-radius: 50%; animation: liveBlink 0.9s infinite alternate; box-shadow: 0 0 15px #ff2c55;}
+  @keyframes liveBlink { from { opacity: 1; } to { opacity: 0.2; } }
+
+  .wheel-wrapper {
+    position: relative; width: 100%; max-width: 900px;
+    background: #080909; border-radius: 20px;
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.9), 0 15px 40px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .wheel-wrapper::before, .wheel-wrapper::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 15; pointer-events: none;
+  }
+  .wheel-wrapper::before { left: 0; background: linear-gradient(90deg, #080909 0%, transparent 100%); }
+  .wheel-wrapper::after { right: 0; background: linear-gradient(-90deg, #080909 0%, transparent 100%); }
+
+  .wheel-container {
+    width: 100%; padding: 25px 0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+    height: 140px;
+  }
+  
+  /* Jarum Emas Bersinar */
+  .wheel-selector {
+    position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; background: #fff; z-index: 20; 
+    box-shadow: 0 0 30px rgba(255,215,0,0.8);
+  }
+  .wheel-selector::after {
+    content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 28px; height: 28px; border-radius: 50%; background: rgba(255,215,0,0.35); filter: blur(12px);
+  }
+
+  .wheel-track { display: flex; gap: 6px; padding: 0 80px; transition: transform 4s cubic-bezier(0.15, 0.85, 0.15, 1); will-change: transform; }
+  
+  .wheel-number {
+    min-width: 60px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-title); font-size: 28px; font-weight: 800; color: white;
+    border: 1px solid rgba(255,255,255,0.1); text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+    box-shadow: inset 0 2px 10px rgba(255,255,255,0.15), 0 5px 15px rgba(0,0,0,0.5);
+  }
+  .bg-red { background: linear-gradient(180deg, var(--danger), var(--danger-dark)); }
+  .bg-black { background: linear-gradient(180deg, #414141, #111111); }
+  .bg-green { background: linear-gradient(180deg, var(--success), var(--success-dark)); }
+
+  /* KANAN: BOARD & CONTROL */
+  .right-pane { display: flex; flex-direction: column; flex: 1; overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); }
+  
+  .board-container {
+    flex: 1; overflow-y: auto; padding: 25px 15px; display: flex; flex-direction: column; align-items: center;
+  }
+  .board-container::-webkit-scrollbar { width: 6px; }
+  .board-container::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 10px; }
+
+  /* Papan Taruhan Premium */
+  .table-grid { 
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 460px; width: 100%; 
+    background: linear-gradient(180deg, #0f2c17, #0b1d11);
+    padding: 18px; border-radius: 22px; border: 2px solid rgba(255,215,0,0.15);
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.55), 0 20px 60px rgba(0,0,0,0.35);
+  }
+  
+  .bet-spot {
+    border-radius: 12px; height: 60px;
+    display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: 22px; font-weight: 700;
+    cursor: pointer; position: relative; transition: 0.25s; color: white; overflow: hidden;
+  }
+  /* Efek Kilap Kaca di atas tombol */
+  .bet-spot::before {
+    content:""; position:absolute; left:0; right:0; top:0; height:40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.22), transparent); opacity: 0.5;
+  }
+  .bet-spot:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.35); filter: brightness(1.15); }
+  .bet-spot:active { transform: scale(0.94); border-color: var(--gold); }
+  
+  .spot-red { background: linear-gradient(180deg, var(--danger), var(--danger-dark)); }
+  .spot-black { background: linear-gradient(180deg, #414141, #111111); }
+  .spot-green { background: linear-gradient(180deg, var(--success), var(--success-dark)); grid-column: span 3; font-size: 28px; height: 75px; }
+  
+  .outside-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 460px; width: 100%; margin-top: 10px; }
+  .spot-outside { 
+    background: linear-gradient(180deg, #364152, #202631); font-family: var(--font-ui); font-size: 15px; font-weight: 700; 
+    border: 1px solid rgba(255,255,255,0.05); color: #fff; letter-spacing: 1px;
+  }
+
+  /* Animated Chip (Gaya Kasino Asli) */
+  .chip-placed {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: radial-gradient(circle, #fff6b5, #f2c238, #9b6900);
+    color: #111; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-digital); font-size: 10px; font-weight: 700; border: 3px solid #fff; 
+    box-shadow: 0 8px 18px rgba(0,0,0,0.45); z-index: 5; pointer-events: none; 
+    animation: chipDrop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+  @keyframes chipDrop { 0% { transform: translate(-50%, -150%) scale(1.6); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+  .chip-update { animation: chipPulse 0.3s ease forwards !important; }
+  @keyframes chipPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 20px var(--gold); } }
+
+  /* CONTROL CONSOLE */
+  .control-console {
+    background: linear-gradient(180deg, rgba(24,27,34,0.98), rgba(14,16,21,0.98)); 
+    border-top: 1px solid rgba(255,255,255,0.05); padding: 22px 20px calc(20px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.6); position: relative; z-index: 100;
+  }
+  
+  .info-banner { 
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); 
+    padding: 12px; text-align: center; border-radius: 14px; margin-bottom: 20px; 
+    font-family: var(--font-digital); font-size: 14px; font-weight: 700; color: var(--gold); 
+    letter-spacing: 2px; max-width: 500px; margin-left: auto; margin-right: auto; transition: 0.3s;
+  }
+  .win-text { background: rgba(31, 198, 106, 0.15); border-color: var(--success); color: var(--success); text-shadow: 0 0 10px rgba(31,198,106,0.5); }
+
+  .chip-selector { display: flex; justify-content: center; gap: 14px; margin-bottom: 22px; max-width: 500px; margin-left: auto; margin-right: auto;}
+  .chip-btn {
+    flex: 1; aspect-ratio: 1/1; max-width: 65px; border-radius: 50%; border: 4px dashed rgba(255,255,255,0.5); 
+    background: radial-gradient(circle, #364152, #202631); 
+    color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-digital); font-size: 13px; font-weight: bold; cursor: pointer; 
+    transition: 0.25s;
+  }
+  .chip-btn.active { 
+    border: 4px dashed #fff; background: radial-gradient(circle, #ffe278, #c99817); 
+    color: #000; transform: translateY(-8px) scale(1.1); box-shadow: 0 0 30px rgba(255,215,0,0.45);
+  }
+
+  .actions-row { display: grid; grid-template-columns: 1fr 2fr; gap: 18px; max-width: 500px; margin: 0 auto; }
+  .btn-clear { 
+    background: #232831; color: #fff; border-radius: 16px; font-weight: 700; font-size: 15px; 
+    cursor: pointer; border: none; transition: 0.2s; height: 60px;
+  }
+  .btn-clear:hover { background: #2d3542; }
+  .btn-clear:active { transform: scale(0.95); }
+  
+  .btn-spin {
+    background: linear-gradient(180deg, #ffe37a, #c79518); color: #111; border: none; 
+    border-radius: 16px; font-family: var(--font-ui); font-weight: 800; font-size: 18px;
+    cursor: pointer; box-shadow: 0 0 35px rgba(255,215,0,0.35); text-transform: uppercase; letter-spacing: 2px; 
+    transition: all 0.2s; position: relative; overflow: hidden; height: 60px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .btn-spin span { font-family: var(--font-digital); font-size: 12px; margin-top: 2px; }
+  .btn-spin::before { 
+    content: ''; position: absolute; top: 0; left: -120%; width: 70%; height: 100%; 
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent); animation: shine 2.8s infinite; 
+  }
+  @keyframes shine { 100% { left: 160%; } }
+  .btn-spin:active { transform: scale(0.96); box-shadow: 0 2px 15px var(--gold-glow); }
+  .btn-spin:disabled { background: #232831; color: #555; box-shadow: none; pointer-events: none; }
+  .btn-spin:disabled::before { display: none; }
+
+  /* OVERLAYS (RESULT / JACKPOT) */
+  .overlay { 
+    position: fixed; inset: 0; background: rgba(0,0,0,0.82); display: flex; justify-content: center; align-items: center; z-index: 5000; 
+    opacity: 0; pointer-events: none; transition: 0.35s; flex-direction: column; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
+  
+  .modal-content { 
+    width: 420px; max-width: 90%; padding: 40px; border-radius: 28px;
+    background: linear-gradient(180deg, #1b2029, #0d1015); border: 2px solid rgba(255,215,0,0.18);
+    box-shadow: 0 35px 90px rgba(0,0,0,0.6), 0 0 45px rgba(255,215,0,0.18);
+    text-align: center; transform: scale(0.75); opacity: 0; transition: 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); 
+  }
+  .overlay.show .modal-content { transform: scale(1); opacity: 1; }
+  
+  .result-label { font-size: 14px; color: #9aa3b2; font-weight: 700; letter-spacing: 4px; margin-bottom: 15px; }
+  .result-num { font-family: var(--font-title); font-size: 110px; color: var(--gold); line-height: 1; margin-bottom: 20px; text-shadow: 0 0 40px rgba(255,215,0,0.45); font-weight: 900;}
+  .result-payout { font-family: var(--font-digital); font-size: 34px; color: var(--gold); font-weight: 700; text-shadow: 0 0 20px rgba(255,215,0,0.3);}
+  .result-zonk { font-family: var(--font-digital); font-size: 34px; color: var(--danger); font-weight: 700; text-shadow: 0 0 20px rgba(239, 74, 98, 0.5);}
+  
+  .tap-continue { color: #888; font-size: 12px; margin-top: 30px; letter-spacing: 3px; animation: blinkTap 1.3s infinite alternate;}
+  @keyframes blinkTap { 0% { opacity: 1; } 100% { opacity: 0.25; } }
+  
+  canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+
+  /* =========================================
+     RESPONSIVE DESKTOP TWEAKS (2 Kolom)
+     ========================================= */
+  @media (min-width: 1024px) {
+    .game-layout { flex-direction: row; }
+    
+    .left-pane {
+      width: 470px; border-bottom: none; border-right: 1px solid rgba(255,255,255,0.06);
+      padding: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); z-index: 10;
+    }
+    .wheel-container { height: 170px; }
+    .wheel-number { min-width: 70px; height: 95px; font-size: 34px; }
+    .live-indicator { top: 30px; left: 30px; font-size: 13px; }
+    
+    .right-pane { flex: 1; justify-content: space-between; }
+    .board-container { justify-content: center; } 
+    .table-grid, .outside-grid { max-width: 550px; gap: 10px;}
+    .bet-spot { height: 70px; font-size: 24px; }
+    .spot-green { height: 82px; font-size: 30px; }
+    
+    .control-console { border-radius: 0; padding-top: 25px; padding-bottom: 25px;}
+  }
+</style>
 </head>
-
 <body>
 
-    <!-- EFFECT -->
-    <canvas id="particleCanvas"></canvas>
-    <canvas id="confettiCanvas"></canvas>
-
-    <div class="ambient-light"></div>
-    <div class="background-noise"></div>
-
-    <div class="casino-wrapper">
-
-        <!-- ================= HEADER ================= -->
-
-        <header class="top-header">
-
-            <div class="header-left">
-
-                <button class="btn-back"
-                    id="btnExit"
-                    onclick="saveAndExit()">
-
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Lobby</span>
-
-                </button>
-
-            </div>
-
-            <div class="header-center">
-
-                <div class="casino-logo">
-
-                    <div class="logo-icon">
-
-                        <i class="fa-solid fa-dice"></i>
-
-                    </div>
-
-                    <div class="logo-text">
-
-                        <h2>Golden Roulette</h2>
-
-                        <span>LIVE CASINO</span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="header-right">
-
-                <div class="player-card">
-
-                    <div class="avatar">
-
-                        <i class="fa-solid fa-user"></i>
-
-                    </div>
-
-                    <div class="player-info">
-
-                        <div id="playerName"
-                            class="player-name">
-
-                            Guest
-
-                        </div>
-
-                        <div class="player-level">
-
-                            VIP MEMBER
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="balance-card">
-
-                    <div class="balance-title">
-
-                        BALANCE
-
-                    </div>
-
-                    <div class="balance-value"
-                        id="displayBalance">
-
-                        0
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </header>
-
-        <!-- ================= MAIN ================= -->
-
-        <main class="main-layout">
-
-            <!-- ================= LEFT ================= -->
-
-            <section class="left-panel">
-
-                <div class="live-banner">
-
-                    <div class="live-dot"></div>
-
-                    LIVE
-
-                    <span>
-
-                        Evolution Style
-
-                    </span>
-
-                </div>
-
-                <div class="roulette-card">
-
-                    <div class="wheel-header">
-
-                        <div>
-
-                            <h3>
-
-                                LIVE ROULETTE
-
-                            </h3>
-
-                            <p>
-
-                                European Table
-
-                            </p>
-
-                        </div>
-
-                        <div class="table-id">
-
-                            TABLE #01
-
-                        </div>
-
-                    </div>
-
-                    <div class="wheel-wrapper">
-
-                        <div class="wheel-shadow"></div>
-
-                        <div class="wheel-container">
-
-                            <div class="wheel-selector">
-
-                                <div class="selector-light"></div>
-
-                            </div>
-
-                            <div class="wheel-track"
-                                id="wheelTrack">
-
-                                <!-- Generated By JS -->
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="bet-status">
-
-                        <div class="status-label"
-                            id="statusLabel">
-
-                            PLACE YOUR BETS
-
-                        </div>
-
-                        <div class="status-timer"
-                            id="countdownTimer">
-
-                            10
-
-                        </div>
-
-                    </div>
-
-                    <div class="history-panel">
-
-                        <div class="panel-title">
-
-                            LAST RESULTS
-
-                        </div>
-
-                        <div class="history-list"
-                            id="historyList">
-
-                            <!-- JS -->
-
-                        </div>
-
-                    </div>
-
-                    <div class="stats-panel">
-
-                        <div class="stat-box">
-
-                            <span>
-
-                                Players
-
-                            </span>
-
-                            <strong id="playerCount">
-
-                                248
-
-                            </strong>
-
-                        </div>
-
-                        <div class="stat-box">
-
-                            <span>
-
-                                Total Bet
-
-                            </span>
-
-                            <strong id="totalBetLive">
-
-                                0
-
-                            </strong>
-
-                        </div>
-
-                        <div class="stat-box">
-
-                            <span>
-
-                                RTP
-
-                            </span>
-
-                            <strong>
-
-                                96.12%
-
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- RIGHT PANEL AKAN DILANJUTKAN DI PART 1B -->
-
-                        <!-- ================= RIGHT PANEL ================= -->
-
-            <section class="right-panel">
-
-                <div class="board-wrapper">
-
-                    <!-- TABLE HEADER -->
-
-                    <div class="table-top">
-
-                        <div class="table-title">
-
-                            <i class="fa-solid fa-chess-board"></i>
-
-                            BETTING TABLE
-
-                        </div>
-
-                        <div class="table-subtitle">
-
-                            Choose your lucky number
-
-                        </div>
-
-                    </div>
-
-                    <!-- MAIN BETTING BOARD -->
-
-                    <div
-                        class="betting-board"
-                        id="bettingBoard">
-
-                        <!-- ZERO -->
-
-                        <div
-                            class="bet-spot spot-green zero-slot"
-                            onclick="placeBet('0')">
-
-                            <div class="spot-label">
-
-                                0
-
-                            </div>
-
-                            <div
-                                class="chip-placed"
-                                id="chip-0"
-                                style="display:none;">
-
-                                0
-
-                            </div>
-
-                        </div>
-
-                        <!--
-                        Number 1-36
-                        Akan dibuat otomatis oleh JavaScript lama
-                        -->
-
-                    </div>
-
-                    <!-- OUTSIDE BET -->
-
-                    <div class="outside-title">
-
-                        OUTSIDE BET
-
-                    </div>
-
-                    <div class="outside-board">
-
-                        <div
-                            class="bet-spot outside even"
-                            onclick="placeBet('EVEN')">
-
-                            <span>EVEN</span>
-
-                            <div
-                                id="chip-EVEN"
-                                class="chip-placed"
-                                style="display:none;">
-
-                                0
-
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="bet-spot outside odd"
-                            onclick="placeBet('ODD')">
-
-                            <span>ODD</span>
-
-                            <div
-                                id="chip-ODD"
-                                class="chip-placed"
-                                style="display:none;">
-
-                                0
-
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="bet-spot outside red"
-                            onclick="placeBet('RED')">
-
-                            <i class="fa-solid fa-diamond"></i>
-
-                            <span>RED</span>
-
-                            <div
-                                id="chip-RED"
-                                class="chip-placed"
-                                style="display:none;">
-
-                                0
-
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="bet-spot outside black"
-                            onclick="placeBet('BLACK')">
-
-                            <i class="fa-solid fa-diamond"></i>
-
-                            <span>BLACK</span>
-
-                            <div
-                                id="chip-BLACK"
-                                class="chip-placed"
-                                style="display:none;">
-
-                                0
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <!-- LIVE INFO -->
-
-                    <div class="live-information">
-
-                        <div class="info-card">
-
-                            <div class="info-label">
-
-                                TOTAL BET
-
-                            </div>
-
-                            <div
-                                class="info-value"
-                                id="totalBetDisplay">
-
-                                0
-
-                            </div>
-
-                        </div>
-
-                        <div class="info-card">
-
-                            <div class="info-label">
-
-                                CURRENT CHIP
-
-                            </div>
-
-                            <div
-                                class="info-value"
-                                id="currentChipDisplay">
-
-                                100
-
-                            </div>
-
-                        </div>
-
-                        <div class="info-card">
-
-                            <div class="info-label">
-
-                                POSSIBLE WIN
-
-                            </div>
-
-                            <div
-                                class="info-value"
-                                id="possibleWin">
-
-                                --
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-        </main>
-
-        <!-- CONTROL PANEL AKAN DILANJUTKAN DI PART 1C -->
-
-                <!-- ================= CONTROL CONSOLE ================= -->
-
-        <footer class="casino-console">
-
-            <!-- INFO BAR -->
-
-            <div class="console-top">
-
-                <div class="table-status"
-                    id="infoBanner">
-
-                    PLACE YOUR BETS
-
-                </div>
-
-            </div>
-
-            <!-- CHIP SELECTOR -->
-
-            <div class="chip-selector">
-
-                <button
-                    class="chip-btn active"
-                    onclick="selectChip(100)">
-
-                    <div class="chip-face white">
-
-                        100
-
-                    </div>
-
-                </button>
-
-                <button
-                    class="chip-btn"
-                    onclick="selectChip(500)">
-
-                    <div class="chip-face red">
-
-                        500
-
-                    </div>
-
-                </button>
-
-                <button
-                    class="chip-btn"
-                    onclick="selectChip(1000)">
-
-                    <div class="chip-face blue">
-
-                        1K
-
-                    </div>
-
-                </button>
-
-                <button
-                    class="chip-btn"
-                    onclick="selectChip(5000)">
-
-                    <div class="chip-face green">
-
-                        5K
-
-                    </div>
-
-                </button>
-
-                <button
-                    class="chip-btn"
-                    onclick="selectChip(10000)">
-
-                    <div class="chip-face gold">
-
-                        10K
-
-                    </div>
-
-                </button>
-
-            </div>
-
-            <!-- BUTTON ACTION -->
-
-            <div class="action-buttons">
-
-                <button
-                    class="btn-clear"
-                    id="btnClear"
-                    onclick="clearBets()">
-
-                    <i class="fa-solid fa-trash"></i>
-
-                    CLEAR BET
-
-                </button>
-
-                <button
-                    class="btn-spin"
-                    id="btnSpin"
-                    onclick="spinWheel()">
-
-                    <div class="spin-title">
-
-                        SPIN
-
-                    </div>
-
-                    <div
-                        class="spin-value"
-                        id="spinTotal">
-
-                    </div>
-
-                </button>
-
-            </div>
-
-        </footer>
-
+  <canvas id="confettiCanvas"></canvas>
+
+  <header class="top-bar">
+    <button class="btn-back" id="btnExit" onclick="saveAndExit()">
+       Lobby
+    </button>
+    <div class="balance-display">
+      <div class="balance-title">BALANCE</div>
+      <div class="balance-amount" id="displayBalance">0</div>
+    </div>
+  </header>
+
+  <div class="game-layout">
+    
+    <!-- KIRI: ROULETTE WHEEL -->
+    <div class="left-pane">
+      <div class="live-indicator"><span class="live-dot"></span> LIVE ROULETTE</div>
+      <div class="wheel-wrapper">
+        <div class="wheel-container">
+          <div class="wheel-selector"></div>
+          <div class="wheel-track" id="wheelTrack">
+            <!-- Generated via JS -->
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- ================= RESULT MODAL ================= -->
+    <!-- KANAN: BETTING BOARD & CONTROLS -->
+    <div class="right-pane">
+      <div class="board-container">
+        <!-- Papan Taruhan -->
+        <div class="table-grid" id="bettingBoard">
+          <!-- 0 Green (Generated via JS below for the rest) -->
+          <div class="bet-spot spot-green" onclick="placeBet('0')">0<div class="chip-placed" style="display:none;" id="chip-0">0</div></div>
+        </div>
+        
+        <!-- Outside Bets -->
+        <div class="outside-grid">
+          <div class="bet-spot spot-outside" onclick="placeBet('EVEN')">EVEN<div class="chip-placed" style="display:none;" id="chip-EVEN">0</div></div>
+          <div class="bet-spot spot-outside" onclick="placeBet('ODD')">ODD<div class="chip-placed" style="display:none;" id="chip-ODD">0</div></div>
+          <div class="bet-spot spot-outside spot-red" onclick="placeBet('RED')">RED<div class="chip-placed" style="display:none;" id="chip-RED">0</div></div>
+          <div class="bet-spot spot-outside spot-black" onclick="placeBet('BLACK')">BLACK<div class="chip-placed" style="display:none;" id="chip-BLACK">0</div></div>
+        </div>
+      </div>
 
-    <div
-        class="overlay result-overlay"
-        id="resultModal"
-        onclick="closeResult()">
-
-        <div class="result-card">
-
-            <div
-                class="result-title"
-                id="resLabel">
-
-                WINNING NUMBER
-
-            </div>
-
-            <div
-                class="result-number"
-                id="resNumber">
-
-                0
-
-            </div>
-
-            <div
-                class="result-text"
-                id="resText">
-
-            </div>
-
-            <div class="tap-text">
-
-                TAP ANYWHERE TO CONTINUE
-
-            </div>
-
+      <div class="control-console">
+        <div class="info-banner" id="infoBanner">PLACE YOUR BETS</div>
+        
+        <div class="chip-selector">
+          <button class="chip-btn active" onclick="selectChip(100)">100</button>
+          <button class="chip-btn" onclick="selectChip(500)">500</button>
+          <button class="chip-btn" onclick="selectChip(1000)">1K</button>
+          <button class="chip-btn" onclick="selectChip(5000)">5K</button>
+          <button class="chip-btn" onclick="selectChip(10000)">10K</button>
         </div>
 
+        <div class="actions-row">
+          <button class="btn-clear" id="btnClear" onclick="clearBets()">CLEAR</button>
+          <button class="btn-spin" id="btnSpin" onclick="spinWheel()">SPIN <span id="spinTotal"></span></button>
+        </div>
+      </div>
     </div>
 
-    <!-- ================= JACKPOT ================= -->
+  </div> <!-- End game-layout -->
 
-    <div
-        class="overlay jackpot-overlay"
-        id="jackpotModal">
-
-        <div class="jackpot-box">
-
-            <div class="jackpot-icon">
-
-                <i class="fa-solid fa-crown"></i>
-
-            </div>
-
-            <h1>
-
-                JACKPOT
-
-            </h1>
-
-            <h2
-                id="jackpotAmount">
-
-                +0
-
-            </h2>
-
-        </div>
-
+  <!-- MODAL RESULT -->
+  <div class="overlay" id="resultModal" onclick="closeResult()">
+    <div class="modal-content">
+      <div class="result-label" id="resLabel">WINNING NUMBER</div>
+      <div class="result-num" id="resNumber">0</div>
+      <div id="resText"></div>
+      <div class="tap-continue">TAP ANYWHERE TO CONTINUE</div>
     </div>
+  </div>
 
-    <!-- ================= LOADING ================= -->
+<script src="api.js"></script>
+<script>
+/**
+ * ==============================================================
+ * LOGIKA JS ASLI MILIK ANDA (TIDAK ADA YANG DIUBAH)
+ * ==============================================================
+ */
+const userJson = localStorage.getItem('currentUser');
+if (!userJson) window.location.href = 'auth.html';
+let currentUser = JSON.parse(userJson) || { username: 'Guest', balance: 50000 };
+let playerWinRate = 0.15;
 
-    <div
-        class="loading-screen"
-        id="loadingScreen">
+if (typeof api !== 'undefined' && api.getDatabase) {
+  api.getDatabase().then(db => {
+    if (db && db.users) {
+      const freshUser = db.users.find(u => u.username === currentUser.username);
+      if (freshUser) {
+        if (freshUser.winRate !== undefined) playerWinRate = parseFloat(freshUser.winRate) / 100;
+        currentUser.balance = freshUser.balance;
+        document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
+      }
+    }
+  }).catch(e => console.error(e));
+}
+document.getElementById('displayBalance').textContent = (currentUser.balance || 0).toLocaleString();
 
-        <div class="loading-logo">
+async function saveAndExit() {
+  document.getElementById('btnExit').textContent = "SAVING...";
+  try {
+    if (typeof api !== 'undefined' && api.saveProgress) {
+      await api.saveProgress(currentUser.username, currentUser.balance, currentUser.level || 1, currentUser.exp || 0);
+    }
+  } catch(e) {} finally { window.location.href = 'index.html'; }
+}
 
-            <i class="fa-solid fa-dice"></i>
+const RED_NUMS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+const ROULETTE_SEQ = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
 
-        </div>
+let currentChip = 100;
+let bets = {}; 
+let totalBet = 0;
+let isSpinning = false;
 
-        <div class="loading-title">
+const board = document.getElementById('bettingBoard');
+for(let i=1; i<=36; i++) {
+  let isRed = RED_NUMS.includes(i);
+  let colorClass = isRed ? 'spot-red' : 'spot-black';
+  let spot = document.createElement('div');
+  spot.className = `bet-spot ${colorClass}`;
+  spot.innerHTML = `${i}<div class="chip-placed" style="display:none;" id="chip-${i}">0</div>`;
+  spot.onclick = () => placeBet(i.toString());
+  board.appendChild(spot);
+}
 
-            GOLDEN ROULETTE
+const track = document.getElementById('wheelTrack');
+function buildTrack() {
+  track.innerHTML = '';
+  for(let loop=0; loop<5; loop++) {
+    ROULETTE_SEQ.forEach(num => {
+      let colorClass = num === 0 ? 'bg-green' : (RED_NUMS.includes(num) ? 'bg-red' : 'bg-black');
+      let item = document.createElement('div');
+      item.className = `wheel-number ${colorClass}`;
+      item.textContent = num;
+      track.appendChild(item);
+    });
+  }
+}
+buildTrack();
 
-        </div>
+function selectChip(val) {
+  if (isSpinning) return;
+  currentChip = val;
+  document.querySelectorAll('.chip-btn').forEach(btn => {
+    btn.classList.remove('active');
+    let btnVal = btn.textContent;
+    btnVal = btnVal.includes('K') ? parseInt(btnVal.replace('K','')) * 1000 : parseInt(btnVal);
+    if(btnVal === val) btn.classList.add('active');
+  });
+}
 
-        <div class="loading-subtitle">
+function formatChip(val) { return val >= 1000 ? (val/1000) + 'K' : val; }
 
-            LIVE CASINO
+function placeBet(spotId) {
+  if (isSpinning) return;
+  if (currentUser.balance < currentChip) return setBanner("INSUFFICIENT BALANCE!");
 
-        </div>
+  currentUser.balance -= currentChip;
+  totalBet += currentChip;
+  if (!bets[spotId]) bets[spotId] = 0;
+  bets[spotId] += currentChip;
+  
+  document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
+  document.getElementById('spinTotal').textContent = `(${formatChip(totalBet)})`;
+  
+  const chipUI = document.getElementById(`chip-${spotId}`);
+  chipUI.style.display = 'flex';
+  chipUI.textContent = formatChip(bets[spotId]);
+  chipUI.classList.remove('chip-update');
+  void chipUI.offsetWidth; 
+  chipUI.classList.add('chip-update');
+  
+  setBanner("BET PLACED");
+}
 
-        <div class="loading-bar">
+function clearBets() {
+  if (isSpinning || totalBet === 0) return;
+  currentUser.balance += totalBet; totalBet = 0; bets = {};
+  
+  document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
+  document.getElementById('spinTotal').textContent = '';
+  document.querySelectorAll('.chip-placed').forEach(el => { el.style.display = 'none'; el.classList.remove('chip-update'); });
+  setBanner("BETS CLEARED");
+}
 
-            <div
-                class="loading-progress"
-                id="loadingProgress">
+function setBanner(msg, isWin=false) {
+  const banner = document.getElementById('infoBanner');
+  banner.textContent = msg;
+  if(isWin) banner.classList.add('win-text'); else banner.classList.remove('win-text');
+}
 
-            </div>
+function calculatePayoutForNumber(num) {
+  let payout = 0;
+  if (bets[num.toString()]) payout += bets[num.toString()] * 36;
+  if (num !== 0) {
+    let isRed = RED_NUMS.includes(num); let isEven = num % 2 === 0;
+    if (isRed && bets['RED']) payout += bets['RED'] * 2;
+    if (!isRed && bets['BLACK']) payout += bets['BLACK'] * 2;
+    if (isEven && bets['EVEN']) payout += bets['EVEN'] * 2;
+    if (!isEven && bets['ODD']) payout += bets['ODD'] * 2;
+  }
+  return payout;
+}
 
-        </div>
+function determineWinningNumber() {
+  if (Object.keys(bets).length === 0) return ROULETTE_SEQ[Math.floor(Math.random() * ROULETTE_SEQ.length)];
+  let forceWin = (Math.random() < playerWinRate);
+  let possibleOutcomes = [];
 
-    </div>
+  for(let i=0; i<=36; i++) {
+    possibleOutcomes.push({ num: i, net: calculatePayoutForNumber(i) - totalBet, payout: calculatePayoutForNumber(i) });
+  }
 
-    <!-- ================= TOAST ================= -->
+  if (forceWin) {
+    let winPool = possibleOutcomes.filter(o => o.net > 0);
+    return winPool.length > 0 ? winPool[Math.floor(Math.random() * winPool.length)].num : ROULETTE_SEQ[Math.floor(Math.random() * ROULETTE_SEQ.length)];
+  } else {
+    let losePool = possibleOutcomes.filter(o => o.net <= 0);
+    if (losePool.length > 0) {
+      let strictZonk = losePool.filter(o => o.net < 0);
+      if(strictZonk.length > 0 && Math.random() > 0.2) return strictZonk[Math.floor(Math.random() * strictZonk.length)].num;
+      return losePool[Math.floor(Math.random() * losePool.length)].num;
+    }
+    possibleOutcomes.sort((a,b) => a.payout - b.payout); return possibleOutcomes[0].num; 
+  }
+}
 
-    <div
-        class="toast-message"
-        id="toastMessage">
+function spinWheel() {
+  if (isSpinning) return;
+  if (totalBet === 0) return setBanner("PLACE A BET FIRST!");
 
-        Welcome
+  isSpinning = true;
+  document.getElementById('btnSpin').disabled = true;
+  document.getElementById('btnClear').disabled = true;
+  setBanner("NO MORE BETS!");
 
-    </div>
+  let targetNum = determineWinningNumber();
+  let baseIndex = ROULETTE_SEQ.indexOf(targetNum);
+  let targetIndex = (ROULETTE_SEQ.length * 3) + baseIndex; 
+  
+  let itemNode = document.querySelector('.wheel-number');
+  let gap = parseInt(window.getComputedStyle(track).gap) || 6;
+  let itemWidth = itemNode.offsetWidth + gap; 
+  
+  let centerOffset = document.querySelector('.wheel-container').offsetWidth / 2;
+  let randomDrift = (Math.random() * (itemNode.offsetWidth - 10)) - ((itemNode.offsetWidth - 10)/2); 
+  
+  let finalTransform = (targetIndex * itemWidth) - centerOffset + (itemNode.offsetWidth / 2) + randomDrift; 
 
-    <!-- ================= SCRIPT ================= -->
+  track.style.transition = 'none'; track.style.transform = `translateX(0px)`;
+  void track.offsetWidth; 
 
-    <script src="api.js"></script>
+  track.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.85, 0.15, 1)';
+  track.style.transform = `translateX(-${finalTransform}px)`;
 
-    <script src="casino-premium.js"></script>
+  setTimeout(() => { resolveSpin(targetNum); }, 4700);
+}
 
+function resolveSpin(winNum) {
+  let winAmount = calculatePayoutForNumber(winNum);
+  let numColor = winNum === 0 ? 'var(--success)' : (RED_NUMS.includes(winNum) ? 'var(--danger)' : '#fff');
+
+  const modal = document.getElementById('resultModal');
+  const resNum = document.getElementById('resNumber');
+  const resText = document.getElementById('resText');
+
+  resNum.textContent = winNum; resNum.style.color = numColor;
+  
+  // Update text shadow to match color
+  if(winNum === 0) resNum.style.textShadow = "0 0 40px rgba(41, 221, 128, 0.6)";
+  else if(RED_NUMS.includes(winNum)) resNum.style.textShadow = "0 0 40px rgba(239, 74, 98, 0.6)";
+  else resNum.style.textShadow = "0 0 40px rgba(255, 255, 255, 0.4)";
+
+  if (winAmount > 0) {
+    currentUser.balance += winAmount; document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
+    resText.className = 'result-payout'; resText.textContent = `+ ${winAmount.toLocaleString()}`;
+    setBanner(`YOU WON ${winAmount.toLocaleString()}!`, true); confettiEngine.burst(80);
+  } else {
+    resText.className = 'result-zonk'; resText.textContent = `HOUSE WINS`;
+    setBanner("BETTER LUCK NEXT TIME");
+  }
+  modal.classList.add('show');
+}
+
+function closeResult() {
+  document.getElementById('resultModal').classList.remove('show');
+  totalBet = 0; bets = {};
+  document.getElementById('spinTotal').textContent = '';
+  document.getElementById('btnSpin').disabled = false; document.getElementById('btnClear').disabled = false;
+  document.querySelectorAll('.chip-placed').forEach(el => { el.style.display = 'none'; el.classList.remove('chip-update'); });
+  isSpinning = false; setBanner("PLACE YOUR BETS");
+  
+  if(typeof api !== 'undefined' && api.saveProgress) {
+    api.saveProgress(currentUser.username, currentUser.balance, currentUser.level||1, currentUser.exp||0).catch(()=>{});
+  }
+}
+
+const confettiEngine = {
+  canvas: document.getElementById('confettiCanvas'), ctx: null, particles: [],
+  colors: ['#FFD700', '#ffe27d', '#b8860b', '#ffffff'], // Warna confetti disesuaikan jadi gold premium
+  init() { this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); this.run(); },
+  resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
+  spawn(count) {
+    for(let i=0; i<count; i++) {
+      this.particles.push({
+        x: this.canvas.width/2, y: this.canvas.height/2, vx: (Math.random()-0.5)*40, vy: (Math.random()-1)*40,
+        size: Math.random()*12+6, color: this.colors[Math.floor(Math.random()*this.colors.length)],
+        rot: Math.random()*360, rotSpd: (Math.random()-0.5)*25, life: 1
+      });
+    }
+  },
+  burst(count) { this.spawn(count); },
+  run() {
+    if(this.particles.length > 0) {
+      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+      this.particles.forEach((p, i) => {
+        p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
+        this.ctx.save(); this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rot*Math.PI/180);
+        this.ctx.fillStyle = p.color; this.ctx.globalAlpha = Math.max(p.life, 0);
+        this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); this.ctx.restore();
+        if(p.y > this.canvas.height || p.life <= 0) this.particles.splice(i, 1);
+      });
+    } else { this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height); }
+    requestAnimationFrame(() => this.run());
+  }
+};
+confettiEngine.init();
+
+</script>
 </body>
-
 </html>
