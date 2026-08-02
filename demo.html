@@ -1,517 +1,758 @@
-<script>
-    // --- CANVAS CONTEXTS ---
-    const canvas = document.getElementById('market-canvas');
-    const ctx = canvas.getContext('2d');
-    const depthCanvas = document.getElementById('depth-canvas');
-    const depthCtx = depthCanvas.getContext('2d');
-    
-    // --- STATE MANAGEMENT ---
-    let candleWidth = 6;
-    let candleSpacing = 2;
-    let chartData = []; 
-    
-    // --- GLOBAL VWAP CALCULATOR ---
-    let sessionTotalValue = 0;
-    let sessionTotalVol = 0;
-    
-    // --- RESIZE HANDLER ---
-    function resizeCanvases() {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-        depthCanvas.width = depthCanvas.parentElement.clientWidth;
-        depthCanvas.height = depthCanvas.parentElement.clientHeight;
-        renderChart();
-        if(Engine) Engine.renderDepth();
-    }
-    window.addEventListener('resize', resizeCanvases);
+<!DOCTYPE html>
+<html lang="id">
 
-    // --- CHART RENDERER (DIPERBAIKI UNTUK REAL-TIME) ---
-    function renderChart() {
-        // PERBAIKAN: Selalu gabungkan data riwayat dengan candle yang sedang menyala (currentBar)
-        const fullData = currentBar ? [...chartData, currentBar] : chartData;
-        
-        if(fullData.length === 0) return;
-        
-        ctx.fillStyle = "var(--bg-dark)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        const maxCandles = Math.floor(canvas.width / (candleWidth + candleSpacing));
-        const visibleData = fullData.slice(-maxCandles);
-        
-        let minP = Infinity, maxP = -Infinity, maxVol = 0;
-        
-        visibleData.forEach(d => {
-            if (d.high > maxP) maxP = d.high;
-            if (d.low < minP) minP = d.low;
-            if (d.vol > maxVol) maxVol = d.vol;
-        });
-        
-        const padding = (maxP - minP) * 0.15; 
-        maxP += padding || 1; 
-        minP -= padding || 1;
-        
-        const priceRange = maxP - minP;
-        const h = canvas.height;
-        const priceH = h * 0.85; 
-        const volH = h * 0.15; 
-        
-        const getY = (price) => priceH - ((price - minP) / priceRange) * priceH;
-        const getVolY = (vol) => h - (vol / maxVol) * volH;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width,
+        initial-scale=1.0,
+        maximum-scale=1,
+        viewport-fit=cover">
 
-        // Grid Lines
-        ctx.strokeStyle = "rgba(42, 46, 57, 0.5)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        const step = Math.ceil(priceRange / 5) || 1;
-        for(let p = Math.floor(minP); p <= Math.ceil(maxP); p+=step) {
-            const y = Math.floor(getY(p)) + 0.5;
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.fillStyle = "var(--text-sec)";
-            ctx.font = "10px 'Roboto Mono'";
-            ctx.fillText(p, canvas.width - 25, y - 4);
-        }
-        ctx.stroke();
+    <title>Golden Roulette Live</title>
 
-        // Draw VWAP Line
-        ctx.beginPath();
-        ctx.strokeStyle = "var(--vwap)";
-        ctx.lineWidth = 1.5;
-        visibleData.forEach((d, i) => {
-            const x = i * (candleWidth + candleSpacing) + (candleWidth/2);
-            const y = getY(d.vwap);
-            if(i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
+    <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap"
+        rel="stylesheet">
 
-        // Draw Candles
-        visibleData.forEach((d, i) => {
-            const x = i * (candleWidth + candleSpacing);
-            const isUp = d.close >= d.open;
-            const color = isUp ? 'var(--up)' : 'var(--down)';
-            const volColor = isUp ? 'var(--up-bg)' : 'var(--down-bg)';
-            
-            ctx.fillStyle = color;
-            ctx.strokeStyle = color;
-            
-            // Wick
-            const yHigh = getY(d.high);
-            const yLow = getY(d.low);
-            const yCenter = x + candleWidth / 2;
-            
-            ctx.beginPath();
-            ctx.moveTo(yCenter, yHigh);
-            ctx.lineTo(yCenter, yLow);
-            ctx.stroke();
-            
-            // Body
-            const yOpen = getY(d.open);
-            const yClose = getY(d.close);
-            const bodyH = Math.max(Math.abs(yClose - yOpen), 1); 
-            const yTop = Math.min(yOpen, yClose);
-            
-            ctx.fillRect(x, yTop, candleWidth, bodyH);
-            
-            // Volume
-            const vY = getVolY(d.vol);
-            ctx.fillStyle = volColor;
-            ctx.fillRect(x, vY, candleWidth, h - vY);
-        });
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 
-        // Current Price Line
-        const last = visibleData[visibleData.length - 1];
-        const lastY = getY(last.close);
-        ctx.strokeStyle = last.close >= last.open ? 'var(--up)' : 'var(--down)';
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(0, lastY);
-        ctx.lineTo(canvas.width, lastY);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        
-        // Price Tag
-        ctx.fillStyle = ctx.strokeStyle;
-        ctx.fillRect(canvas.width - 35, lastY - 9, 35, 18);
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 11px 'Roboto Mono'";
-        ctx.fillText(last.close.toFixed(0), canvas.width - 30, lastY + 4);
-    }
+    <!-- QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    // --- INITIALIZE DUMMY DATA ---
-    let currentPrice = 82;
-    let time = Math.floor(Date.now() / 1000) - 3600;
+    <!-- CSS PREMIUM -->
+    <link rel="stylesheet" href="casino-premium.css">
+</head>
 
-    for(let i=0; i<150; i++) {
-        time += 60;
-        const open = currentPrice;
-        const close = Math.round((open + (Math.random() - 0.5) * 2)*10)/10;
-        const high = Math.max(open, close) + Math.random();
-        const low = Math.min(open, close) - Math.random();
-        const vol = Math.floor(Math.random() * 5000) + 500;
-        
-        sessionTotalValue += ((high+low+close)/3) * vol;
-        sessionTotalVol += vol;
-        const vwap = sessionTotalValue / sessionTotalVol;
+<body>
 
-        currentPrice = close;
-        chartData.push({ time, open, high, low, close, vol, vwap });
-    }
+    <!-- EFFECT -->
+    <canvas id="particleCanvas"></canvas>
+    <canvas id="confettiCanvas"></canvas>
 
-    // Tunggu DOM siap sebelum render
-    let currentBar = null; 
-    setTimeout(() => {
-        let lastCandle = chartData[chartData.length - 1];
-        currentBar = {
-            open: lastCandle.close,
-            high: lastCandle.close,
-            low: lastCandle.close,
-            close: lastCandle.close,
-            vol: 0,
-            vwap: lastCandle.vwap,
-            time: lastCandle.time + 60,
-        };
-        resizeCanvases();
-        Engine.init(); // Pindahkan init ke sini agar currentBar siap
-    }, 100);
+    <div class="ambient-light"></div>
+    <div class="background-noise"></div>
 
-    // --- MARKET MAKER ENGINE ---
-    const Engine = {
-        price: 82,
-        bids: [],
-        asks: [],
-        trades: [],
-        
-        isIceberg: false,
-        icebergPrice: 0,
-        isSpoof: false,
-        spoofPrice: 0,
-        
-        bandarCodes: ['MG', 'BK', 'AK', 'ZP', 'CC'],
-        retailCodes: ['YP', 'PD', 'NI', 'XL', 'KK'],
-        brokerStats: {},
+    <div class="casino-wrapper">
 
-        init() {
-            this.price = Math.round(currentBar.close);
-            [...this.bandarCodes, ...this.retailCodes].forEach(code => {
-                this.brokerStats[code] = { buy: 0, sell: 0, net: 0, isBandar: this.bandarCodes.includes(code) };
-            });
+        <!-- ================= HEADER ================= -->
 
-            this.generateOB();
-            this.renderOB();
-            this.renderBrokerSummary();
-            setInterval(() => this.tick(), 400); 
-        },
+        <header class="top-header">
 
-        generateOB() {
-            this.bids = [];
-            this.asks = [];
-            for(let i=1; i<=10; i++) {
-                this.bids.push({ p: this.price - i, v: Math.floor(Math.random()*8000), type: 'NORMAL' });
-                this.asks.push({ p: this.price + i, v: Math.floor(Math.random()*8000), type: 'NORMAL' });
-            }
-        },
+            <div class="header-left">
 
-        toggleAlgo(type) {
-            if(type === 'ICEBERG') {
-                this.isIceberg = !this.isIceberg;
-                document.getElementById('status-iceberg').className = `w-2 h-2 rounded-full ${this.isIceberg ? 'bg-green-500 shadow-[0_0_5px_lime]' : 'bg-gray-600'}`;
-                if(this.isIceberg) {
-                    this.icebergPrice = this.bids[0].p;
-                    this.bids[0].v = 112; 
-                    this.bids[0].type = 'ICEBERG';
-                    UI.notify("ICEBERG ACTIVE", "text-up");
-                } else {
-                    this.bids[0].type = 'NORMAL';
-                    this.bids[0].v = Math.floor(Math.random()*2000);
-                }
-            }
-            if(type === 'SPOOF') {
-                this.isSpoof = !this.isSpoof;
-                document.getElementById('status-spoof').className = `w-2 h-2 rounded-full ${this.isSpoof ? 'bg-red-500 shadow-[0_0_5px_red]' : 'bg-gray-600'}`;
-                if(this.isSpoof) {
-                    if(this.asks[2]) {
-                        this.spoofPrice = this.asks[2].p;
-                        this.asks[2].v = 850000;
-                        this.asks[2].type = 'SPOOF';
-                        UI.notify("WALL DEPLOYED", "text-down");
-                    }
-                } else {
-                    const wall = this.asks.find(a => a.type === 'SPOOF');
-                    if(wall) { wall.type = 'NORMAL'; wall.v = Math.random()*5000; }
-                }
-            }
-            this.renderOB();
-            this.renderDepth();
-        },
+                <button class="btn-back"
+                    id="btnExit"
+                    onclick="saveAndExit()">
 
-        manualTrade(side) {
-            const qty = Math.floor(Math.random() * 2000) + 1000;
-            this.executeTrade(this.price, qty, side, 'BANDAR');
-        },
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Lobby</span>
 
-        executeTrade(price, qty, side, aggressor) {
-            if(side === 'BUY') {
-                this.price += (qty > 1500 ? 1 : 0); 
-                if(this.isSpoof && this.price >= this.spoofPrice - 1) {
-                    this.toggleAlgo('SPOOF'); 
-                    UI.notify("WALL PULLED (SAFEGUARD)", "text-yellow-500");
-                }
-            } else {
-                if(this.isIceberg && this.price <= this.icebergPrice + 1) {
-                     this.price = this.icebergPrice; 
-                } else {
-                    this.price -= (qty > 1500 ? 1 : 0);
-                }
-            }
-            this.price = Math.round(this.price); 
+                </button>
 
-            let buyer = side === 'BUY' ? (aggressor==='BANDAR' ? this.getRandomBroker(true) : this.getRandomBroker(false)) : this.getRandomBroker(false);
-            let seller = side === 'SELL' ? (aggressor==='BANDAR' ? this.getRandomBroker(true) : this.getRandomBroker(false)) : this.getRandomBroker(false);
-            
-            this.brokerStats[buyer].buy += qty;
-            this.brokerStats[buyer].net += qty;
-            this.brokerStats[seller].sell += qty;
-            this.brokerStats[seller].net -= qty;
+            </div>
 
-            sessionTotalValue += price * qty;
-            sessionTotalVol += qty;
-            currentBar.vwap = sessionTotalValue / sessionTotalVol;
+            <div class="header-center">
 
-            // Update Candle SEGERA setelah eksekusi
-            this.updateCandle(this.price, qty);
-            
-            this.trades.unshift({ 
-                t: new Date().toLocaleTimeString('id-ID', {hour12:false}), 
-                p: this.price, q: qty, s: side, b: buyer, sl: seller 
-            });
-            if(this.trades.length > 40) this.trades.pop();
-            
-            this.regenerateOBRows();
-            this.renderTape();
-            this.renderOB();
-            this.renderDepth();
-            this.renderBrokerSummary();
-            UI.updateHeader();
-        },
+                <div class="casino-logo">
 
-        tick() {
-            // Random Market Noise (Ritel)
-            if(Math.random() > 0.6) {
-                const side = Math.random() > 0.5 ? 'BUY' : 'SELL';
-                const qty = Math.floor(Math.random() * 300) + 10;
-                this.executeTrade(this.price, qty, side, 'RETAIL');
-            }
-            
-            // Logika ganti candle tiap 60 detik
-            if (Date.now()/1000 > currentBar.time + 60) {
-                chartData.push({...currentBar}); // Simpan yang lama ke riwayat
-                // Buat candle baru
-                currentBar = {
-                    open: currentBar.close, high: currentBar.close, low: currentBar.close,
-                    close: currentBar.close, vol: 0, vwap: currentBar.vwap, time: currentBar.time + 60
-                };
-            }
-            
-            // PERBAIKAN: Pastikan render selalu berjalan di tiap tick (termasuk idle)
-            renderChart();
-        },
+                    <div class="logo-icon">
 
-        updateCandle(price, vol) {
-            // PERBAIKAN: Tidak perlu lagi swap array yang ribet
-            currentBar.vol += vol;
-            currentBar.close = price;
-            if(price > currentBar.high) currentBar.high = price;
-            if(price < currentBar.low) currentBar.low = price;
-            
-            // Panggil render langsung agar sumbu (wick) dan body seketika memanjang
-            renderChart(); 
-        },
+                        <i class="fa-solid fa-dice"></i>
 
-        regenerateOBRows() {
-            const center = this.price;
-            this.bids = [];
-            this.asks = [];
-            for(let i=1; i<=10; i++) {
-                let bidP = center - i;
-                let bidV = Math.floor(Math.random() * 5000) + 100;
-                let bidType = 'NORMAL';
-                if(this.isIceberg && bidP === this.icebergPrice) { bidV = Math.floor(Math.random() * 200) + 50; bidType = 'ICEBERG'; }
-                this.bids.push({ p: bidP, v: bidV, type: bidType });
-
-                let askP = center + i;
-                let askV = Math.floor(Math.random() * 5000) + 100;
-                let askType = 'NORMAL';
-                if(this.isSpoof && askP === this.spoofPrice) { askV = 850000 + Math.floor(Math.random()*10000); askType = 'SPOOF'; }
-                this.asks.push({ p: askP, v: askV, type: askType });
-            }
-        },
-
-        getRandomBroker(isBandar) {
-            const arr = isBandar ? this.bandarCodes : this.retailCodes;
-            return arr[Math.floor(Math.random() * arr.length)];
-        },
-
-        renderBrokerSummary() {
-            const container = document.getElementById('broker-summary-container');
-            const sortedBrokers = Object.entries(this.brokerStats).sort((a,b) => b[1].net - a[1].net);
-            
-            let html = '';
-            for(let i=0; i<5; i++) {
-                const buyer = sortedBrokers[i];
-                const seller = sortedBrokers[sortedBrokers.length - 1 - i];
-                
-                if(!buyer || !seller) continue;
-
-                const bColor = buyer[1].isBandar ? 'text-purple-400' : 'text-gray-400';
-                const sColor = seller[1].isBandar ? 'text-purple-400' : 'text-gray-400';
-
-                html += `
-                <div class="flex justify-between items-center bg-[#181c25] p-1.5 rounded border border-[var(--border)] mb-1">
-                    <div class="flex items-center gap-2 w-1/2 border-r border-[#2a2e39] pr-2">
-                        <span class="font-bold text-[10px] ${bColor} w-6">${buyer[0]}</span>
-                        <span class="font-mono text-[9px] text-up flex-1 text-right">${buyer[1].net > 0 ? '+'+buyer[1].net.toLocaleString() : 0}</span>
                     </div>
-                    <div class="flex items-center gap-2 w-1/2 pl-2">
-                        <span class="font-mono text-[9px] text-down flex-1">${seller[1].net < 0 ? seller[1].net.toLocaleString() : 0}</span>
-                        <span class="font-bold text-[10px] ${sColor} w-6 text-right">${seller[0]}</span>
+
+                    <div class="logo-text">
+
+                        <h2>Golden Roulette</h2>
+
+                        <span>LIVE CASINO</span>
+
                     </div>
-                </div>`;
-            }
-            container.innerHTML = html;
-        },
 
-        renderDepth() {
-            depthCtx.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-            
-            const midX = depthCanvas.width / 2;
-            const h = depthCanvas.height;
-            
-            let cumBid = 0;
-            const bidPoints = [];
-            [...this.bids].forEach((b) => { 
-                cumBid += b.v;
-                bidPoints.push({p: b.p, v: cumBid});
-            });
+                </div>
 
-            let cumAsk = 0;
-            const askPoints = [];
-            [...this.asks].forEach((a) => { 
-                cumAsk += a.v;
-                askPoints.push({p: a.p, v: cumAsk});
-            });
+            </div>
 
-            const maxVol = Math.max(cumBid, cumAsk) || 1;
-            const pxPerItem = midX / 10; 
+            <div class="header-right">
 
-            // Draw Bids (Green)
-            depthCtx.beginPath();
-            depthCtx.moveTo(midX, h);
-            bidPoints.forEach((pt, i) => {
-                const x = midX - (i * pxPerItem);
-                const y = h - ((pt.v / maxVol) * (h * 0.9));
-                depthCtx.lineTo(x, y);
-            });
-            depthCtx.lineTo(0, h);
-            depthCtx.fillStyle = "rgba(38, 166, 154, 0.2)";
-            depthCtx.fill();
-            depthCtx.strokeStyle = "rgba(38, 166, 154, 0.8)";
-            depthCtx.lineWidth = 1.5;
-            depthCtx.stroke();
+                <div class="player-card">
 
-            // Draw Asks (Red)
-            depthCtx.beginPath();
-            depthCtx.moveTo(midX, h);
-            askPoints.forEach((pt, i) => {
-                const x = midX + (i * pxPerItem);
-                const y = h - ((pt.v / maxVol) * (h * 0.9));
-                depthCtx.lineTo(x, y);
-            });
-            depthCtx.lineTo(depthCanvas.width, h);
-            depthCtx.fillStyle = "rgba(239, 83, 80, 0.2)";
-            depthCtx.fill();
-            depthCtx.strokeStyle = "rgba(239, 83, 80, 0.8)";
-            depthCtx.stroke();
-        },
+                    <div class="avatar">
 
-        renderOB() {
-            const el = document.getElementById('orderbook-container');
-            
-            let asksHtml = '<div class="flex-1 flex flex-col justify-end">';
-            [...this.asks].reverse().forEach(a => {
-                const barW = Math.min(a.v/10000 * 100, 100);
-                const isSpoof = a.type === 'SPOOF';
-                asksHtml += `
-                <div class="grid grid-cols-3 text-[11px] hover:bg-[#1e222d] relative border-b border-[#1f2937] ${isSpoof ? 'bg-red-900/30' : ''}">
-                    <div class="text-right text-[var(--text-sec)] py-0.5 z-10">-</div>
-                    <div class="text-center text-down font-bold py-0.5 z-10">${a.p}</div>
-                    <div class="text-right text-white py-0.5 pr-2 z-10 font-bold">${a.v.toLocaleString()}</div>
-                    <div class="absolute right-0 top-0 bottom-0 bg-red-900/20" style="width:${isSpoof ? 100 : barW}%"></div>
-                </div>`;
-            });
-            asksHtml += '</div>';
+                        <i class="fa-solid fa-user"></i>
 
-            let spreadHtml = `<div class="h-5 flex items-center justify-center bg-[var(--bg-header)] border-y border-[var(--border)] text-[9px] text-[var(--text-sec)] font-bold tracking-widest">SPREAD</div>`;
-
-            let bidsHtml = '<div class="flex-1 flex flex-col">';
-            this.bids.forEach(b => {
-                const barW = Math.min(b.v/10000 * 100, 100);
-                const isIce = b.type === 'ICEBERG';
-                bidsHtml += `
-                <div class="grid grid-cols-3 text-[11px] hover:bg-[#1e222d] relative border-b border-[#1f2937] ${isIce ? 'bg-green-900/30' : ''}">
-                    <div class="text-right text-white font-bold py-0.5 z-10 pl-2">${b.v.toLocaleString()}</div>
-                    <div class="text-center text-up font-bold py-0.5 z-10">${b.p}</div>
-                    <div class="text-right text-[var(--text-sec)] py-0.5 z-10">-</div>
-                    <div class="absolute left-0 top-0 bottom-0 bg-green-900/20" style="width:${barW}%"></div>
-                    ${isIce ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>' : ''}
-                </div>`;
-            });
-            bidsHtml += '</div>';
-
-            el.innerHTML = asksHtml + spreadHtml + bidsHtml;
-        },
-
-        renderTape() {
-            const el = document.getElementById('tape-container');
-            const html = this.trades.map(t => {
-                const color = t.s === 'BUY' ? 'text-up' : 'text-down';
-                const isBandar = this.bandarCodes.includes(t.b) || this.bandarCodes.includes(t.sl);
-                const bg = isBandar ? 'bg-[#181c25]' : '';
-                return `
-                <div class="grid grid-cols-4 px-2 py-1 border-b border-[#1f2937] hover:bg-[#1e222d] ${bg}">
-                    <span class="text-[var(--text-sec)]">${t.t}</span>
-                    <span class="${color} font-bold text-center">${t.p}</span>
-                    <span class="text-white text-right font-mono">${t.q}</span>
-                    <div class="text-right flex justify-end gap-1">
-                        <span class="${this.bandarCodes.includes(t.b) ? 'text-purple-400 font-bold' : 'text-gray-500'}">${t.b}</span>
-                        <span class="text-gray-600">-</span>
-                        <span class="${this.bandarCodes.includes(t.sl) ? 'text-purple-400 font-bold' : 'text-gray-500'}">${t.sl}</span>
                     </div>
-                </div>`;
-            }).join('');
-            el.innerHTML = html;
-        }
-    };
 
-    const UI = {
-        updateHeader() {
-            document.getElementById('header-price').innerText = Engine.price;
-            document.getElementById('header-vol').innerText = Engine.trades.reduce((acc, t) => acc + t.q, 0).toLocaleString();
-            document.getElementById('header-vwap').innerText = currentBar.vwap.toFixed(1);
-            
-            let high = parseFloat(document.getElementById('stat-h').innerText);
-            let low = parseFloat(document.getElementById('stat-l').innerText);
-            if(Engine.price > high) document.getElementById('stat-h').innerText = Engine.price;
-            if(Engine.price < low) document.getElementById('stat-l').innerText = Engine.price;
-        },
-        notify(msg, colorClass) {
-            const el = document.getElementById('chart-status');
-            el.innerText = msg;
-            el.className = `text-[11px] font-mono font-bold ${colorClass} animate-pulse`;
-            setTimeout(() => {
-                el.innerText = "NORMAL MARKET";
-                el.className = "text-[11px] font-mono text-up font-bold";
-            }, 2500);
-        }
-    };
-</script>
+                    <div class="player-info">
+
+                        <div id="playerName"
+                            class="player-name">
+
+                            Guest
+
+                        </div>
+
+                        <div class="player-level">
+
+                            VIP MEMBER
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="balance-card">
+
+                    <div class="balance-title">
+
+                        BALANCE
+
+                    </div>
+
+                    <div class="balance-value"
+                        id="displayBalance">
+
+                        0
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ================= MAIN ================= -->
+
+        <main class="main-layout">
+
+            <!-- ================= LEFT ================= -->
+
+            <section class="left-panel">
+
+                <div class="live-banner">
+
+                    <div class="live-dot"></div>
+
+                    LIVE
+
+                    <span>
+
+                        Evolution Style
+
+                    </span>
+
+                </div>
+
+                <div class="roulette-card">
+
+                    <div class="wheel-header">
+
+                        <div>
+
+                            <h3>
+
+                                LIVE ROULETTE
+
+                            </h3>
+
+                            <p>
+
+                                European Table
+
+                            </p>
+
+                        </div>
+
+                        <div class="table-id">
+
+                            TABLE #01
+
+                        </div>
+
+                    </div>
+
+                    <div class="wheel-wrapper">
+
+                        <div class="wheel-shadow"></div>
+
+                        <div class="wheel-container">
+
+                            <div class="wheel-selector">
+
+                                <div class="selector-light"></div>
+
+                            </div>
+
+                            <div class="wheel-track"
+                                id="wheelTrack">
+
+                                <!-- Generated By JS -->
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="bet-status">
+
+                        <div class="status-label"
+                            id="statusLabel">
+
+                            PLACE YOUR BETS
+
+                        </div>
+
+                        <div class="status-timer"
+                            id="countdownTimer">
+
+                            10
+
+                        </div>
+
+                    </div>
+
+                    <div class="history-panel">
+
+                        <div class="panel-title">
+
+                            LAST RESULTS
+
+                        </div>
+
+                        <div class="history-list"
+                            id="historyList">
+
+                            <!-- JS -->
+
+                        </div>
+
+                    </div>
+
+                    <div class="stats-panel">
+
+                        <div class="stat-box">
+
+                            <span>
+
+                                Players
+
+                            </span>
+
+                            <strong id="playerCount">
+
+                                248
+
+                            </strong>
+
+                        </div>
+
+                        <div class="stat-box">
+
+                            <span>
+
+                                Total Bet
+
+                            </span>
+
+                            <strong id="totalBetLive">
+
+                                0
+
+                            </strong>
+
+                        </div>
+
+                        <div class="stat-box">
+
+                            <span>
+
+                                RTP
+
+                            </span>
+
+                            <strong>
+
+                                96.12%
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- RIGHT PANEL AKAN DILANJUTKAN DI PART 1B -->
+
+                        <!-- ================= RIGHT PANEL ================= -->
+
+            <section class="right-panel">
+
+                <div class="board-wrapper">
+
+                    <!-- TABLE HEADER -->
+
+                    <div class="table-top">
+
+                        <div class="table-title">
+
+                            <i class="fa-solid fa-chess-board"></i>
+
+                            BETTING TABLE
+
+                        </div>
+
+                        <div class="table-subtitle">
+
+                            Choose your lucky number
+
+                        </div>
+
+                    </div>
+
+                    <!-- MAIN BETTING BOARD -->
+
+                    <div
+                        class="betting-board"
+                        id="bettingBoard">
+
+                        <!-- ZERO -->
+
+                        <div
+                            class="bet-spot spot-green zero-slot"
+                            onclick="placeBet('0')">
+
+                            <div class="spot-label">
+
+                                0
+
+                            </div>
+
+                            <div
+                                class="chip-placed"
+                                id="chip-0"
+                                style="display:none;">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+                        <!--
+                        Number 1-36
+                        Akan dibuat otomatis oleh JavaScript lama
+                        -->
+
+                    </div>
+
+                    <!-- OUTSIDE BET -->
+
+                    <div class="outside-title">
+
+                        OUTSIDE BET
+
+                    </div>
+
+                    <div class="outside-board">
+
+                        <div
+                            class="bet-spot outside even"
+                            onclick="placeBet('EVEN')">
+
+                            <span>EVEN</span>
+
+                            <div
+                                id="chip-EVEN"
+                                class="chip-placed"
+                                style="display:none;">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="bet-spot outside odd"
+                            onclick="placeBet('ODD')">
+
+                            <span>ODD</span>
+
+                            <div
+                                id="chip-ODD"
+                                class="chip-placed"
+                                style="display:none;">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="bet-spot outside red"
+                            onclick="placeBet('RED')">
+
+                            <i class="fa-solid fa-diamond"></i>
+
+                            <span>RED</span>
+
+                            <div
+                                id="chip-RED"
+                                class="chip-placed"
+                                style="display:none;">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="bet-spot outside black"
+                            onclick="placeBet('BLACK')">
+
+                            <i class="fa-solid fa-diamond"></i>
+
+                            <span>BLACK</span>
+
+                            <div
+                                id="chip-BLACK"
+                                class="chip-placed"
+                                style="display:none;">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- LIVE INFO -->
+
+                    <div class="live-information">
+
+                        <div class="info-card">
+
+                            <div class="info-label">
+
+                                TOTAL BET
+
+                            </div>
+
+                            <div
+                                class="info-value"
+                                id="totalBetDisplay">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+                        <div class="info-card">
+
+                            <div class="info-label">
+
+                                CURRENT CHIP
+
+                            </div>
+
+                            <div
+                                class="info-value"
+                                id="currentChipDisplay">
+
+                                100
+
+                            </div>
+
+                        </div>
+
+                        <div class="info-card">
+
+                            <div class="info-label">
+
+                                POSSIBLE WIN
+
+                            </div>
+
+                            <div
+                                class="info-value"
+                                id="possibleWin">
+
+                                --
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- CONTROL PANEL AKAN DILANJUTKAN DI PART 1C -->
+
+                <!-- ================= CONTROL CONSOLE ================= -->
+
+        <footer class="casino-console">
+
+            <!-- INFO BAR -->
+
+            <div class="console-top">
+
+                <div class="table-status"
+                    id="infoBanner">
+
+                    PLACE YOUR BETS
+
+                </div>
+
+            </div>
+
+            <!-- CHIP SELECTOR -->
+
+            <div class="chip-selector">
+
+                <button
+                    class="chip-btn active"
+                    onclick="selectChip(100)">
+
+                    <div class="chip-face white">
+
+                        100
+
+                    </div>
+
+                </button>
+
+                <button
+                    class="chip-btn"
+                    onclick="selectChip(500)">
+
+                    <div class="chip-face red">
+
+                        500
+
+                    </div>
+
+                </button>
+
+                <button
+                    class="chip-btn"
+                    onclick="selectChip(1000)">
+
+                    <div class="chip-face blue">
+
+                        1K
+
+                    </div>
+
+                </button>
+
+                <button
+                    class="chip-btn"
+                    onclick="selectChip(5000)">
+
+                    <div class="chip-face green">
+
+                        5K
+
+                    </div>
+
+                </button>
+
+                <button
+                    class="chip-btn"
+                    onclick="selectChip(10000)">
+
+                    <div class="chip-face gold">
+
+                        10K
+
+                    </div>
+
+                </button>
+
+            </div>
+
+            <!-- BUTTON ACTION -->
+
+            <div class="action-buttons">
+
+                <button
+                    class="btn-clear"
+                    id="btnClear"
+                    onclick="clearBets()">
+
+                    <i class="fa-solid fa-trash"></i>
+
+                    CLEAR BET
+
+                </button>
+
+                <button
+                    class="btn-spin"
+                    id="btnSpin"
+                    onclick="spinWheel()">
+
+                    <div class="spin-title">
+
+                        SPIN
+
+                    </div>
+
+                    <div
+                        class="spin-value"
+                        id="spinTotal">
+
+                    </div>
+
+                </button>
+
+            </div>
+
+        </footer>
+
+    </div>
+
+    <!-- ================= RESULT MODAL ================= -->
+
+    <div
+        class="overlay result-overlay"
+        id="resultModal"
+        onclick="closeResult()">
+
+        <div class="result-card">
+
+            <div
+                class="result-title"
+                id="resLabel">
+
+                WINNING NUMBER
+
+            </div>
+
+            <div
+                class="result-number"
+                id="resNumber">
+
+                0
+
+            </div>
+
+            <div
+                class="result-text"
+                id="resText">
+
+            </div>
+
+            <div class="tap-text">
+
+                TAP ANYWHERE TO CONTINUE
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= JACKPOT ================= -->
+
+    <div
+        class="overlay jackpot-overlay"
+        id="jackpotModal">
+
+        <div class="jackpot-box">
+
+            <div class="jackpot-icon">
+
+                <i class="fa-solid fa-crown"></i>
+
+            </div>
+
+            <h1>
+
+                JACKPOT
+
+            </h1>
+
+            <h2
+                id="jackpotAmount">
+
+                +0
+
+            </h2>
+
+        </div>
+
+    </div>
+
+    <!-- ================= LOADING ================= -->
+
+    <div
+        class="loading-screen"
+        id="loadingScreen">
+
+        <div class="loading-logo">
+
+            <i class="fa-solid fa-dice"></i>
+
+        </div>
+
+        <div class="loading-title">
+
+            GOLDEN ROULETTE
+
+        </div>
+
+        <div class="loading-subtitle">
+
+            LIVE CASINO
+
+        </div>
+
+        <div class="loading-bar">
+
+            <div
+                class="loading-progress"
+                id="loadingProgress">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= TOAST ================= -->
+
+    <div
+        class="toast-message"
+        id="toastMessage">
+
+        Welcome
+
+    </div>
+
+    <!-- ================= SCRIPT ================= -->
+
+    <script src="api.js"></script>
+
+    <script src="casino-premium.js"></script>
+
+</body>
+
+</html>
