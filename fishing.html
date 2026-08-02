@@ -59,8 +59,8 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
 #sound-btn{position:absolute;left:8px;top:70px;background:rgba(0,8,25,0.85);border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:9px;color:var(--c-blue);font-family:var(--font-hud);cursor:pointer;pointer-events:auto;z-index:20;}
 
 /* SHOP & INFO OVERLAY */
-.overlay-wrap{position:fixed;inset:0;background:rgba(0,0,12,0.94);display:none;align-items:flex-start;justify-content:center;z-index:300;pointer-events:auto;overflow-y:auto;padding:10px;backdrop-filter:blur(6px);}
-.box-wrap{background:rgba(0,6,22,0.99);border:1.5px solid rgba(0,229,255,0.25);border-radius:16px;padding:18px;max-width:700px;width:100%;margin:auto;}
+.overlay-bg{position:fixed;inset:0;background:rgba(0,0,12,0.94);display:none;align-items:center;justify-content:center;z-index:300;pointer-events:auto;overflow-y:auto;padding:10px;backdrop-filter:blur(6px);}
+.modal-box{background:rgba(0,6,22,0.99);border:1.5px solid rgba(0,229,255,0.25);border-radius:16px;padding:18px;max-width:700px;width:100%;margin:auto;}
 .shop-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;}
 .shop-title{font-size:16px;font-weight:900;color:var(--c-blue);font-family:var(--font-hud);letter-spacing:3px;}
 .shop-balance{font-size:12px;color:var(--c-gold);font-family:var(--font-hud);white-space:nowrap;}
@@ -114,9 +114,6 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
   #gameover-box{padding:26px 28px;}
   .jw-title{font-size:26px;}.jw-amount{font-size:36px;}
 }
-
-.info-ul { margin-left: 20px; margin-bottom: 15px; color: #aab; }
-.info-ul li { margin-bottom: 4px; }
 </style>
 </head>
 <body>
@@ -129,10 +126,10 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
     <div class="hud-cell"><div class="hud-label">SALDO</div><div class="hud-val gold" id="h-bal">0</div></div>
     <div class="hud-cell" style="border-color:rgba(0,255,170,0.2);"><div class="hud-label">WIN</div><div class="hud-val green" id="h-win">0</div></div>
     <div class="hud-cell jp"><div class="hud-label">🏆 JACKPOT</div><div class="jp-val" id="h-jack">9,999,999</div></div>
+    <div class="hud-cell"><div class="hud-label">LVL</div><div class="hud-val blue" id="h-lvl">1</div></div>
     <div class="hud-cell" style="cursor:pointer;pointer-events:auto;" onclick="openShop()"><div class="hud-label">SHOP</div><div class="hud-val" style="font-size:17px;">🏪</div></div>
-    <div class="hud-cell" style="cursor:pointer;pointer-events:auto;border-color:rgba(255,255,255,0.3);" onclick="openInfo()">
-        <div class="hud-label">INFO</div><div class="hud-val" style="font-size:17px;">❓</div>
-    </div>
+    <!-- TOMBOL INFO DITAMBAHKAN -->
+    <div class="hud-cell" style="cursor:pointer;pointer-events:auto; min-width:45px;" onclick="openInfo()"><div class="hud-label">INFO</div><div class="hud-val" style="font-size:17px;">❓</div></div>
   </div>
   <div id="sound-btn" onclick="toggleSound()">🔊 SFX</div>
   <div id="weapon-row"></div>
@@ -142,7 +139,7 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
     <button class="hud-btn danger" id="btnExit" onclick="saveAndExit()">⬅ LOBBY</button>
     <button class="hud-btn" id="btn-auto" onclick="toggleAuto()">⚡AUTO</button>
     <div class="bet-group">
-      <div class="hud-label" style="font-size:6px;">BET (10 - 500K)</div>
+      <div class="hud-label" style="font-size:6px;">BET</div>
       <div class="bet-ctrl">
         <div class="bet-btn" onclick="changeBet(-1)">−</div>
         <span id="h-bet">10</span>
@@ -154,9 +151,8 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
   </div>
 </div>
 
-<!-- SHOP OVERLAY -->
-<div id="shop-overlay" class="overlay-wrap">
-  <div id="shop-box" class="box-wrap">
+<div id="shop-overlay" class="overlay-bg" style="align-items:flex-start;">
+  <div id="shop-box" class="modal-box">
     <div class="shop-header">
       <div class="shop-title">⚓ ARMORY</div>
       <div class="shop-balance">💰 <span id="sh-bal">0</span></div>
@@ -172,40 +168,41 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
   </div>
 </div>
 
-<!-- INFO OVERLAY -->
-<div id="info-overlay" class="overlay-wrap">
-  <div id="info-box" class="box-wrap" style="color:#fff;">
+<!-- MODAL INFORMASI TAMBAHAN -->
+<div id="info-overlay" class="overlay-bg">
+  <div id="info-box" class="modal-box" style="max-width:550px;">
     <div class="shop-header">
-      <div class="shop-title">❓ INFORMASI GAME</div>
+      <div class="shop-title">❓ INFO PERMAINAN</div>
       <button class="shop-close" onclick="closeInfo()">✕</button>
     </div>
-    <div style="font-size:11px; line-height:1.6; color:#cde;">
-       <h3 style="color:var(--c-gold); margin-top:5px;">🐟 REWARD IKAN (PERKALI BET)</h3>
-       <ul class="info-ul">
-         <li><b>Small Fish (Biru):</b> Bet x 8</li>
-         <li><b>Medium Fish (Hijau):</b> Bet x 28</li>
-         <li><b>Large Fish (Oranye):</b> Bet x 70</li>
-         <li><b>Boss (👑):</b> Bet x 450</li>
-         <li><b>Twin Fish:</b> Bet x 85</li>
-       </ul>
-       <h3 style="color:var(--c-gold); margin-top:10px;">🎁 BONUS & MINIGAME</h3>
-       <ul class="info-ul">
-         <li><b>Jackpot Fish ($):</b> Memberikan saldo langsung dari Global Jackpot Pool.</li>
-         <li><b>Bomb (💣):</b> Meledak dan membunuh/melukai ikan-ikan di sekitarnya.</li>
-         <li><b>Roulette (🎰):</b> Memutar roda keberuntungan untuk multiplier hingga 100x atau MISS.</li>
-         <li><b>Electric (⚡):</b> Mengalirkan listrik dan merusak semua ikan yang ada di layar (Bet x 200).</li>
-       </ul>
-       <h3 style="color:var(--c-gold); margin-top:10px;">🔫 BIAYA ADD-ON (SENJATA)</h3>
-       <p style="color:#aab; margin-bottom: 5px;">Membeli senjata di shop akan membuka senjatanya. Saat dilengkapi (Equip), biaya per tembakan Anda akan dikalikan sesuai beban senjata:</p>
-       <ul class="info-ul">
-         <li><b>Single Shot:</b> Total Biaya = Bet x 1</li>
-         <li><b>Double Shot:</b> Total Biaya = Bet x 2</li>
-         <li><b>Triple Shot:</b> Total Biaya = Bet x 3</li>
-         <li><b>Minigun:</b> Total Biaya = Bet x 4</li>
-         <li><b>Laser Beam:</b> Total Biaya = Bet x 5</li>
-         <li><b>Shotgun:</b> Total Biaya = Bet x 6</li>
-         <li><b>Nuke Cannon:</b> Total Biaya = Bet x 15</li>
-       </ul>
+    <div style="color:#cde; font-size:11.5px; line-height:1.6; text-align:left; max-height:65vh; overflow-y:auto; padding-right:10px; font-family:var(--font-main);">
+      
+      <h3 style="color:var(--c-gold); margin-bottom:6px; font-family:var(--font-hud);">🐟 REWARD IKAN</h3>
+      <p style="margin-bottom:12px;">Reward dihitung dari: <b>Nilai Ikan × Bet Anda</b>.<br>
+      • Ikan Kecil: Base x8<br>
+      • Ikan Sedang: Base x28<br>
+      • Ikan Besar: Base x70<br>
+      • Ikan Boss 👑: Base x450</p>
+      
+      <h3 style="color:var(--c-purple); margin-bottom:6px; font-family:var(--font-hud);">🎁 BONUS & MINIGAME</h3>
+      <ul style="margin-bottom:12px; padding-left:18px;">
+        <li><b>💣 Bomb:</b> Meledak area luas dan memusnahkan ikan disekitar.</li>
+        <li><b>🎰 Roulette:</b> Membuka putaran Wheel of Fortune (Multiplier hingga 100x Bet).</li>
+        <li><b>⚡ Electric (Zap):</b> Menyetrum menyebar ke beberapa ikan terdekat.</li>
+        <li><b>🏆 Jackpot:</b> Tembak terus ikan pembawa koin. Jika pecah, dapatkan kumpulan pool Jackpot kumulatif!</li>
+      </ul>
+      
+      <h3 style="color:var(--c-blue); margin-bottom:6px; font-family:var(--font-hud);">⚔️ HARGA TEMBAKAN ADD-ON</h3>
+      <p style="margin-bottom:12px;">Ketika Add-on/Senjata Khusus dipasang (Equip), sistem akan menarik saldo <b>Bet + (Bet × Pengali Senjata)</b> per peluru:</p>
+      <ul style="padding-left:18px;">
+        <li><b>🔫 Single Shot:</b> Normal (Biaya = Bet)</li>
+        <li><b>🎯 Double Shot:</b> Bet + (1x Bet)</li>
+        <li><b>💥 Triple Shot:</b> Bet + (2x Bet)</li>
+        <li><b>⚡ Laser Beam:</b> Bet + (3x Bet)</li>
+        <li><b>💢 Shotgun:</b> Bet + (4x Bet)</li>
+        <li><b>🔥 Minigun:</b> Bet + (5x Bet)</li>
+        <li><b>☢ Nuke Cannon:</b> Bet + (10x Bet)</li>
+      </ul>
     </div>
   </div>
 </div>
@@ -229,7 +226,7 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-//  OCEAN EMPEROR V7 — OPTIMIZED FOR CASINO (COMPATIBILITY PATCH)
+//  OCEAN EMPEROR V7 — OPTIMIZED FOR CASINO (FULL UNIFIED FIX)
 // ═══════════════════════════════════════════════════════════════════
 
 /** 1. CASINO API & AUTH **/
@@ -237,13 +234,11 @@ const userJson = localStorage.getItem('currentUser');
 if (!userJson) window.location.href = 'auth.html';
 let currentUser = JSON.parse(userJson) || { username: 'Guest', balance: 50000 };
 
-currentUser.balance = parseInt(currentUser.balance) || 0;
-
 if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
     if (db && db.users) {
       const freshUser = db.users.find(u => u.username === currentUser.username);
-      if (freshUser) currentUser.balance = parseInt(freshUser.balance) || 0;
+      if (freshUser) currentUser.balance = freshUser.balance;
       updateUI();
     }
   }).catch(e => console.error(e));
@@ -256,11 +251,6 @@ async function saveAndExit() {
       await api.saveProgress(currentUser.username, currentUser.balance, level, totalWin || 0);
     }
   } catch(e) {} finally { window.location.href = 'index.html'; }
-}
-
-function formatM(num) {
-    if(num >= 1000) return (num/1000) + 'K';
-    return num.toString();
 }
 
 /** 2. GLOBALS & STATE **/
@@ -277,22 +267,23 @@ let upgrades={dmg:0,rate:0,winrate:0,radius:0};
 let buffs={autoReload:false, goldFish:false, comboMaster:false};
 
 const players = [
-  {id:0, isBot:false, name:'YOU', color:'#00e5ff', bet:10, ang:0, totalWin:0, totalKills:0, x:0, y:0},
-  {id:1, isBot:true, name:'BOT-R', color:'#ff2266', bet:10, bal:5000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
-  {id:2, isBot:true, name:'BOT-G', color:'#00ffaa', bet:10, bal:8000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
-  {id:3, isBot:true, name:'BOT-Y', color:'#ffd700', bet:10, bal:4000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
-  {id:4, isBot:true, name:'BOT-P', color:'#c040ff', bet:10, bal:6000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
-  {id:5, isBot:true, name:'BOT-O', color:'#ff7700', bet:10, bal:7000, ang:0, cooldown:0, totalWin:0, x:0, y:0}
+  {id:0, isBot:false, name:'YOU', color:'#00e5ff', bet:10, ang:0, totalWin:0, totalKills:0},
+  {id:1, isBot:true, name:'BOT-R', color:'#ff2266', bet:10, bal:5000, ang:0, cooldown:0, totalWin:0},
+  {id:2, isBot:true, name:'BOT-G', color:'#00ffaa', bet:10, bal:8000, ang:0, cooldown:0, totalWin:0},
+  {id:3, isBot:true, name:'BOT-Y', color:'#ffd700', bet:10, bal:4000, ang:0, cooldown:0, totalWin:0},
+  {id:4, isBot:true, name:'BOT-P', color:'#c040ff', bet:10, bal:6000, ang:0, cooldown:0, totalWin:0},
+  {id:5, isBot:true, name:'BOT-O', color:'#ff7700', bet:10, bal:7000, ang:0, cooldown:0, totalWin:0}
 ];
 
+// HARGA ADDON DITAMBAHKAN costMulti
 const WEAPON_DEFS={
-  single: {id:'single', name:'Single Shot', ico:'🔫',dmg:1,multi:1, price:0, shotCostMulti:1, color:'#00e5ff', desc:'Biaya: Bet x1'},
-  double: {id:'double', name:'Double Shot', ico:'🎯',dmg:1,multi:2, price:600, shotCostMulti:2, color:'#ffd700', desc:'Biaya: Bet x2'},
-  triple: {id:'triple', name:'Triple Shot', ico:'💥',dmg:1,multi:3, price:1400,shotCostMulti:3, color:'#ff9100', desc:'Biaya: Bet x3'},
-  laser:  {id:'laser',  name:'Laser Beam',  ico:'⚡',dmg:3,multi:1, price:2800,shotCostMulti:5, color:'#e040fb',piercing:true, desc:'Biaya: Bet x5'},
-  shotgun:{id:'shotgun',name:'Shotgun',     ico:'💢',dmg:1,multi:6, price:2200,shotCostMulti:6, color:'#ff8a65', desc:'Biaya: Bet x6'},
-  minigun:{id:'minigun',name:'Minigun',     ico:'🔥',dmg:1,multi:1, price:3200,shotCostMulti:4, color:'#ff5722',minigun:true, desc:'Biaya: Bet x4'},
-  nuke:   {id:'nuke',   name:'Nuke Cannon', ico:'☢', dmg:8,multi:1, price:9000,shotCostMulti:15, color:'#00ff88',nuke:true, desc:'Biaya: Bet x15'}
+  single: {id:'single', name:'Single Shot', ico:'🔫',dmg:1,multi:1, price:0, color:'#00e5ff', costMulti:0, desc:'Biaya Normal'},
+  double: {id:'double', name:'Double Shot', ico:'🎯',dmg:1,multi:2, price:600, color:'#ffd700', costMulti:1, desc:'Biaya: Bet + 1x'},
+  triple: {id:'triple', name:'Triple Shot', ico:'💥',dmg:1,multi:3, price:1400,color:'#ff9100', costMulti:2, desc:'Biaya: Bet + 2x'},
+  laser:  {id:'laser',  name:'Laser Beam',  ico:'⚡',dmg:3,multi:1, price:2800,color:'#e040fb',piercing:true, costMulti:3, desc:'Biaya: Bet + 3x'},
+  shotgun:{id:'shotgun',name:'Shotgun',     ico:'💢',dmg:1,multi:6, price:2200,color:'#ff8a65', costMulti:4, desc:'Biaya: Bet + 4x'},
+  minigun:{id:'minigun',name:'Minigun',     ico:'🔥',dmg:1,multi:1, price:3200,color:'#ff5722',minigun:true, costMulti:5, desc:'Biaya: Bet + 5x'},
+  nuke:   {id:'nuke',   name:'Nuke Cannon', ico:'☢', dmg:8,multi:1, price:9000,color:'#00ff88',nuke:true, costMulti:10, desc:'Biaya: Bet + 10x'}
 };
 
 const UPGRADE_DEFS=[
@@ -302,7 +293,7 @@ const UPGRADE_DEFS=[
   {id:'radius', name:'Blast Radius',ico:'💣',desc:'+15% AoE',  max:5,prices:[350,800,1600,3200,6400]}
 ];
 const BUFF_DEFS=[
-  {id:'autoReload', name:'Auto Reload', ico:'🔄',desc:'Auto tidak habiskan saldo < 300',price:2000},
+  {id:'autoReload', name:'Auto Reload', ico:'🔄',desc:'Cegah peluru jika saldo < 300',price:2000},
   {id:'goldFish',   name:'Gold Magnet', ico:'🪙',desc:'Reward ikan +50%',price:3200},
   {id:'comboMaster',name:'Combo Master',ico:'🔥',desc:'Combo 2× lebih lama',price:4000}
 ];
@@ -316,7 +307,7 @@ const ACHIEVEMENTS=[
   {id:'first_kill',  name:'First Blood',   icon:'🩸',done:false},
   {id:'kill_50',     name:'Sharpshooter',  icon:'🎯',done:false},
   {id:'win_10k',     name:'Millionaire Jr.',icon:'💰',done:false},
-  {id:'level_10',    name:'Veteran',        icon:'⭐',done:false},
+  {id:'level_10',    name:'Veteran',       icon:'⭐',done:false},
 ];
 
 /** 3. AUDIO ENGINE **/
@@ -372,7 +363,7 @@ function toggleSound(){
   document.getElementById('sound-btn').textContent=(soundOn?'🔊':'🔇')+' SFX';
 }
 
-/** 4. CANVAS FLOATERS **/
+/** 4. CANVAS FLOATERS (ANTI-LAG) **/
 const canvasFloaters = [];
 function addCanvasText(str, x, y, color, size) {
   canvasFloaters.push({ str, x, y, color, size, life: 1 });
@@ -408,7 +399,7 @@ function pickFishType(){let r=Math.random(),c=0;for(let t of FISH_TYPES){c+=t.pr
 const fishes=[], bullets=[], _particles=[], lasers=[], inWorldRoulettes=[];
 
 class Fish {
-  constructor(){ this.isExtra = false; this.init(); }
+  constructor(){this.init();}
   init(overType){
     const t=overType?FISH_TYPES.find(x=>x.id===overType)||pickFishType():pickFishType();
     Object.assign(this,{
@@ -419,8 +410,8 @@ class Fish {
       alive:true, flash:0, orbitAngle:Math.random()*Math.PI*2, 
       countUp: 100+Math.floor(Math.random()*400)
     });
-    this.x = this.dir===1?-90:(W||320)+90;
-    this.baseY = (hudTopH+45) + Math.random()*((H||480)-hudTopH-hudBotH-120);
+    this.x = this.dir===1?-90:W+90;
+    this.baseY = (hudTopH+45) + Math.random()*(H-hudTopH-hudBotH-120);
     this.y = this.baseY;
 
     if(this.id === 'bomb') {
@@ -462,11 +453,7 @@ class Fish {
     if(this.id==='roulette') this.spinAngle+=0.04;
 
     const marg = this.size+50;
-    if((this.dir===1 && this.x>W+marg) || (this.dir===-1 && this.x<-marg)) {
-       // PENCEGAHAN BUG BLANK: Jika ini ikan pecahan, jangan diloop terus! Biarkan sistem menghapusnya.
-       if(this.isExtra) this.alive = false; 
-       else this.init();
-    }
+    if((this.dir===1 && this.x>W+marg) || (this.dir===-1 && this.x<-marg)) this.init();
   }
 
   draw(){
@@ -476,14 +463,13 @@ class Fish {
     if(this.flash>0) ctx.globalAlpha = 0.5 + 0.5 * Math.sin(frameCount*0.5);
     ctx.fillStyle = this.color;
 
-    // COMPATIBILITY PATCH: Diganti dari ctx.ellipse menjadi ctx.arc dengan scale agar tidak blank di HP jadul
     if(this.id === 'boss') {
-      ctx.save(); ctx.scale(1, 0.6); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
+      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.6,0,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#ffd700'; ctx.font=`bold ${Math.floor(this.size*0.5)}px Arial`;
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('👑',0,-this.size*0.1);
     } 
     else if (this.id === 'jackpot') {
-      ctx.save(); ctx.scale(1, 0.6); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
+      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.6,0,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#fff'; ctx.font=`bold ${Math.floor(this.size*0.6)}px Arial`;
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$',0,0);
     }
@@ -498,12 +484,12 @@ class Fish {
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🎰',0,0);
     }
     else if (this.id === 'electric') {
-      ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
+      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.5,0,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#fff'; ctx.font=`bold ${Math.floor(this.size*0.5)}px Arial`;
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('⚡',0,0);
     }
     else {
-      ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
+      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.5,0,0,Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.moveTo(-this.size,0); ctx.lineTo(-this.size-12,-10); ctx.lineTo(-this.size-12,10); ctx.fill();
     }
     
@@ -606,7 +592,7 @@ class InWorldRoulette{
     const o=players[this.ownerId], win=this.result.m*o.bet;
     if(win>0){
       o.bal+=win; if(this.ownerId===0){ currentUser.balance+=win; totalWin+=win; updateMissionProgress('win',win); updateUI(); }
-      addCanvasText('+'+win, this.x, this.y-55, o.color, 24);
+      addCanvasText('+'+win.toLocaleString(), this.x, this.y-55, o.color, 24);
       if(soundOn)SFX.coin();
     }else{ addCanvasText('MISS!', this.x, this.y-50, '#aaa', 18); }
   }
@@ -638,17 +624,17 @@ function explodeAt(x, y, radius, dmg, ownerId, immuneFish = null){
   if(soundOn) SFX.explosion();
   for(let f of fishes){
     if(!f.alive || f === immuneFish) continue;
-    const dx = f.x-x; const dy = f.y-y;
-    if(Math.sqrt(dx*dx + dy*dy)<radius+f.size){
+    const d=Math.hypot(f.x-x,f.y-y);
+    if(d<radius+f.size){
       f.hp-=dmg; f.flash=10; 
       if(f.hp<=0) killFish(f,ownerId);
     }
   }
 }
 function nukeAll(ownerId){
-  nukeFlash=20; spawnParticle((W||320)/2,(H||480)/2,'#00ff88',30,1.5);
+  nukeFlash=20; spawnParticle(W/2,H/2,'#00ff88',30,1.5);
   if(soundOn)SFX.explosion();
-  addCanvasText('☢ NUKE!', (W||320)/2, (H||480)/2, '#00ff88', 45);
+  addCanvasText('☢ NUKE!', W/2, H/2, '#00ff88', 45);
   for(let f of fishes){
     if(f.alive){ f.hp=0; killFish(f,ownerId); }
   }
@@ -666,31 +652,21 @@ function killFish(f, ownerId){
 
   if (ownerId === 0) { totalKills++; checkAchievements(); }
 
-  // PENCEGAHAN BUG BLANK MEMORY LEAK: Jangan panggil f.init() lagi jika ikan ini adalah pecahan.
-  let isExtraFish = f.isExtra;
-
-  if (f.id === 'bomb') { explodeAt(f.x, f.y, 250, 45, ownerId); if(!isExtraFish) f.init(); return; }
+  if (f.id === 'bomb') { explodeAt(f.x, f.y, 250, 45, ownerId); f.init(); return; }
   if (f.id === 'electric') {
     addCanvasText('⚡ ZAP!', f.x, f.y, '#ffd740', 26);
     fishes.forEach(nf => {
-      if(nf.alive && nf!==f){
-        const dx = nf.x-f.x; const dy = nf.y-f.y;
-        if(Math.sqrt(dx*dx + dy*dy)<300){
-           nf.hp-=35; nf.flash=10; if(nf.hp<=0) killFish(nf, ownerId);
-        }
+      if(nf.alive && nf!==f && Math.hypot(nf.x-f.x, nf.y-f.y)<300){
+        nf.hp-=35; nf.flash=10; if(nf.hp<=0) killFish(nf, ownerId);
       }
     });
   }
   if (f.id === 'roulette') {
     inWorldRoulettes.push(new InWorldRoulette(f.x, f.y, ownerId));
-    if(!isExtraFish) f.init(); return;
+    f.init(); return;
   }
   if (f.id === 'twin') {
-    for(let i=0;i<2;i++){
-        const nf=new Fish(); nf.init('small'); nf.x=f.x+(i-0.5)*40; nf.y=f.y; 
-        nf.isExtra = true; // Tandai agar mati secara permanen dan mencegah array membesar tiada akhir.
-        fishes.push(nf);
-    }
+    for(let i=0;i<2;i++){const nf=new Fish(); nf.init('small'); nf.x=f.x+(i-0.5)*40; nf.y=f.y; fishes.push(nf);}
   }
 
   if(ownerId === 0){
@@ -704,11 +680,11 @@ function killFish(f, ownerId){
     if(f.id === 'jackpot'){
       win = f.countUp; jackpotPool = Math.max(0, jackpotPool - win); updateJackpot();
       if(ownerId === 0){ showJackpotWin(win); updateMissionProgress('jackpot', 1); } 
-      else addCanvasText('JACKPOT +'+win, f.x, f.y, '#ffd700', 24);
+      else addCanvasText('JACKPOT +'+win.toLocaleString(), f.x, f.y, '#ffd700', 24);
     } else {
       const goldMod = (ownerId === 0 && buffs.goldFish) ? 1.5 : 1;
       const comboMod = ownerId === 0 ? Math.max(1, comboKills * 0.1 + 1) : 1;
-      win = Math.floor(f.val * (owner.bet / 10) * goldMod * comboMod);
+      win = Math.floor(f.val * owner.bet * goldMod * comboMod);
     }
     
     if (ownerId === 0) {
@@ -719,10 +695,9 @@ function killFish(f, ownerId){
       owner.bal += win; 
     }
     
-    if(win > 0) addCanvasText('+'+win, f.x, f.y-10, owner.color, 16);
+    if(win > 0) addCanvasText('+'+win.toLocaleString(), f.x, f.y-10, owner.color, 16);
   }
-  
-  if(!isExtraFish) f.init(); // Restart ikan biasa ke layar awal
+  f.init();
 }
 
 function performShoot(player,ang){
@@ -734,13 +709,17 @@ function performShoot(player,ang){
   }
 
   if(player.id === 0) {
-    const costMulti = wDef.shotCostMulti || 1;
-    const cost = (buffs.autoReload && currentUser.balance<300) ? 0 : (player.bet * costMulti);
-    if(currentUser.balance < cost) {
-       if(!autoFire) alert(`Saldo tidak cukup! Total Biaya Tembak: ${cost.toLocaleString()} (Bet x ${costMulti})`);
-       return;
+    // Harga per peluru: Bet + (Bet * costMulti senjata)
+    const addOnCost = player.bet * (wDef.costMulti || 0);
+    const cost = player.bet + addOnCost;
+    const actualCost = (buffs.autoReload && currentUser.balance < 300 && cost < 300) ? 0 : cost;
+
+    if(currentUser.balance < actualCost) {
+      addCanvasText('SALDO KURANG!', player.x, player.y - 40, '#ff2266', 16);
+      if(autoFire) toggleAuto();
+      return;
     }
-    currentUser.balance -= cost; updateUI();
+    currentUser.balance -= actualCost; updateUI();
   } else {
     if(player.bal < player.bet) player.bal += 500; 
   }
@@ -785,10 +764,8 @@ function updateBots(){
 function drawCannons(){
   players.forEach(p=>{
     ctx.save();ctx.translate(p.x,p.y);
-    ctx.fillStyle='#071828';
-    ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,30,0,Math.PI*2); ctx.fill(); ctx.restore();
-    ctx.strokeStyle=p.color;ctx.lineWidth=2;
-    ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,30,0,Math.PI*2); ctx.stroke(); ctx.restore();
+    ctx.fillStyle='#071828';ctx.beginPath();ctx.ellipse(0,0,30,15,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=p.color;ctx.lineWidth=2;ctx.stroke();
     ctx.rotate(p.ang);
     ctx.fillStyle='#1a3b50';ctx.fillRect(0,-6,40,12);
     ctx.fillStyle=p.color;ctx.fillRect(30,-7,10,14);
@@ -798,8 +775,8 @@ function drawCannons(){
 
 /** 8. RENDER LOOP & RESIZE INIT **/
 function resize(){
-  W = canvas.width = window.innerWidth || 320; 
-  H = canvas.height = window.innerHeight || 480;
+  W = canvas.width = window.innerWidth; 
+  H = canvas.height = window.innerHeight;
   const top = document.getElementById('hud-top-bar');
   const bot = document.getElementById('hud-bot-bar');
   if(top) hudTopH = top.offsetHeight || 62;
@@ -810,7 +787,7 @@ function resize(){
 
   bgCanvas = document.createElement('canvas');
   bgCanvas.width = W; bgCanvas.height = H;
-  bgCtx = bgCanvas.getContext('2d'); // Dihilangkan flag {alpha:false} untuk menghindari bug di OS lawas
+  bgCtx = bgCanvas.getContext('2d', { alpha: false });
   const g = bgCtx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,'#000c20');g.addColorStop(0.5,'#001430');g.addColorStop(1,'#00080e');
   bgCtx.fillStyle = g; bgCtx.fillRect(0,0,W,H);
@@ -839,12 +816,7 @@ function loop(){
     ctx.globalAlpha=1; nukeFlash--;
   }
 
-  // PEMBERSIHAN ARRAY OTOMATIS: Anti Lag (Bug Blank Fix)
-  for(let i=fishes.length-1; i>=0; i--){ 
-    let f = fishes[i];
-    if(f.alive){ f.update(); f.draw(); }
-    else if(f.isExtra){ fishes.splice(i, 1); } // Hapus sisa ikan pecahan secara permanen
-  }
+  for(let f of fishes){ if(f.alive){ f.update(); f.draw(); } }
 
   for(let i=inWorldRoulettes.length-1;i>=0;i--){
     inWorldRoulettes[i].update(); inWorldRoulettes[i].draw();
@@ -905,11 +877,11 @@ function renderWeaponRow(){
 }
 
 let shopTabActive='weapons';
+function openShop(){document.getElementById('shop-overlay').style.display='flex';renderShop();}
+function closeShop(){document.getElementById('shop-overlay').style.display='none';}
 function openInfo(){document.getElementById('info-overlay').style.display='flex';}
 function closeInfo(){document.getElementById('info-overlay').style.display='none';}
 
-function openShop(){document.getElementById('shop-overlay').style.display='flex';renderShop();}
-function closeShop(){document.getElementById('shop-overlay').style.display='none';}
 function shopTab(t){
   shopTabActive=t;
   document.querySelectorAll('.shop-tab').forEach((el,i)=>el.classList.toggle('active',['weapons','upgrades','buffs','missions'][i]===t));
@@ -922,7 +894,7 @@ function renderShop(){
   
   if(shopTabActive==='weapons'){
     for(let wid in WEAPON_DEFS){
-      const w=WEAPON_DEFS[wid], owned=!!inventory[wid], equipped=equippedSlots.indexOf(wid) !== -1;
+      const w=WEAPON_DEFS[wid], owned=!!inventory[wid], equipped=equippedSlots.includes(wid);
       const card=document.createElement('div');card.className='shop-card'+(equipped?' equipped':owned?' owned':'');
       let btn=equipped?`<button class="card-btn equipped-tag" onclick="unequipWeapon('${wid}')">✓ EQUIPPED</button>`:
                owned?`<button class="card-btn equip" onclick="equipWeapon('${wid}')">EQUIP</button>`:
@@ -934,7 +906,7 @@ function renderShop(){
     for(let upg of UPGRADE_DEFS){
       const cur=upgrades[upg.id]||0, maxed=cur>=upg.max, price=maxed?0:upg.prices[cur];
       const card=document.createElement('div');card.className='shop-card'+(maxed?' owned':'');
-      card.innerHTML=`<div class="card-ico">${upg.ico}</div><div class="card-name">${upg.name}</div><div class="card-stat">Lv: ${cur}/${upg.max}<br>${upg.desc}</div><button class="card-btn ${maxed?'equipped-tag':'buy'}" onclick="${maxed?'':(`buyUpgrade('${upg.id}')`)}">${maxed?'MAX':'💰 '+price}</button>`;
+      card.innerHTML=`<div class="card-ico">${upg.ico}</div><div class="card-name">${upg.name}</div><div class="card-stat">Lv: ${cur}/${upg.max}</div><button class="card-btn ${maxed?'equipped-tag':'buy'}" onclick="${maxed?'':(`buyUpgrade('${upg.id}')`)}">${maxed?'MAX':'💰 '+price.toLocaleString()}</button>`;
       c.appendChild(card);
     }
   } else if (shopTabActive==='buffs') {
@@ -949,7 +921,7 @@ function renderShop(){
       const card=document.createElement('div');card.className='shop-card'+(m.done?' owned':'');
       const pct=Math.min(1,m.prog/m.goal);
       const bar=`<div style="width:100%;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;margin:5px 0 3px;overflow:hidden;"><div style="width:${(pct*100).toFixed(0)}%;height:100%;background:${m.done?'#00ffaa':'#00e5ff'};border-radius:3px;"></div></div>`;
-      card.innerHTML=`<div style="display:flex;align-items:center;gap:10px;text-align:left;"><div style="font-size:20px;">${m.done?'✅':'📋'}</div><div style="flex:1;"><div class="card-name" style="text-align:left;">${m.desc}</div><div class="card-stat" style="text-align:left;">${m.done?'SELESAI':`${Math.min(m.prog,m.goal)}/${m.goal}`} — Reward 💰${m.reward}</div>${bar}</div></div>`;
+      card.innerHTML=`<div style="display:flex;align-items:center;gap:10px;text-align:left;"><div style="font-size:20px;">${m.done?'✅':'📋'}</div><div style="flex:1;"><div class="card-name" style="text-align:left;">${m.desc}</div><div class="card-stat" style="text-align:left;">${m.done?'SELESAI':`${Math.min(m.prog,m.goal)}/${m.goal}`} — Reward 💰${m.reward.toLocaleString()}</div>${bar}</div></div>`;
       c.appendChild(card);
     });
   }
@@ -960,7 +932,7 @@ function buyWeapon(wid){
   currentUser.balance -= WEAPON_DEFS[wid].price; inventory[wid]=true; updateUI(); renderShop();
 }
 function equipWeapon(wid){const idx=equippedSlots.indexOf(null);if(idx!==-1)equippedSlots[idx]=wid;else equippedSlots[activeSlot]=wid;renderWeaponRow();renderShop();}
-function unequipWeapon(wid){const idx=equippedSlots.indexOf(wid);if(idx!==-1)equippedSlots[idx]=null;if(equippedSlots.indexOf(null)===3)equippedSlots[0]='single';renderWeaponRow();renderShop();}
+function unequipWeapon(wid){const idx=equippedSlots.indexOf(wid);if(idx!==-1)equippedSlots[idx]=null;if(!equippedSlots.some(s=>s))equippedSlots[0]='single';renderWeaponRow();renderShop();}
 function buyUpgrade(id){
   const upg=UPGRADE_DEFS.find(u=>u.id===id), cur=upgrades[id]||0, price=upg.prices[cur];
   if(currentUser.balance < price) return alert('Saldo tidak cukup!');
@@ -976,7 +948,9 @@ function updateUI(){
   document.getElementById('h-bal').textContent=Math.floor(currentUser.balance).toLocaleString();
   document.getElementById('h-win').textContent=Math.floor(totalWin).toLocaleString();
   document.getElementById('h-lvl').textContent=level;
-  document.getElementById('h-bet').textContent=formatM(players[0].bet);
+  
+  let b = players[0].bet;
+  document.getElementById('h-bet').textContent = b >= 1000 ? (b/1000) + 'k' : b;
 }
 function updateJackpot(){document.getElementById('h-jack').textContent=jackpotPool.toLocaleString();}
 function showJackpotWin(amount){
@@ -985,28 +959,29 @@ function showJackpotWin(amount){
   if(soundOn)SFX.jackpot_win();
 }
 function closeJackpot(){document.getElementById('jackpot-win').style.display='none';}
-function toggleAuto(){autoFire=!autoFire;const b=document.getElementById('btn-auto');b.textContent=autoFire?'⚡AUTO ON':'⚡AUTO';b.classList.toggle('on',autoFire);}
+function toggleAuto(){
+  autoFire=!autoFire;
+  const b=document.getElementById('btn-auto');
+  b.textContent=autoFire?'⚡AUTO ON':'⚡AUTO';
+  b.classList.toggle('on',autoFire);
+}
 
-function changeBet(dir,type){
+// LEVEL BET DITAMBAHKAN HINGGA 500k
+const BET_LEVELS = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000];
+function changeBet(d, type){
   if(type==='max') {
-    players[0].bet = Math.min(currentUser.balance, 500000);
-  } else {
-    let step = 10;
-    if (players[0].bet >= 100000) step = 50000;
-    else if (players[0].bet >= 10000) step = 10000;
-    else if (players[0].bet >= 1000) step = 1000;
-    else if (players[0].bet >= 100) step = 100;
-    
-    if(dir < 0) {
-      if(players[0].bet <= 100000 && players[0].bet > 10000) step = 10000;
-      else if(players[0].bet <= 10000 && players[0].bet > 1000) step = 1000;
-      else if(players[0].bet <= 1000 && players[0].bet > 100) step = 100;
-      else if(players[0].bet <= 100) step = 10;
-    }
-    
-    players[0].bet = Math.max(10, Math.min(500000, players[0].bet + (dir * step)));
+    players[0].bet = Math.min(Math.floor(currentUser.balance), 500000) || 10;
   }
-  document.getElementById('h-bet').textContent = formatM(players[0].bet);
+  else {
+    let idx = BET_LEVELS.findIndex(b => b >= players[0].bet);
+    if(idx === -1) idx = BET_LEVELS.length - 1;
+    
+    if (d > 0) idx = Math.min(BET_LEVELS.length - 1, idx + 1);
+    else if (d < 0) idx = Math.max(0, idx - 1);
+    
+    players[0].bet = BET_LEVELS[idx];
+  }
+  updateUI();
 }
 
 /** 10. ACHIEVEMENTS & GAMEOVER **/
@@ -1031,7 +1006,7 @@ function updateMissionProgress(type,amt){
     if(m.done)continue;
     if(m.target===type){
       m.prog+=amt; 
-      if(m.prog>=m.goal){ m.done=true; currentUser.balance+=m.reward; addCanvasText('📋 MISI SELESAI +'+m.reward, (W||320)/2, (H||480)*0.3, '#00ffaa', 30); updateUI(); }
+      if(m.prog>=m.goal){ m.done=true; currentUser.balance+=m.reward; addCanvasText('📋 MISI SELESAI +'+m.reward, W/2, H*0.3, '#00ffaa', 30); updateUI(); }
     }
   }
 }
@@ -1044,11 +1019,11 @@ function showGameOver(){
 /** 11. INPUT LISTENERS **/
 window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
 window.addEventListener('mousedown',e=>{
-  if(e.target.closest('.hud-bot')||e.target.closest('#weapon-row')||e.target.closest('.overlay-wrap')||e.target.closest('.hud-top')||e.target.closest('#jackpot-win')||e.target.closest('#sound-btn')||e.target.closest('#gameover'))return;
+  if(e.target.closest('.hud-bot')||e.target.closest('#weapon-row')||e.target.closest('.overlay-bg')||e.target.closest('.hud-top')||e.target.closest('#jackpot-win')||e.target.closest('#sound-btn')||e.target.closest('#gameover'))return;
   resumeAC(); if(!audioStarted){audioStarted=true;initAudio();} shootMainPlayer();
 });
 window.addEventListener('touchstart',e=>{
-  if(e.target.closest('.hud-bot')||e.target.closest('#weapon-row')||e.target.closest('.overlay-wrap')||e.target.closest('.hud-top')||e.target.closest('#jackpot-win')||e.target.closest('#sound-btn')||e.target.closest('#gameover'))return;
+  if(e.target.closest('.hud-bot')||e.target.closest('#weapon-row')||e.target.closest('.overlay-bg')||e.target.closest('.hud-top')||e.target.closest('#jackpot-win')||e.target.closest('#sound-btn')||e.target.closest('#gameover'))return;
   resumeAC(); if(!audioStarted){audioStarted=true;initAudio();}
   const t=e.touches[0]; mouse.x=t.clientX; mouse.y=t.clientY; shootMainPlayer(); e.preventDefault();
 },{passive:false});
@@ -1061,12 +1036,13 @@ window.addEventListener('keydown',e=>{
 
 /** 12. INIT ENGINE & EVENT BINDINGS **/
 window.addEventListener('resize', resize);
-resize(); 
+resize(); // Call resize immediately after setting up W, H, and players.
 
 for(let i=0;i<18;i++) fishes.push(new Fish());
 renderWeaponRow(); updateUI(); updateJackpot();
 requestAnimationFrame(loop);
 
+// Auto-save interval (every 30 seconds)
 setInterval(() => {
   if (typeof api !== 'undefined' && api.saveProgress) {
     api.saveProgress(currentUser.username, currentUser.balance, level, totalWin).catch(()=>{});
