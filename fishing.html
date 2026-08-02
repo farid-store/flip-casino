@@ -229,7 +229,7 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-//  OCEAN EMPEROR V7 — OPTIMIZED FOR CASINO (FULL UNIFIED FIX & ANTI-BLANK)
+//  OCEAN EMPEROR V7 — OPTIMIZED FOR CASINO (COMPATIBILITY PATCH)
 // ═══════════════════════════════════════════════════════════════════
 
 /** 1. CASINO API & AUTH **/
@@ -237,7 +237,6 @@ const userJson = localStorage.getItem('currentUser');
 if (!userJson) window.location.href = 'auth.html';
 let currentUser = JSON.parse(userJson) || { username: 'Guest', balance: 50000 };
 
-// PENGAMANAN TIPE DATA AGAR SALDO TIDAK MENJADI NaN (Menghindari Blank Canvas)
 currentUser.balance = parseInt(currentUser.balance) || 0;
 
 if (typeof api !== 'undefined' && api.getDatabase) {
@@ -286,7 +285,6 @@ const players = [
   {id:5, isBot:true, name:'BOT-O', color:'#ff7700', bet:10, bal:7000, ang:0, cooldown:0, totalWin:0, x:0, y:0}
 ];
 
-// ADD-ON PRICING MULTIPLIER ADDED
 const WEAPON_DEFS={
   single: {id:'single', name:'Single Shot', ico:'🔫',dmg:1,multi:1, price:0, shotCostMulti:1, color:'#00e5ff', desc:'Biaya: Bet x1'},
   double: {id:'double', name:'Double Shot', ico:'🎯',dmg:1,multi:2, price:600, shotCostMulti:2, color:'#ffd700', desc:'Biaya: Bet x2'},
@@ -374,7 +372,7 @@ function toggleSound(){
   document.getElementById('sound-btn').textContent=(soundOn?'🔊':'🔇')+' SFX';
 }
 
-/** 4. CANVAS FLOATERS (ANTI-LAG) **/
+/** 4. CANVAS FLOATERS **/
 const canvasFloaters = [];
 function addCanvasText(str, x, y, color, size) {
   canvasFloaters.push({ str, x, y, color, size, life: 1 });
@@ -478,13 +476,14 @@ class Fish {
     if(this.flash>0) ctx.globalAlpha = 0.5 + 0.5 * Math.sin(frameCount*0.5);
     ctx.fillStyle = this.color;
 
+    // COMPATIBILITY PATCH: Diganti dari ctx.ellipse menjadi ctx.arc dengan scale agar tidak blank di HP jadul
     if(this.id === 'boss') {
-      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.6,0,0,Math.PI*2); ctx.fill();
+      ctx.save(); ctx.scale(1, 0.6); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
       ctx.fillStyle='#ffd700'; ctx.font=`bold ${Math.floor(this.size*0.5)}px Arial`;
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('👑',0,-this.size*0.1);
     } 
     else if (this.id === 'jackpot') {
-      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.6,0,0,Math.PI*2); ctx.fill();
+      ctx.save(); ctx.scale(1, 0.6); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
       ctx.fillStyle='#fff'; ctx.font=`bold ${Math.floor(this.size*0.6)}px Arial`;
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$',0,0);
     }
@@ -499,12 +498,12 @@ class Fish {
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🎰',0,0);
     }
     else if (this.id === 'electric') {
-      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.5,0,0,Math.PI*2); ctx.fill();
+      ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
       ctx.fillStyle='#fff'; ctx.font=`bold ${Math.floor(this.size*0.5)}px Arial`;
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('⚡',0,0);
     }
     else {
-      ctx.beginPath(); ctx.ellipse(0,0,this.size,this.size*0.5,0,0,Math.PI*2); ctx.fill();
+      ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore();
       ctx.beginPath(); ctx.moveTo(-this.size,0); ctx.lineTo(-this.size-12,-10); ctx.lineTo(-this.size-12,10); ctx.fill();
     }
     
@@ -639,8 +638,8 @@ function explodeAt(x, y, radius, dmg, ownerId, immuneFish = null){
   if(soundOn) SFX.explosion();
   for(let f of fishes){
     if(!f.alive || f === immuneFish) continue;
-    const d=Math.hypot(f.x-x,f.y-y);
-    if(d<radius+f.size){
+    const dx = f.x-x; const dy = f.y-y;
+    if(Math.sqrt(dx*dx + dy*dy)<radius+f.size){
       f.hp-=dmg; f.flash=10; 
       if(f.hp<=0) killFish(f,ownerId);
     }
@@ -674,8 +673,11 @@ function killFish(f, ownerId){
   if (f.id === 'electric') {
     addCanvasText('⚡ ZAP!', f.x, f.y, '#ffd740', 26);
     fishes.forEach(nf => {
-      if(nf.alive && nf!==f && Math.hypot(nf.x-f.x, nf.y-f.y)<300){
-        nf.hp-=35; nf.flash=10; if(nf.hp<=0) killFish(nf, ownerId);
+      if(nf.alive && nf!==f){
+        const dx = nf.x-f.x; const dy = nf.y-f.y;
+        if(Math.sqrt(dx*dx + dy*dy)<300){
+           nf.hp-=35; nf.flash=10; if(nf.hp<=0) killFish(nf, ownerId);
+        }
       }
     });
   }
@@ -783,8 +785,10 @@ function updateBots(){
 function drawCannons(){
   players.forEach(p=>{
     ctx.save();ctx.translate(p.x,p.y);
-    ctx.fillStyle='#071828';ctx.beginPath();ctx.ellipse(0,0,30,15,0,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=p.color;ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#071828';
+    ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,30,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.strokeStyle=p.color;ctx.lineWidth=2;
+    ctx.save(); ctx.scale(1, 0.5); ctx.beginPath(); ctx.arc(0,0,30,0,Math.PI*2); ctx.stroke(); ctx.restore();
     ctx.rotate(p.ang);
     ctx.fillStyle='#1a3b50';ctx.fillRect(0,-6,40,12);
     ctx.fillStyle=p.color;ctx.fillRect(30,-7,10,14);
@@ -806,7 +810,7 @@ function resize(){
 
   bgCanvas = document.createElement('canvas');
   bgCanvas.width = W; bgCanvas.height = H;
-  bgCtx = bgCanvas.getContext('2d', { alpha: false });
+  bgCtx = bgCanvas.getContext('2d'); // Dihilangkan flag {alpha:false} untuk menghindari bug di OS lawas
   const g = bgCtx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,'#000c20');g.addColorStop(0.5,'#001430');g.addColorStop(1,'#00080e');
   bgCtx.fillStyle = g; bgCtx.fillRect(0,0,W,H);
@@ -918,7 +922,7 @@ function renderShop(){
   
   if(shopTabActive==='weapons'){
     for(let wid in WEAPON_DEFS){
-      const w=WEAPON_DEFS[wid], owned=!!inventory[wid], equipped=equippedSlots.includes(wid);
+      const w=WEAPON_DEFS[wid], owned=!!inventory[wid], equipped=equippedSlots.indexOf(wid) !== -1;
       const card=document.createElement('div');card.className='shop-card'+(equipped?' equipped':owned?' owned':'');
       let btn=equipped?`<button class="card-btn equipped-tag" onclick="unequipWeapon('${wid}')">✓ EQUIPPED</button>`:
                owned?`<button class="card-btn equip" onclick="equipWeapon('${wid}')">EQUIP</button>`:
@@ -956,7 +960,7 @@ function buyWeapon(wid){
   currentUser.balance -= WEAPON_DEFS[wid].price; inventory[wid]=true; updateUI(); renderShop();
 }
 function equipWeapon(wid){const idx=equippedSlots.indexOf(null);if(idx!==-1)equippedSlots[idx]=wid;else equippedSlots[activeSlot]=wid;renderWeaponRow();renderShop();}
-function unequipWeapon(wid){const idx=equippedSlots.indexOf(wid);if(idx!==-1)equippedSlots[idx]=null;if(!equippedSlots.some(s=>s))equippedSlots[0]='single';renderWeaponRow();renderShop();}
+function unequipWeapon(wid){const idx=equippedSlots.indexOf(wid);if(idx!==-1)equippedSlots[idx]=null;if(equippedSlots.indexOf(null)===3)equippedSlots[0]='single';renderWeaponRow();renderShop();}
 function buyUpgrade(id){
   const upg=UPGRADE_DEFS.find(u=>u.id===id), cur=upgrades[id]||0, price=upg.prices[cur];
   if(currentUser.balance < price) return alert('Saldo tidak cukup!');
