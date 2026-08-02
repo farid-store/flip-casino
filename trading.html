@@ -97,7 +97,7 @@
   .icon-btn.muted { opacity: 0.5; border-color: var(--text-muted); color: var(--text-muted); }
 
   /* =========================================
-     MAIN LAYOUT (FLEX ROW ON DESKTOP)
+     MAIN LAYOUT
      ========================================= */
   .main-layout {
     display: flex; flex-direction: column; flex: 1; overflow: hidden;
@@ -286,9 +286,6 @@
     padding: 14px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: var(--font-ui);
   }
 
-  /* =========================================
-     RESPONSIVE DESKTOP LAYOUT
-     ========================================= */
   @media (min-width: 768px) {
     #app-wrapper { border-radius: 16px; margin: 20px auto; height: calc(100dvh - 40px); border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 20px 60px rgba(0,0,0,1);}
     .main-layout { flex-direction: row; }
@@ -304,7 +301,6 @@
 <div id="app-wrapper">
   <canvas id="confettiCanvas" class="confetti"></canvas>
 
-  <!-- TOP BAR -->
   <header class="top-bar">
     <button class="btn-back" id="btnExit" onclick="saveAndExit()">◀ KEMBALI</button>
     <div class="stats-group">
@@ -317,10 +313,8 @@
     </div>
   </header>
 
-  <!-- MAIN LAYOUT (FLEX ROW ON DESKTOP) -->
   <div class="main-layout">
     
-    <!-- LEFT: CHART SECTION -->
     <div class="chart-section">
       <div class="chart-toolbar">
         <div class="toolbar-group">
@@ -342,7 +336,6 @@
         <div class="timer-display" id="timerDisplay">00:00</div>
         <div class="price-tag" id="priceTag">50000.00</div>
 
-        <!-- RESULT SPLASH -->
         <div class="result-splash" id="resultSplash">
           <div class="result-title" id="resultTitle">PROFIT</div>
           <div class="result-amount" id="resultAmount">+ 0</div>
@@ -350,10 +343,7 @@
       </div>
     </div>
 
-    <!-- RIGHT/BOTTOM: CONTROL SECTION -->
     <div class="control-section">
-      
-      <!-- Time Selector -->
       <div class="time-selector-wrap">
         <span class="control-label">WAKTU KONTRAK</span>
         <div class="time-grid">
@@ -392,14 +382,11 @@
           <span style="font-size: 24px;">📉</span> TURUN (PUT)
         </button>
       </div>
-
-    </div> <!-- End Control Section -->
-
-  </div> <!-- End Main Layout -->
+    </div>
+  </div>
 
   <div class="toast" id="toast"></div>
 
-  <!-- HELP MODAL -->
   <div class="modal-overlay" id="helpModal">
     <div class="modal-box">
       <button class="btn-close-modal" onclick="closeHelpModal()">×</button>
@@ -430,11 +417,11 @@ let currentUser = JSON.parse(userJson);
 // Config
 let playerWinRate = 0.15; 
 const MIN_BET = 100;
-const PROFIT_MULTIPLIER = 1.90; // 90% Profit (100% Modal + 90% Menang)
+const PROFIT_MULTIPLIER = 1.90; 
 const SOUND_KEY = 'trading_sound';
 
 let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
-let tradeDuration = 5000; // Default 5s
+let tradeDuration = 5000; 
 
 if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
@@ -524,7 +511,7 @@ document.getElementById('btnSound').classList.toggle('muted', !soundOn);
  * ==============================================================
  */
 let currentBet = 100;
-let gameState = 'IDLE'; // IDLE, TRADING
+let gameState = 'IDLE'; 
 
 function clearChipActive() { document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); }
 
@@ -553,10 +540,6 @@ function setDuration(ms, btnEl) {
   if (gameState !== 'IDLE') return;
   sfxClick();
   tradeDuration = ms;
-  
-  // Set window view based on duration (show a bit more history than duration)
-  windowSize = Math.max(10000, ms + 4000); 
-
   document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
   btnEl.classList.add('active');
 }
@@ -569,26 +552,30 @@ function setControlsEnabled(enabled) {
 
 /**
  * ==============================================================
- * CHART ENGINE (Time-based X-Axis, Smooth Scroll, OHLC Candles)
+ * REVISED CHART ENGINE (SOLID OHLC CANDLES, FIXED WIDTH, NO MORPHING)
  * ==============================================================
  */
 const canvas = document.getElementById('tradeCanvas');
 const ctx = canvas.getContext('2d');
 let animFrame;
+let chartType = 'CANDLE'; 
 
-let chartType = 'CANDLE'; // 'CANDLE' or 'LINE'
 function setChartType(type) {
   chartType = type;
   document.getElementById('btnCandle').classList.toggle('active', type === 'CANDLE');
   document.getElementById('btnLine').classList.toggle('active', type === 'LINE');
 }
 
+// Chart Configurations
 let currentPrice = 50000.00;
-let ticks = []; // Array of { time: ms, price: number }
-let windowSize = 10000; // X-Axis total time window in ms (10s default)
+const MAX_CANDLES = 20; // Kunci tepat 20 Candle Tampil di layar
+const CANDLE_PERIOD = 1000; // 1 Detik per 1 Candle terbentuk
+
+let candles = []; 
+let currentCandle = null;
 
 let tradeEntryPrice = 0;
-let tradeDirection = ''; // 'CALL' or 'PUT'
+let tradeDirection = ''; 
 let isWinRound = false;
 let tradeStartTime = 0;
 
@@ -599,43 +586,69 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-function addTick(price, time) {
-  ticks.push({ t: time, p: price });
-  // Keep only ticks within our moving time window
-  ticks = ticks.filter(tick => tick.t > time - windowSize);
+// Fungsi untuk membuat/memperbarui history Candle secara solid
+function updatePriceTick(price, now) {
+  if (!currentCandle) return;
+  
+  if (now - currentCandle.openTime >= CANDLE_PERIOD) {
+    // Tutup candle lama, Buka candle baru (Tidak akan berubah bentuk lagi)
+    let newCandle = {
+      openTime: currentCandle.openTime + CANDLE_PERIOD,
+      o: currentCandle.c,
+      h: currentCandle.c,
+      l: currentCandle.c,
+      c: price
+    };
+    candles.push(newCandle);
+    if (candles.length > MAX_CANDLES) {
+      candles.shift(); // Buang yang paling tua, jaga tetap 20
+    }
+    currentCandle = newCandle;
+  } else {
+    // Update live candle (candle ke 20 yg sedang berjalan)
+    currentCandle.c = price;
+    if (price > currentCandle.h) currentCandle.h = price;
+    if (price < currentCandle.l) currentCandle.l = price;
+  }
 }
 
 function drawChart(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (ticks.length === 0) return;
+  if (candles.length === 0) return;
 
-  // Safe padding so chart doesn't touch borders
   const paddingTop = canvas.height * 0.15;
   const paddingBottom = canvas.height * 0.15;
   const renderHeight = canvas.height - paddingTop - paddingBottom;
 
-  // Find Min/Max dynamically
-  let minP = Math.min(...ticks.map(t => t.p));
-  let maxP = Math.max(...ticks.map(t => t.p));
+  // Find Min/Max dynamically dari seluruh kumpulan candle
+  let minP = Math.min(...candles.map(c => c.l));
+  let maxP = Math.max(...candles.map(c => c.h));
   let paddingY = (maxP - minP) * 0.2;
-  if (paddingY === 0) paddingY = 10;
+  if (paddingY < 5) paddingY = 5;
   
   const scaleY = (val) => {
     let normalized = (val - (minP - paddingY)) / ((maxP + paddingY) - (minP - paddingY));
     return canvas.height - paddingBottom - (normalized * renderHeight);
   };
 
-  const scaleX = (time) => {
-    // Map time to X coordinate. Right edge = `now`, Left edge = `now - windowSize`
-    let age = now - time; 
-    return canvas.width - (age / windowSize) * canvas.width;
-  };
+  // Kalkulasi lebar tiap candle dan efek Smooth Scrolling
+  const candleSpacing = canvas.width / MAX_CANDLES;
+  const candleWidth = candleSpacing * 0.7; // Lebar badan candle
+  
+  // Efek geser layar perlahan ke kiri (berdasarkan milidetik yg sudah berjalan di candle saat ini)
+  let elapsedInCandle = now - currentCandle.openTime;
+  let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
+  
+  let baseX = canvas.width - (candleSpacing / 2); // Titik mulai dari kanan mentok
 
-  // Draw Entry Line & Shaded Area if Trading
+  // Hitung posisi kursor saat ini (Glow putih)
+  let lastX = baseX - shiftX;
+  let lastY = scaleY(currentCandle.c);
+
+  // Draw Entry Line & Shaded Area jika sedang TRADING
   if (gameState === 'TRADING') {
     const entryY = scaleY(tradeEntryPrice);
     
-    // Shaded Area
     ctx.fillStyle = tradeDirection === 'CALL' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
     if (tradeDirection === 'CALL') {
       ctx.fillRect(0, 0, canvas.width, entryY);
@@ -643,7 +656,6 @@ function drawChart(now) {
       ctx.fillRect(0, entryY, canvas.width, canvas.height);
     }
 
-    // Horizontal Line
     ctx.beginPath();
     ctx.moveTo(0, entryY);
     ctx.lineTo(canvas.width, entryY);
@@ -653,37 +665,37 @@ function drawChart(now) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Entry Label
     ctx.fillStyle = tradeDirection === 'CALL' ? '#10b981' : '#ef4444';
     ctx.font = 'bold 12px Montserrat';
     ctx.textAlign = 'left';
     ctx.fillText(`${tradeDirection} ENTRY: ${tradeEntryPrice.toFixed(2)}`, 10, entryY - 8);
   }
 
-  // Determine Main Color
+  // Warna indikator utama saat trade berjalan
   let activeColor = '#3b82f6';
   if (gameState === 'TRADING') {
     activeColor = (currentPrice >= tradeEntryPrice) ? '#10b981' : '#ef4444';
   }
 
   if (chartType === 'LINE') {
-    // Draw Line Chart
+    // DRAW LINE CHART
     ctx.beginPath();
-    ticks.forEach((tick, i) => {
-      const x = scaleX(tick.t);
-      const y = scaleY(tick.p);
+    for (let i = 0; i < candles.length; i++) {
+      let offsetIndex = (candles.length - 1 - i);
+      let x = baseX - (offsetIndex * candleSpacing) - shiftX;
+      let y = scaleY(candles[i].c);
+      
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
-    });
+    }
 
     ctx.strokeStyle = activeColor;
     ctx.lineWidth = 3;
     ctx.lineJoin = 'round';
     ctx.stroke();
 
-    // Gradient Fill
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.lineTo(0, canvas.height);
+    ctx.lineTo(lastX, canvas.height);
+    ctx.lineTo(baseX - ((candles.length - 1) * candleSpacing) - shiftX, canvas.height);
     ctx.closePath();
     let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, activeColor + '40');
@@ -692,66 +704,40 @@ function drawChart(now) {
     ctx.fill();
 
   } else {
-    // Draw Candlestick Chart bergaya SmartAlgo
-    const numCandles = 40; 
-    const interval = windowSize / numCandles;
-    
-    const padding = 3; 
-    const candleWidth = Math.max((canvas.width / numCandles) - padding, 2);
-    
-    let candles = [];
-    for(let i=0; i<numCandles; i++) candles.push(null);
-
-    ticks.forEach(tick => {
-      let age = now - tick.t;
-      let cIndex = numCandles - 1 - Math.floor(age / interval);
-      if (cIndex >= 0 && cIndex < numCandles) {
-        if (!candles[cIndex]) {
-          candles[cIndex] = { o: tick.p, h: tick.p, l: tick.p, c: tick.p, x: scaleX(now - (numCandles - 1 - cIndex) * interval) };
-        } else {
-          candles[cIndex].c = tick.p; // latest is close
-          candles[cIndex].h = Math.max(candles[cIndex].h, tick.p);
-          candles[cIndex].l = Math.min(candles[cIndex].l, tick.p);
-        }
-      }
-    });
-
-    // Render Candles ala SmartAlgo
-    candles.forEach((c) => {
-      if (!c) return;
-      const isGreen = c.c >= c.o;
-      const color = isGreen ? '#10b981' : '#ef4444'; 
+    // DRAW SOLID CANDLESTICK CHART
+    for (let i = 0; i < candles.length; i++) {
+      let c = candles[i];
+      let isGreen = c.c >= c.o;
+      let color = isGreen ? '#10b981' : '#ef4444'; 
       
-      const x = c.x;
-      const yOpen = scaleY(c.o);
-      const yClose = scaleY(c.c);
-      const yHigh = scaleY(c.h);
-      const yLow = scaleY(c.l);
+      let offsetIndex = (candles.length - 1 - i);
+      let x = baseX - (offsetIndex * candleSpacing) - shiftX;
+      
+      let yOpen = scaleY(c.o);
+      let yClose = scaleY(c.c);
+      let yHigh = scaleY(c.h);
+      let yLow = scaleY(c.l);
 
       ctx.strokeStyle = color;
       ctx.fillStyle = color;
       ctx.lineWidth = 1.5;
 
-      // Gambar Wick (Ekor)
+      // Draw Wick (Sumbu panjang)
       ctx.beginPath();
       ctx.moveTo(x, yHigh);
       ctx.lineTo(x, yLow);
       ctx.stroke();
 
-      // Gambar Body (Tubuh Candle)
+      // Draw Body (Badan padat)
       const bodyY = Math.min(yOpen, yClose);
       let bodyH = Math.abs(yOpen - yClose);
-      if (bodyH < 2) bodyH = 2; // Memastikan Doji (harga open=close) tetap terlihat
+      if (bodyH < 2) bodyH = 2; // Paksa tebal minimal 2px jika doji (harga buka=tutup sama)
       
-      ctx.fillRect(x - candleWidth/2, bodyY, candleWidth, bodyH);
-    });
+      ctx.fillRect(x - (candleWidth / 2), bodyY, candleWidth, bodyH);
+    }
   }
 
-  // Draw current point glow
-  const lastTick = ticks[ticks.length - 1];
-  const lastX = scaleX(lastTick.t);
-  const lastY = scaleY(lastTick.p);
-  
+  // Draw Titik Glow pada harga terakhir (ujung kanan)
   ctx.beginPath();
   ctx.arc(lastX, lastY, 5, 0, Math.PI*2);
   ctx.fillStyle = '#fff';
@@ -760,22 +746,27 @@ function drawChart(now) {
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  // Update Price Tag UI
+  // Update Badge Label Harga UI
   const tag = document.getElementById('priceTag');
   tag.textContent = currentPrice.toFixed(2);
   tag.style.top = `${lastY}px`;
   tag.className = 'price-tag ' + ((gameState === 'TRADING' && currentPrice >= tradeEntryPrice) ? 'up' : (gameState === 'TRADING' ? 'down' : ''));
 }
 
-// Background Idle Animation Loop
+
+/**
+ * ==============================================================
+ * GAME LOOP & LOGIKA PERGERAKAN HARGA
+ * ==============================================================
+ */
 let lastTickTime = performance.now();
+
 function gameLoop(now) {
   let dt = now - lastTickTime;
   
-  // Create a new price tick roughly every 50ms (20 ticks per second) for smooth history
-  if (dt > 50) {
-    // Kurangi pengali volatilitas dari 6 menjadi 1.2 agar pergerakan lebih halus
-    let volatility = 1.2; 
+  // Update harga dilakukan setiap 150ms agar santai dan profesional (tidak seperti kesetrum)
+  if (dt > 150) {
+    let volatility = 0.8; 
     
     if (gameState === 'IDLE') {
       currentPrice += (Math.random() - 0.5) * volatility; 
@@ -787,23 +778,21 @@ function gameLoop(now) {
         return; 
       }
 
-      // RTP Logic: Force price to destination based on duration
+      // Sistem RTP: Tarik harga perlahan menuju tujuan Win/Loss
       let progress = elapsed / tradeDuration;
-      let targetMagnitude = (tradeDuration / 1000) * 4; 
+      let targetMagnitude = (tradeDuration / 1000) * 1.5; 
       let targetDiff = isWinRound ? (tradeDirection === 'CALL' ? targetMagnitude : -targetMagnitude) : (tradeDirection === 'CALL' ? -targetMagnitude : targetMagnitude);
       
       let bias = targetDiff * progress;
-      // Kurangi juga noise saat trading berlangsung agar tidak melompat-lompat
-      let noise = (Math.random() - 0.5) * (volatility * 1.5); 
+      let noise = (Math.random() - 0.5) * (volatility * 0.8); 
       
       currentPrice = tradeEntryPrice + bias + noise;
     }
     
-    addTick(currentPrice, now);
+    updatePriceTick(currentPrice, now);
     lastTickTime = now;
   }
 
-  // Update Timer UI smoothly
   if (gameState === 'TRADING') {
     let elapsed = now - tradeStartTime;
     let remaining = Math.max(0, tradeDuration - elapsed);
@@ -815,12 +804,24 @@ function gameLoop(now) {
   animFrame = requestAnimationFrame(gameLoop);
 }
 
-// Initialize initial history so chart isn't empty
-let initTime = performance.now();
-for(let i=0; i<100; i++) {
-  currentPrice += (Math.random() - 0.5) * 1.2; // Match the new volatility
-  addTick(currentPrice, initTime - (100-i)*50);
+// Inisialisasi awal agar grafik sudah terisi penuh 20 candle saat web dibuka
+let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
+for(let i=0; i<MAX_CANDLES; i++) {
+  let cOpen = currentPrice;
+  let cClose = cOpen + ((Math.random() - 0.5) * 3);
+  candles.push({
+    openTime: initTime,
+    o: cOpen,
+    h: Math.max(cOpen, cClose) + (Math.random() * 1.5),
+    l: Math.min(cOpen, cClose) - (Math.random() * 1.5),
+    c: cClose
+  });
+  currentPrice = cClose;
+  initTime += CANDLE_PERIOD;
 }
+currentCandle = candles[candles.length - 1];
+currentCandle.openTime = performance.now();
+
 animFrame = requestAnimationFrame(gameLoop);
 
 /**
@@ -847,7 +848,6 @@ function placeTrade(direction) {
   document.getElementById('resultSplash').classList.remove('show');
   document.getElementById('timerDisplay').classList.add('active');
 
-  // Strict RTP Check
   isWinRound = Math.random() < playerWinRate;
 }
 
@@ -856,7 +856,7 @@ function finishTrade() {
   document.getElementById('timerDisplay').classList.remove('active');
   document.getElementById('timerDisplay').textContent = `00:00`;
   
-  // Force final check to ensure RTP logic holds true despite last millisecond noise
+  // Eksekusi RTP Bandar secara mutlak di ujung trade
   if (isWinRound) {
     if (tradeDirection === 'CALL' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 2.5;
     if (tradeDirection === 'PUT' && currentPrice >= tradeEntryPrice) currentPrice = tradeEntryPrice - 2.5;
@@ -865,10 +865,9 @@ function finishTrade() {
     if (tradeDirection === 'PUT' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 2.5;
   }
   
-  addTick(currentPrice, performance.now());
-  drawChart(performance.now()); // Draw final frame
+  updatePriceTick(currentPrice, performance.now());
+  drawChart(performance.now()); 
 
-  // Evaluate Win/Loss
   const won = (tradeDirection === 'CALL' && currentPrice > tradeEntryPrice) || 
               (tradeDirection === 'PUT' && currentPrice < tradeEntryPrice);
 
@@ -896,15 +895,14 @@ function finishTrade() {
   }
 
   splash.classList.add('show');
-  saveToServer(); // Sync balance
+  saveToServer();
 
-  // Reset after delay
   setTimeout(() => {
     splash.classList.remove('show');
     gameState = 'IDLE';
     setControlsEnabled(true);
-    lastTickTime = performance.now(); // Reset time diff
-    animFrame = requestAnimationFrame(gameLoop); // Restart idle loop
+    lastTickTime = performance.now(); 
+    animFrame = requestAnimationFrame(gameLoop); 
   }, 3000);
 }
 
