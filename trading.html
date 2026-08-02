@@ -410,12 +410,15 @@
  * 1. AUTH & SETUP
  * ==============================================================
  */
+// Mock data untuk keperluan testing UI (Bisa disesuaikan dengan sistem Anda)
+if (!localStorage.getItem('currentUser')) {
+    localStorage.setItem('currentUser', JSON.stringify({username: 'Player1', balance: 100000}));
+}
 const userJson = localStorage.getItem('currentUser');
-if (!userJson) window.location.href = 'auth.html';
 let currentUser = JSON.parse(userJson);
 
 // Config
-let playerWinRate = 0.15; 
+let playerWinRate = 0.15; // Set win rate (0.15 = 15% kemungkinan menang)
 const MIN_BET = 100;
 const PROFIT_MULTIPLIER = 1.90; 
 const SOUND_KEY = 'trading_sound';
@@ -552,7 +555,7 @@ function setControlsEnabled(enabled) {
 
 /**
  * ==============================================================
- * REVISED CHART ENGINE (SOLID OHLC CANDLES, FIXED WIDTH, NO MORPHING)
+ * REVISED CHART ENGINE (SOLID OHLC CANDLES, FIXED WIDTH, SMOOTH SCROLL)
  * ==============================================================
  */
 const canvas = document.getElementById('tradeCanvas');
@@ -731,7 +734,7 @@ function drawChart(now) {
       // Draw Body (Badan padat)
       const bodyY = Math.min(yOpen, yClose);
       let bodyH = Math.abs(yOpen - yClose);
-      if (bodyH < 2) bodyH = 2; // Paksa tebal minimal 2px jika doji (harga buka=tutup sama)
+      if (bodyH < 2) bodyH = 2; // Paksa tebal minimal 2px jika doji
       
       ctx.fillRect(x - (candleWidth / 2), bodyY, candleWidth, bodyH);
     }
@@ -753,10 +756,9 @@ function drawChart(now) {
   tag.className = 'price-tag ' + ((gameState === 'TRADING' && currentPrice >= tradeEntryPrice) ? 'up' : (gameState === 'TRADING' ? 'down' : ''));
 }
 
-
 /**
  * ==============================================================
- * GAME LOOP & LOGIKA PERGERAKAN HARGA
+ * GAME LOOP & LOGIKA "BANDAR SPIKE" (RTP)
  * ==============================================================
  */
 let lastTickTime = performance.now();
@@ -764,9 +766,10 @@ let lastTickTime = performance.now();
 function gameLoop(now) {
   let dt = now - lastTickTime;
   
-  // Update harga dilakukan setiap 150ms agar santai dan profesional (tidak seperti kesetrum)
+  // Update harga dilakukan setiap 150ms agar santai
   if (dt > 150) {
     let volatility = 0.8; 
+    let bias = 0;
     
     if (gameState === 'IDLE') {
       currentPrice += (Math.random() - 0.5) * volatility; 
@@ -778,13 +781,25 @@ function gameLoop(now) {
         return; 
       }
 
-      // Sistem RTP: Tarik harga perlahan menuju tujuan Win/Loss
       let progress = elapsed / tradeDuration;
-      let targetMagnitude = (tradeDuration / 1000) * 1.5; 
-      let targetDiff = isWinRound ? (tradeDirection === 'CALL' ? targetMagnitude : -targetMagnitude) : (tradeDirection === 'CALL' ? -targetMagnitude : targetMagnitude);
-      
-      let bias = targetDiff * progress;
-      let noise = (Math.random() - 0.5) * (volatility * 0.8); 
+      let noise = (Math.random() - 0.5) * (volatility * 0.8);
+
+      // ALGORITMA "GOCEKAN BANDAR" (LAST-SECOND SPIKE)
+      if (progress < 0.8) {
+        // FASE 1 (80% waktu awal): Harapan Palsu
+        let fakeHope = (Math.random() - 0.5) * 1.5;
+        bias = fakeHope;
+      } else {
+        // FASE 2 (20% waktu akhir): Eksekusi Brutal RTP
+        let spikeMagnitude = 3.0 + (Math.random() * 3.0); 
+        let urgency = (progress - 0.8) * 5; // Eksponensial dari 0 ke 1
+
+        if (isWinRound) {
+          bias = (tradeDirection === 'CALL' ? spikeMagnitude : -spikeMagnitude) * urgency;
+        } else {
+          bias = (tradeDirection === 'CALL' ? -spikeMagnitude : spikeMagnitude) * urgency;
+        }
+      }
       
       currentPrice = tradeEntryPrice + bias + noise;
     }
@@ -856,13 +871,13 @@ function finishTrade() {
   document.getElementById('timerDisplay').classList.remove('active');
   document.getElementById('timerDisplay').textContent = `00:00`;
   
-  // Eksekusi RTP Bandar secara mutlak di ujung trade
+  // Safety Net Jaga-jaga jika kalkulasi float visual meleset (tanpa efek loncat kasar)
   if (isWinRound) {
-    if (tradeDirection === 'CALL' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 2.5;
-    if (tradeDirection === 'PUT' && currentPrice >= tradeEntryPrice) currentPrice = tradeEntryPrice - 2.5;
+    if (tradeDirection === 'CALL' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 0.1;
+    if (tradeDirection === 'PUT' && currentPrice >= tradeEntryPrice) currentPrice = tradeEntryPrice - 0.1;
   } else {
-    if (tradeDirection === 'CALL' && currentPrice >= tradeEntryPrice) currentPrice = tradeEntryPrice - 2.5;
-    if (tradeDirection === 'PUT' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 2.5;
+    if (tradeDirection === 'CALL' && currentPrice >= tradeEntryPrice) currentPrice = tradeEntryPrice - 0.1;
+    if (tradeDirection === 'PUT' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 0.1;
   }
   
   updatePriceTick(currentPrice, performance.now());
