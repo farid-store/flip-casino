@@ -229,7 +229,7 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-//  OCEAN EMPEROR V7 — OPTIMIZED FOR CASINO (FULL UNIFIED FIX)
+//  OCEAN EMPEROR V7 — OPTIMIZED FOR CASINO (FULL UNIFIED FIX & ANTI-BLANK)
 // ═══════════════════════════════════════════════════════════════════
 
 /** 1. CASINO API & AUTH **/
@@ -237,11 +237,14 @@ const userJson = localStorage.getItem('currentUser');
 if (!userJson) window.location.href = 'auth.html';
 let currentUser = JSON.parse(userJson) || { username: 'Guest', balance: 50000 };
 
+// PENGAMANAN TIPE DATA AGAR SALDO TIDAK MENJADI NaN (Menghindari Blank Canvas)
+currentUser.balance = parseInt(currentUser.balance) || 0;
+
 if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
     if (db && db.users) {
       const freshUser = db.users.find(u => u.username === currentUser.username);
-      if (freshUser) currentUser.balance = freshUser.balance;
+      if (freshUser) currentUser.balance = parseInt(freshUser.balance) || 0;
       updateUI();
     }
   }).catch(e => console.error(e));
@@ -275,12 +278,12 @@ let upgrades={dmg:0,rate:0,winrate:0,radius:0};
 let buffs={autoReload:false, goldFish:false, comboMaster:false};
 
 const players = [
-  {id:0, isBot:false, name:'YOU', color:'#00e5ff', bet:10, ang:0, totalWin:0, totalKills:0},
-  {id:1, isBot:true, name:'BOT-R', color:'#ff2266', bet:10, bal:5000, ang:0, cooldown:0, totalWin:0},
-  {id:2, isBot:true, name:'BOT-G', color:'#00ffaa', bet:10, bal:8000, ang:0, cooldown:0, totalWin:0},
-  {id:3, isBot:true, name:'BOT-Y', color:'#ffd700', bet:10, bal:4000, ang:0, cooldown:0, totalWin:0},
-  {id:4, isBot:true, name:'BOT-P', color:'#c040ff', bet:10, bal:6000, ang:0, cooldown:0, totalWin:0},
-  {id:5, isBot:true, name:'BOT-O', color:'#ff7700', bet:10, bal:7000, ang:0, cooldown:0, totalWin:0}
+  {id:0, isBot:false, name:'YOU', color:'#00e5ff', bet:10, ang:0, totalWin:0, totalKills:0, x:0, y:0},
+  {id:1, isBot:true, name:'BOT-R', color:'#ff2266', bet:10, bal:5000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
+  {id:2, isBot:true, name:'BOT-G', color:'#00ffaa', bet:10, bal:8000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
+  {id:3, isBot:true, name:'BOT-Y', color:'#ffd700', bet:10, bal:4000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
+  {id:4, isBot:true, name:'BOT-P', color:'#c040ff', bet:10, bal:6000, ang:0, cooldown:0, totalWin:0, x:0, y:0},
+  {id:5, isBot:true, name:'BOT-O', color:'#ff7700', bet:10, bal:7000, ang:0, cooldown:0, totalWin:0, x:0, y:0}
 ];
 
 // ADD-ON PRICING MULTIPLIER ADDED
@@ -407,7 +410,7 @@ function pickFishType(){let r=Math.random(),c=0;for(let t of FISH_TYPES){c+=t.pr
 const fishes=[], bullets=[], _particles=[], lasers=[], inWorldRoulettes=[];
 
 class Fish {
-  constructor(){this.init();}
+  constructor(){ this.isExtra = false; this.init(); }
   init(overType){
     const t=overType?FISH_TYPES.find(x=>x.id===overType)||pickFishType():pickFishType();
     Object.assign(this,{
@@ -418,8 +421,8 @@ class Fish {
       alive:true, flash:0, orbitAngle:Math.random()*Math.PI*2, 
       countUp: 100+Math.floor(Math.random()*400)
     });
-    this.x = this.dir===1?-90:W+90;
-    this.baseY = (hudTopH+45) + Math.random()*(H-hudTopH-hudBotH-120);
+    this.x = this.dir===1?-90:(W||320)+90;
+    this.baseY = (hudTopH+45) + Math.random()*((H||480)-hudTopH-hudBotH-120);
     this.y = this.baseY;
 
     if(this.id === 'bomb') {
@@ -461,7 +464,11 @@ class Fish {
     if(this.id==='roulette') this.spinAngle+=0.04;
 
     const marg = this.size+50;
-    if((this.dir===1 && this.x>W+marg) || (this.dir===-1 && this.x<-marg)) this.init();
+    if((this.dir===1 && this.x>W+marg) || (this.dir===-1 && this.x<-marg)) {
+       // PENCEGAHAN BUG BLANK: Jika ini ikan pecahan, jangan diloop terus! Biarkan sistem menghapusnya.
+       if(this.isExtra) this.alive = false; 
+       else this.init();
+    }
   }
 
   draw(){
@@ -640,9 +647,9 @@ function explodeAt(x, y, radius, dmg, ownerId, immuneFish = null){
   }
 }
 function nukeAll(ownerId){
-  nukeFlash=20; spawnParticle(W/2,H/2,'#00ff88',30,1.5);
+  nukeFlash=20; spawnParticle((W||320)/2,(H||480)/2,'#00ff88',30,1.5);
   if(soundOn)SFX.explosion();
-  addCanvasText('☢ NUKE!', W/2, H/2, '#00ff88', 45);
+  addCanvasText('☢ NUKE!', (W||320)/2, (H||480)/2, '#00ff88', 45);
   for(let f of fishes){
     if(f.alive){ f.hp=0; killFish(f,ownerId); }
   }
@@ -660,7 +667,10 @@ function killFish(f, ownerId){
 
   if (ownerId === 0) { totalKills++; checkAchievements(); }
 
-  if (f.id === 'bomb') { explodeAt(f.x, f.y, 250, 45, ownerId); f.init(); return; }
+  // PENCEGAHAN BUG BLANK MEMORY LEAK: Jangan panggil f.init() lagi jika ikan ini adalah pecahan.
+  let isExtraFish = f.isExtra;
+
+  if (f.id === 'bomb') { explodeAt(f.x, f.y, 250, 45, ownerId); if(!isExtraFish) f.init(); return; }
   if (f.id === 'electric') {
     addCanvasText('⚡ ZAP!', f.x, f.y, '#ffd740', 26);
     fishes.forEach(nf => {
@@ -671,10 +681,14 @@ function killFish(f, ownerId){
   }
   if (f.id === 'roulette') {
     inWorldRoulettes.push(new InWorldRoulette(f.x, f.y, ownerId));
-    f.init(); return;
+    if(!isExtraFish) f.init(); return;
   }
   if (f.id === 'twin') {
-    for(let i=0;i<2;i++){const nf=new Fish(); nf.init('small'); nf.x=f.x+(i-0.5)*40; nf.y=f.y; fishes.push(nf);}
+    for(let i=0;i<2;i++){
+        const nf=new Fish(); nf.init('small'); nf.x=f.x+(i-0.5)*40; nf.y=f.y; 
+        nf.isExtra = true; // Tandai agar mati secara permanen dan mencegah array membesar tiada akhir.
+        fishes.push(nf);
+    }
   }
 
   if(ownerId === 0){
@@ -705,7 +719,8 @@ function killFish(f, ownerId){
     
     if(win > 0) addCanvasText('+'+win, f.x, f.y-10, owner.color, 16);
   }
-  f.init();
+  
+  if(!isExtraFish) f.init(); // Restart ikan biasa ke layar awal
 }
 
 function performShoot(player,ang){
@@ -720,7 +735,6 @@ function performShoot(player,ang){
     const costMulti = wDef.shotCostMulti || 1;
     const cost = (buffs.autoReload && currentUser.balance<300) ? 0 : (player.bet * costMulti);
     if(currentUser.balance < cost) {
-       // Hanya alert jika bukan mode auto untuk hindari spam
        if(!autoFire) alert(`Saldo tidak cukup! Total Biaya Tembak: ${cost.toLocaleString()} (Bet x ${costMulti})`);
        return;
     }
@@ -780,8 +794,8 @@ function drawCannons(){
 
 /** 8. RENDER LOOP & RESIZE INIT **/
 function resize(){
-  W = canvas.width = window.innerWidth; 
-  H = canvas.height = window.innerHeight;
+  W = canvas.width = window.innerWidth || 320; 
+  H = canvas.height = window.innerHeight || 480;
   const top = document.getElementById('hud-top-bar');
   const bot = document.getElementById('hud-bot-bar');
   if(top) hudTopH = top.offsetHeight || 62;
@@ -821,7 +835,12 @@ function loop(){
     ctx.globalAlpha=1; nukeFlash--;
   }
 
-  for(let f of fishes){ if(f.alive){ f.update(); f.draw(); } }
+  // PEMBERSIHAN ARRAY OTOMATIS: Anti Lag (Bug Blank Fix)
+  for(let i=fishes.length-1; i>=0; i--){ 
+    let f = fishes[i];
+    if(f.alive){ f.update(); f.draw(); }
+    else if(f.isExtra){ fishes.splice(i, 1); } // Hapus sisa ikan pecahan secara permanen
+  }
 
   for(let i=inWorldRoulettes.length-1;i>=0;i--){
     inWorldRoulettes[i].update(); inWorldRoulettes[i].draw();
@@ -903,7 +922,7 @@ function renderShop(){
       const card=document.createElement('div');card.className='shop-card'+(equipped?' equipped':owned?' owned':'');
       let btn=equipped?`<button class="card-btn equipped-tag" onclick="unequipWeapon('${wid}')">✓ EQUIPPED</button>`:
                owned?`<button class="card-btn equip" onclick="equipWeapon('${wid}')">EQUIP</button>`:
-               `<button class="card-btn buy" onclick="buyWeapon('${wid}')">💰 ${w.price}</button>`;
+               `<button class="card-btn buy" onclick="buyWeapon('${wid}')">💰 ${w.price.toLocaleString()}</button>`;
       card.innerHTML=`<div class="card-ico">${w.ico}</div><div class="card-name">${w.name}</div><div class="card-stat">${w.desc}</div>${btn}`;
       c.appendChild(card);
     }
@@ -1008,7 +1027,7 @@ function updateMissionProgress(type,amt){
     if(m.done)continue;
     if(m.target===type){
       m.prog+=amt; 
-      if(m.prog>=m.goal){ m.done=true; currentUser.balance+=m.reward; addCanvasText('📋 MISI SELESAI +'+m.reward, W/2, H*0.3, '#00ffaa', 30); updateUI(); }
+      if(m.prog>=m.goal){ m.done=true; currentUser.balance+=m.reward; addCanvasText('📋 MISI SELESAI +'+m.reward, (W||320)/2, (H||480)*0.3, '#00ffaa', 30); updateUI(); }
     }
   }
 }
