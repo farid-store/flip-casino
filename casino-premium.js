@@ -4,6 +4,7 @@
 ========================================================== */
 
 const UI = {
+   
 
 balance:document.getElementById("displayBalance"),
 spinTotal:document.getElementById("spinTotal"),
