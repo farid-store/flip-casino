@@ -1,898 +1,414 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#030507">
-<title>Royal Casino - VIP Lobby</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<style>
-  /* =========================================
-     CSS VARIABLES - TEMA KASINO VIP PREMIUM
-     ========================================= */
-  :root {
-    --bg-base: #030507;
-    --bg-panel: #0a0e14;
-    --bg-glass: rgba(10, 14, 20, 0.85);
-    --bg-card: linear-gradient(145deg, #111827, #080b11);
-    
-    --gold-light: #fef08a;
-    --gold-main: #eab308;
-    --gold-dark: #a16207;
-    
-    --text-light: #f8fafc;
-    --text-muted: #94a3b8;
-    
-    --danger: #ef4444;
-    --success: #10b981;
-    --info: #3b82f6;
-    --purple: #8b5cf6;
-    --orange: #f97316;
-    
-    --font-title: 'Cinzel', serif;
-    --font-ui: 'Montserrat', sans-serif;
-    --font-digital: 'Orbitron', sans-serif;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  /* SCROLLBAR KUSTOM */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg-base); }
-  ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--gold-main); }
-
-  body {
-    background: radial-gradient(circle at 50% 0%, #162032 0%, var(--bg-base) 100%);
-    color: var(--text-light);
-    font-family: var(--font-ui);
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-  }
-
-  /* =========================================
-     HEADER & TICKER
-     ========================================= */
-  .lobby-header {
-    background: var(--bg-glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(234, 179, 8, 0.2);
-    padding: calc(15px + env(safe-area-inset-top)) 24px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-  }
-
-  .brand-logo {
-    font-family: var(--font-title);
-    font-size: clamp(18px, 4vw, 24px);
-    font-weight: 800;
-    color: var(--gold-main);
-    text-shadow: 0 0 25px rgba(234, 179, 8, 0.5);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    letter-spacing: 1.5px;
-  }
-
-  .btn-logout {
-    background: transparent;
-    border: 1px solid rgba(239, 68, 68, 0.5);
-    color: var(--danger);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-family: var(--font-ui);
-    font-weight: 800;
-    font-size: 11px;
-    cursor: pointer;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .btn-logout:hover {
-    background: var(--danger);
-    color: #fff;
-    border-color: var(--danger);
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
-    transform: translateY(-2px);
-  }
-
-  .ticker-wrap {
-    background: linear-gradient(90deg, rgba(234, 179, 8, 0.05), rgba(0,0,0,0.8), rgba(234, 179, 8, 0.05));
-    border-bottom: 1px solid rgba(234, 179, 8, 0.15);
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-  }
-  .ticker-wrap span { color: var(--gold-main); margin-right: 12px; font-size: 16px; z-index: 2; }
-  .ticker-content {
-    white-space: nowrap;
-    animation: ticker 35s linear infinite;
-    font-family: var(--font-digital);
-    font-size: 12px;
-    color: var(--gold-light);
-    letter-spacing: 1.5px;
-  }
-  @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
-
-  /* =========================================
-     MAIN DASHBOARD (PROFILE & WALLET)
-     ========================================= */
-  .dashboard-section {
-    padding: 30px 24px calc(80px + env(safe-area-inset-bottom));
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    flex: 1;
-  }
-
-  .user-dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 24px;
-    margin-bottom: 50px;
-  }
-
-  .dash-card {
-    background: var(--bg-card);
-    border: 1px solid rgba(234, 179, 8, 0.15);
-    border-radius: 24px;
-    padding: 28px;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.4);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .dash-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
-  }
-
-  /* Profile Card Details */
-  .profile-wrapper { display: flex; align-items: center; gap: 18px; margin-bottom: 25px; }
-  .avatar-large {
-    width: 70px; height: 70px; border-radius: 50%; background: var(--bg-base);
-    border: 2px solid var(--gold-main); display: flex; align-items: center; justify-content: center;
-    font-size: 32px; box-shadow: 0 0 25px rgba(234, 179, 8, 0.4); flex-shrink: 0;
-  }
-  .user-details h2 { font-size: 20px; color: #fff; margin-bottom: 8px; font-weight: 800; letter-spacing: 1px;}
-  .user-level {
-    font-size: 10px; color: var(--gold-main); font-weight: 900; letter-spacing: 1.5px;
-    background: rgba(234, 179, 8, 0.15); padding: 5px 14px; border-radius: 12px; display: inline-block;
-    border: 1px solid rgba(234, 179, 8, 0.3);
-  }
-  .btn-edit-profile { 
-    background: none; border: none; color: var(--text-muted); font-size: 11.5px; font-weight: 600;
-    cursor: pointer; text-decoration: underline; margin-top: 12px; transition: 0.2s; display: block;
-  }
-  .btn-edit-profile:hover { color: var(--info); }
-
-  .btn-bonus {
-    width: 100%; background: linear-gradient(135deg, var(--purple), #6d28d9); color: white;
-    border: none; padding: 14px; border-radius: 14px; font-size: 12px; font-weight: 800;
-    cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
-    letter-spacing: 1px;
-  }
-  .btn-bonus:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.7); filter: brightness(1.1); }
-  .btn-bonus:disabled { background: #1e293b; color: var(--text-muted); box-shadow: none; cursor: not-allowed; border: 1px solid #334155;}
-
-  /* Wallet Card Details */
-  .wallet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .wallet-label { font-size: 12px; color: var(--text-muted); font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
-  .wallet-currency { font-size: 11px; color: var(--gold-main); background: rgba(234, 179, 8, 0.15); padding: 4px 10px; border-radius: 6px; font-weight: 900;}
-  
-  .wallet-balance { font-family: var(--font-digital); font-size: clamp(32px, 5vw, 42px); color: var(--gold-light); text-shadow: 0 0 25px rgba(234, 179, 8, 0.5); margin-bottom: 24px; font-weight: 900;}
-  
-  .wallet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .wallet-actions-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-  
-  .btn-action {
-    padding: 14px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 800;
-    cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-family: var(--font-ui); text-align: center; border: none;
-    letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .btn-topup { background: linear-gradient(135deg, var(--gold-main), var(--gold-dark)); color: #000; box-shadow: 0 6px 20px rgba(234, 179, 8, 0.4);}
-  .btn-withdraw { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.5); color: var(--danger); }
-  .btn-history { background: #1e293b; color: var(--text-light); border: 1px solid #334155;}
-  .btn-leaderboard { background: #05070a; border: 1px solid var(--gold-main); color: var(--gold-light); }
-  
-  .btn-action:hover { filter: brightness(1.2); transform: translateY(-3px); }
-
-  /* =========================================
-     GAME SELECTION GRID
-     ========================================= */
-  .section-title {
-    font-family: var(--font-title); font-size: 24px; color: var(--gold-main);
-    margin-bottom: 35px; text-align: center; font-weight: 800;
-    display: flex; align-items: center; justify-content: center; gap: 20px;
-    text-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
-    letter-spacing: 2px;
-  }
-  .section-title::before, .section-title::after { content: ''; height: 2px; background: linear-gradient(90deg, transparent, rgba(234, 179, 8, 0.6), transparent); flex: 1; max-width: 150px; }
-
-  .games-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-    gap: 28px; 
-  }
-
-  .game-card {
-    background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden;
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; display: flex; flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-  }
-  .game-card:hover { 
-    transform: translateY(-10px); 
-    border-color: rgba(234, 179, 8, 0.6); 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 25px rgba(234, 179, 8, 0.3); 
-  }
-
-  .game-badge {
-    position: absolute; top: 15px; right: 15px; padding: 6px 14px; border-radius: 20px;
-    font-size: 9px; font-weight: 900; z-index: 2; letter-spacing: 1.5px; text-transform: uppercase;
-  }
-  .badge-hot { background: linear-gradient(135deg, var(--danger), #991b1b); color: white; box-shadow: 0 4px 15px rgba(239,68,68,0.6); }
-  .badge-new { background: linear-gradient(135deg, var(--info), #1e3a8a); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.6); }
-  .badge-trend { background: linear-gradient(135deg, var(--orange), #c2410c); color: white; box-shadow: 0 4px 15px rgba(249,115,22,0.6); }
-  .badge-multi { background: linear-gradient(135deg, var(--purple), #5b21b6); color: white; box-shadow: 0 4px 15px rgba(139,92,246,0.6); }
-  .badge-live { background: linear-gradient(135deg, var(--success), #047857); color: white; box-shadow: 0 4px 15px rgba(16,185,129,0.6); animation: pulseLive 2s infinite; }
-  .badge-lock { background: #1e293b; color: #94a3b8; border: 1px solid #334155;}
-
-  @keyframes pulseLive {
-    0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
-    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
-  }
-
-  .game-thumb {
-    height: 180px; background: #000; display: flex; align-items: center; justify-content: center;
-    font-size: 65px; position: relative; transition: 0.4s;
-  }
-  .game-card:hover .game-thumb { transform: scale(1.05); }
-  .game-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 20%, #111827 100%); }
-  .game-thumb.locked { filter: grayscale(1) brightness(0.4); }
-
-  .game-info { padding: 20px 24px 28px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: #111827; position: relative; z-index: 2;}
-  .game-title { font-family: var(--font-title); font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: 0.5px;}
-  .game-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 25px; font-weight: 500; line-height: 1.5;}
-
-  .btn-play {
-    background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000;
-    border: none; padding: 15px; border-radius: 12px; font-family: var(--font-ui); font-weight: 800;
-    font-size: 13px; cursor: pointer; width: 100%; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: 1px;
-    box-shadow: 0 6px 20px rgba(234, 179, 8, 0.3); text-transform: uppercase;
-  }
-  .btn-play:hover { filter: brightness(1.15); box-shadow: 0 8px 25px rgba(234, 179, 8, 0.5); transform: translateY(-2px); }
-  .btn-play.disabled { background: #1e293b; color: #64748b; cursor: not-allowed; box-shadow: none; border: 1px solid #334155; transform: none;}
-  .btn-play.disabled:hover { filter: none; transform: none;}
-
-  /* =========================================
-     MODALS GLOBAL (POPUPS)
-     ========================================= */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    display: flex; justify-content: center; align-items: center; z-index: 2000;
-    opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px;
-  }
-  .modal-overlay.show { opacity: 1; pointer-events: auto; }
-  
-  .modal-content {
-    background: var(--bg-card); border: 1px solid rgba(234, 179, 8, 0.3);
-    border-radius: 28px; padding: 40px 30px; width: 100%; max-width: 440px;
-    position: relative; box-shadow: 0 25px 60px rgba(0,0,0,1), inset 0 0 30px rgba(234, 179, 8, 0.05);
-    max-height: 90vh; overflow-y: auto; transform: translateY(40px) scale(0.95); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .modal-overlay.show .modal-content { transform: translateY(0) scale(1); }
-
-  .btn-close-modal {
-    position: absolute; top: 18px; right: 24px; background: rgba(255,255,255,0.05); border: none;
-    color: var(--text-muted); font-size: 26px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; transition: 0.3s;
-  }
-  .btn-close-modal:hover { background: rgba(239, 68, 68, 0.2); color: var(--danger); transform: rotate(90deg); }
-
-  .modal-title { font-family: var(--font-title); font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 30px; letter-spacing: 1px;}
-  .text-gold { color: var(--gold-main); text-shadow: 0 0 20px rgba(234, 179, 8, 0.4);}
-  .text-danger { color: var(--danger); text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);}
-  .text-info { color: var(--info); text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);}
-
-  /* Inputs & Grids */
-  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
-  .btn-preset {
-    background: #162032; border: 1px solid #1e293b; color: var(--text-light);
-    padding: 16px; border-radius: 14px; font-weight: bold; cursor: pointer;
-    transition: 0.2s; font-family: var(--font-digital); font-size: 14px;
-  }
-  .btn-preset:hover, .btn-preset.active { background: rgba(234, 179, 8, 0.15); color: var(--gold-main); border-color: var(--gold-main); box-shadow: 0 0 20px rgba(234, 179, 8, 0.3);}
-
-  .input-group { margin-bottom: 22px; text-align: left; }
-  .input-label { font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px; display: block; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-  .input-field {
-    width: 100%; padding: 16px; background: #05070a; border: 1px solid #1e293b; 
-    color: #fff; border-radius: 14px; font-family: var(--font-ui); font-size: 15px; transition: 0.3s;
-  }
-  .input-field:focus { outline: none; border-color: var(--gold-main); box-shadow: 0 0 20px rgba(234, 179, 8, 0.25); }
-  .input-field.digital { font-family: var(--font-digital); text-align: center; font-size: 20px; color: var(--gold-main); font-weight: bold;}
-
-  #qrcode { background: white; padding: 20px; display: inline-block; border-radius: 20px; margin: 20px 0; border: 4px solid var(--gold-main); box-shadow: 0 15px 35px rgba(0,0,0,0.6);}
-
-  /* Riwayat & Leaderboard Lists */
-  .data-list { display: flex; flex-direction: column; gap: 14px; max-height: 450px; overflow-y: auto; padding-right: 5px; }
-  
-  .list-item { background: #0a0e14; border: 1px solid #1e293b; padding: 18px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;}
-  .list-item:hover { border-color: rgba(255,255,255,0.1); background: #111827;}
-  
-  /* Badge Status */
-  .badge { padding: 5px 12px; border-radius: 8px; font-size: 9.5px; font-weight: 800; width: max-content; margin-top: 10px; display: inline-block; letter-spacing: 1px;}
-  .badge-pending { background: rgba(234, 179, 8, 0.1); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); }
-  .badge-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); }
-  .badge-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.4); }
-
-  .amount-in { color: var(--success); }
-  .amount-out { color: var(--danger); }
-
-  /* Leaderboard Styling */
-  .lb-rank { font-family: var(--font-title); font-size: 18px; font-weight: 900; color: var(--text-muted); width: 40px; text-align: center; }
-  .lb-rank.rank-1 { color: #ffd700; font-size: 28px; text-shadow: 0 0 25px rgba(255,215,0,0.8); }
-  .lb-rank.rank-2 { color: #e2e8f0; font-size: 24px; text-shadow: 0 0 15px rgba(226,232,240,0.6);}
-  .lb-rank.rank-3 { color: #cd7f32; font-size: 22px; text-shadow: 0 0 15px rgba(205,127,50,0.6);}
-  .lb-name { flex: 1; font-weight: 700; font-size: 15px; margin-left: 14px;}
-  .lb-score { font-family: var(--font-digital); color: var(--gold-main); font-weight: bold; font-size: 16px;}
-
-  /* Floating CS */
-  .floating-cs {
-    position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); right: 24px;
-    background: linear-gradient(135deg, #25D366, #128C7E); color: white;
-    padding: 16px 28px; border-radius: 30px; font-family: var(--font-ui); font-weight: 800;
-    font-size: 13px; text-decoration: none; box-shadow: 0 10px 30px rgba(37, 211, 102, 0.5);
-    display: flex; align-items: center; gap: 10px; z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: 0.5px;
-  }
-  .floating-cs:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 40px rgba(37, 211, 102, 0.7); }
-
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .user-dashboard-grid { grid-template-columns: 1fr; gap: 20px; }
-    .wallet-balance { font-size: 32px; }
-    .games-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-  }
-</style>
-</head>
-<body>
-
-  <!-- ================= HEADER ================= -->
-  <header class="lobby-header">
-    <div class="brand-logo">🎰 ROYAL CASINO</div>
-    <button class="btn-logout" onclick="logout()">KELUAR</button>
-  </header>
-
-  <!-- ================= TICKER ================= -->
-  <div class="ticker-wrap">
-    <span>📢</span>
-    <div class="ticker-content">
-      🔥 Player_88 memenangkan SUPER JACKPOT 5.000.000 di Fruit Flip! &nbsp;&nbsp;&nbsp; 💸 SultanX menarik 2.500.000 Credits! &nbsp;&nbsp;&nbsp; 🚀 Crash Multiplier x150 Payout! &nbsp;&nbsp;&nbsp; 📈 Trading VIP Profit 90% dalam 1 Menit! &nbsp;&nbsp;&nbsp; 🎁 Klaim Bonus Harian Anda!
-    </div>
-  </div>
-
-  <!-- ================= DASHBOARD ================= -->
-  <main class="dashboard-section">
-    
-    <div class="user-dashboard-grid">
-      <!-- PANEL PROFIL -->
-      <div class="dash-card">
-        <div class="profile-wrapper">
-          <div class="avatar-large">👤</div>
-          <div class="user-details">
-            <h2 id="displayUsername">PLAYER</h2>
-            <div class="user-level" id="displayLevel">LEVEL 1</div>
-            <button class="btn-edit-profile" onclick="openProfileModal()">Ubah Profil & Rekening</button>
-          </div>
-        </div>
-        <button class="btn-bonus" id="btnDailyClaim" onclick="claimDailyBonus()">🎁 KLAIM BONUS (5.000)</button>
-      </div>
-
-      <!-- PANEL DOMPET -->
-      <div class="dash-card">
-        <div class="wallet-header">
-          <div class="wallet-label">TOTAL CREDITS</div>
-          <div class="wallet-currency">IDR</div>
-        </div>
-        <div class="wallet-balance" id="displayBalance">0</div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAlgo Pro v2.1 - Bandar Benchmark</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050709; color: #d1d4dc; overflow: hidden; }
+        .mono { font-family: 'Roboto Mono', monospace; }
+        .bg-sidebar { background-color: #0c0e14; }
+        .bg-card { background-color: #131722; }
+        .border-stockbit { border-color: #1e222d; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        input, select { background: #000 !important; color: #00ff00 !important; border: 1px solid #222 !important; text-align: center; }
         
-        <div class="wallet-actions">
-          <button class="btn-action btn-topup" onclick="openDepositModal()">💰 DEPOSIT</button>
-          <button class="btn-action btn-withdraw" onclick="openWithdrawModal()">🏧 TARIK DANA</button>
-        </div>
-        <div class="wallet-actions-bottom">
-          <button class="btn-action btn-history" onclick="openHistoryModal()">📜 RIWAYAT</button>
-          <button class="btn-action btn-leaderboard" onclick="openLeaderboardModal()">🏆 TOP SULTAN</button>
-        </div>
-      </div>
-    </div>
+        /* Animasi Flash untuk Tape Reading */
+        .flash-buy { animation: flashGreen 0.5s ease-out; background-color: rgba(34, 197, 94, 0.1); }
+        .flash-sell { animation: flashRed 0.5s ease-out; background-color: rgba(239, 68, 68, 0.1); }
+        @keyframes flashGreen { 0% { background-color: rgba(34, 197, 94, 0.4); } 100% { background-color: transparent; } }
+        @keyframes flashRed { 0% { background-color: rgba(239, 68, 68, 0.4); } 100% { background-color: transparent; } }
+    </style>
+</head>
+<body class="flex h-screen w-screen text-[12px]">
 
-    <!-- ================= DAFTAR GAME (8 GAMES BALANCE GRID) ================= -->
-    <h3 class="section-title">PERMAINAN EKSKLUSIF</h3>
-    
-    <div class="games-grid">
-      
-      <!-- Game 1: Slot Original -->
-      <div class="game-card" onclick="window.location.href='game.html'">
-        <div class="game-badge badge-hot">HOT 🔥</div>
-        <div class="game-thumb">🍒👑🍋</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">FRUIT FLIP SLOT</div>
-            <div class="game-desc">5x5 Grid Multiplier & Zonk Bomb</div>
-          </div>
-          <button class="btn-play">MAIN SEKARANG</button>
-        </div>
-      </div>
+    <aside class="w-14 bg-sidebar border-r border-stockbit flex flex-col items-center py-4 space-y-8 z-20">
+        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-900/20">S</div>
+        <div class="text-blue-500 cursor-pointer hover:text-white"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11 7h2v10h-2zm-4 3h2v7H7zm8 3h2v4h-2z"/></svg></div>
+    </aside>
 
-      <!-- Game 2: Trading Option (BARU DITAMBAHKAN) -->
-      <div class="game-card" onclick="window.location.href='trading.html'">
-        <div class="game-badge badge-live">LIVE 🔴</div>
-        <div class="game-thumb" style="color: var(--success); text-shadow: 0 0 30px rgba(16,185,129,0.5);">💹📊</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">BINARY OPTIONS VIP</div>
-            <div class="game-desc">Tebak Arah Market Crypto & Profit 90%</div>
-          </div>
-          <button class="btn-play" style="background: linear-gradient(135deg, var(--success), #047857); color: white;">TRADING SEKARANG</button>
-        </div>
-      </div>
-      
-      <!-- Game 3: Roulette -->
-      <div class="game-card" onclick="window.location.href='roulette.html'">
-        <div class="game-badge badge-new">NEW ✨</div>
-        <div class="game-thumb">🎡💰</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">ROULETTE DELUXE</div>
-            <div class="game-desc">Tebak Angka & Warna Keberuntungan</div>
-          </div>
-          <button class="btn-play">MAIN SEKARANG</button>
-        </div>
-      </div>
-
-      <!-- Game 4: Crash / Aviator -->
-      <div class="game-card" onclick="window.location.href='crash.html'">
-        <div class="game-badge badge-trend">TRENDING 🚀</div>
-        <div class="game-thumb" style="font-size: 55px;">📈💥</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">CRASH X MULTIPLIER</div>
-            <div class="game-desc">Tarik Dana Sebelum Grafik Hancur!</div>
-          </div>
-          <button class="btn-play">MAIN SEKARANG</button>
-        </div>
-      </div>
-
-      <!-- Game 5: Poker Texas -->
-      <div class="game-card" onclick="window.location.href='poker.html'">
-        <div class="game-badge badge-multi">MULTIPLAYER 👥</div>
-        <div class="game-thumb">♥️♣️</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">TEXAS HOLD'EM PRO</div>
-            <div class="game-desc">Lawan Pemain Lain di Meja VIP</div>
-          </div>
-          <button class="btn-play">MAIN SEKARANG</button>
-        </div>
-      </div>
-
-      <!-- Game 6: Baccarat (LOCKED) -->
-      <div class="game-card" style="cursor: not-allowed;">
-        <div class="game-badge badge-lock">LOCKED 🔒</div>
-        <div class="game-thumb locked">🏦🎲</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">BACCARAT LIVE</div>
-            <div class="game-desc">Segera Hadir di Update Berikutnya</div>
-          </div>
-          <button class="btn-play disabled" disabled>TERKUNCI</button>
-        </div>
-      </div>
-      
-      <!-- Game 7: Blackjack (LOCKED) -->
-      <div class="game-card" style="cursor: not-allowed;">
-        <div class="game-badge badge-lock">LOCKED 🔒</div>
-        <div class="game-thumb locked">🃏♠️</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">BLACKJACK VIP</div>
-            <div class="game-desc">Capai Level 5 Untuk Membuka</div>
-          </div>
-          <button class="btn-play disabled" disabled>TERKUNCI</button>
-        </div>
-      </div>
-
-      <!-- Game 8: Sportsbook (LOCKED - Untuk menyeimbangkan Grid 4 kolom) -->
-      <div class="game-card" style="cursor: not-allowed;">
-        <div class="game-badge badge-lock">LOCKED 🔒</div>
-        <div class="game-thumb locked">⚽🏆</div>
-        <div class="game-info">
-          <div>
-            <div class="game-title">SPORTSBOOK PRO</div>
-            <div class="game-desc">Taruhan Olahraga Global</div>
-          </div>
-          <button class="btn-play disabled" disabled>TERKUNCI</button>
-        </div>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- ================= FLOATING WHATSAPP ================= -->
-  <a href="https://wa.me/6281234567890" target="_blank" class="floating-cs">💬 HUBUNGI CS VIP</a>
-
-
-  <!-- ================= MODALS SECTION ================= -->
-
-  <!-- MODAL DEPOSIT QRIS -->
-  <div class="modal-overlay" id="depositModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeDepositModal()">×</button>
-      <h2 class="modal-title text-gold">TOP UP CREDITS</h2>
-      
-      <div id="depositStep1">
-        <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">Pilih Nominal Deposit Instan</p>
-        <div class="preset-grid">
-          <button class="btn-preset" onclick="setNominal(25000)">25.000</button>
-          <button class="btn-preset" onclick="setNominal(50000)">50.000</button>
-          <button class="btn-preset" onclick="setNominal(100000)">100.000</button>
-          <button class="btn-preset" onclick="setNominal(500000)">500.000</button>
-        </div>
-        <div class="input-group">
-          <span class="input-label">Atau Masukkan Nominal Lain</span>
-          <input type="number" id="customAmount" class="input-field digital" placeholder="Min. 10.000">
-        </div>
-        <button class="btn-play" onclick="generateQRIS()">GENERATE QRIS</button>
-      </div>
-
-      <div id="depositStep2" style="display: none; text-align: center;">
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Total Pembayaran:</p>
-        <p style="font-size: 36px; color: var(--gold-main); font-weight: 900; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
-        <div id="qrcode"></div>
-        <p style="font-size: 12px; color: var(--danger); margin-bottom: 30px; line-height: 1.6;">*Wajib transfer sesuai nominal agar dapat diproses otomatis oleh sistem kasino.</p>
-        <button class="btn-play" style="background: linear-gradient(135deg, var(--success), #059669); color: white; margin-bottom: 15px;" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
-        <button class="btn-logout" style="width: 100%; border: none; color: var(--text-muted);" onclick="resetDepositModal()">Ubah Nominal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL WITHDRAWAL -->
-  <div class="modal-overlay" id="withdrawModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeWithdrawModal()">×</button>
-      <h2 class="modal-title text-danger">TARIK DANA</h2>
-      <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 30px;">Minimal Penarikan: 50.000 Credits</p>
-      
-      <div class="input-group">
-        <span class="input-label">Nominal Penarikan</span>
-        <input type="number" id="wdAmount" class="input-field digital" placeholder="0">
-      </div>
-      <div class="input-group">
-        <span class="input-label">Tujuan (Bank/E-Wallet & Nama)</span>
-        <input type="text" id="wdBankDetails" class="input-field" placeholder="Contoh: BCA 12345678 a.n Budi">
-      </div>
-      
-      <button class="btn-play" style="background: linear-gradient(135deg, var(--danger), #b91c1c); color: white; margin-top: 20px;" id="btnConfirmWD" onclick="submitWithdraw()">AJUKAN PENARIKAN</button>
-    </div>
-  </div>
-
-  <!-- MODAL EDIT PROFIL -->
-  <div class="modal-overlay" id="profileModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeProfileModal()">×</button>
-      <h2 class="modal-title text-info">INFO PROFIL</h2>
-      
-      <div class="input-group">
-        <span class="input-label">Nama Lengkap (Sesuai Rekening)</span>
-        <input type="text" id="profFullName" class="input-field" placeholder="Masukkan nama lengkap">
-      </div>
-      <div class="input-group">
-        <span class="input-label">Nomor HP / WhatsApp</span>
-        <input type="text" id="profPhone" class="input-field" placeholder="08xxxxxxxx">
-      </div>
-      <div class="input-group">
-        <span class="input-label">Akun Bank Utama (Opsional)</span>
-        <input type="text" id="profBank" class="input-field" placeholder="Contoh: BCA - 123456">
-      </div>
-      
-      <button class="btn-play" style="background: linear-gradient(135deg, var(--info), #1d4ed8); color: white; margin-top: 20px;" id="btnSaveProfile" onclick="saveProfile()">SIMPAN PROFIL</button>
-    </div>
-  </div>
-
-  <!-- MODAL RIWAYAT TRANSAKSI -->
-  <div class="modal-overlay" id="historyModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeHistoryModal()">×</button>
-      <h2 class="modal-title text-gold">RIWAYAT TRANSAKSI</h2>
-      
-      <div class="data-list" id="historyListContainer">
-        <!-- Injected via JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL TOP GLOBAL (LEADERBOARD) -->
-  <div class="modal-overlay" id="leaderboardModal">
-    <div class="modal-content">
-      <button class="btn-close-modal" onclick="closeLeaderboardModal()">×</button>
-      <h2 class="modal-title" style="color: #ffd700; margin-bottom: 8px; text-shadow: 0 0 25px rgba(255,215,0,0.5);">🏆 TOP SULTAN</h2>
-      <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 30px;">10 Pemain dengan Saldo Tertinggi</p>
-      
-      <div class="data-list" id="leaderboardContainer">
-        <!-- Injected via JS -->
-      </div>
-    </div>
-  </div>
-
-  <script src="api.js"></script>
-  <script>
-    // ==========================================
-    // LOGIKA APLIKASI UTAMA
-    // ==========================================
-    const userJson = localStorage.getItem('currentUser');
-    if (!userJson) window.location.href = 'auth.html';
-    let user = JSON.parse(userJson);
-    let selectedAmount = 0;
-    let qrEngine = null;
-
-    function updateUI() {
-      document.getElementById('displayUsername').textContent = user.username.toUpperCase();
-      document.getElementById('displayLevel').textContent = `LEVEL ${user.level || 1}`;
-      document.getElementById('displayBalance').textContent = (user.balance || 0).toLocaleString();
-    }
-
-    async function syncDataWithServer() {
-      try {
-        if(typeof api !== 'undefined' && api.getDatabase) {
-          const db = await api.getDatabase();
-          if(db && db.users) {
-            const freshUser = db.users.find(u => u.username === user.username);
-            if(freshUser) {
-              user.balance = freshUser.balance;
-              user.fullName = freshUser.fullName || user.fullName;
-              user.phone = freshUser.phone || user.phone;
-              user.bank = freshUser.bank || user.bank;
-              user.level = freshUser.level || user.level;
-              localStorage.setItem('currentUser', JSON.stringify(user));
-              updateUI();
-            }
-          }
-        }
-      } catch(e) { console.error("Gagal sinkronisasi data", e); }
-    }
-
-    /* --- BONUS HARIAN --- */
-    function checkDailyBonus() {
-      const lastClaim = localStorage.getItem('lastClaimDate_' + user.username);
-      const today = new Date().toDateString();
-      const btn = document.getElementById('btnDailyClaim');
-      
-      if (lastClaim === today) {
-        btn.disabled = true; btn.innerHTML = '✅ BONUS DIAMBIL';
-      } else {
-        btn.disabled = false; btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
-      }
-    }
-
-    async function claimDailyBonus() {
-      const btn = document.getElementById('btnDailyClaim');
-      btn.disabled = true; btn.innerHTML = 'MEMPROSES...';
-      try {
-        if(typeof api !== 'undefined' && api.getDatabase) {
-          const db = await api.getDatabase();
-          if(db && db.users) {
-            const userIndex = db.users.findIndex(u => u.username === user.username);
-            if (userIndex !== -1) {
-              let currentBal = parseInt(db.users[userIndex].balance) || 0;
-              db.users[userIndex].balance = currentBal + 5000;
-              if (await api.updateDatabase(db)) {
-                user.balance = db.users[userIndex].balance;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                localStorage.setItem('lastClaimDate_' + user.username, new Date().toDateString());
-                alert("🎉 Selamat! Anda mendapatkan 5.000 Credits Bonus Harian!");
-                updateUI(); checkDailyBonus();
-              } else {
-                alert("Gagal klaim bonus dari server."); btn.disabled = false; btn.innerHTML = '🎁 KLAIM BONUS (5.000)';
-              }
-            }
-          }
-        }
-      } catch (e) { btn.disabled = false; btn.innerHTML = '🎁 KLAIM BONUS (5.000)'; }
-    }
-
-    updateUI(); syncDataWithServer(); checkDailyBonus();
-    function logout() { localStorage.removeItem('currentUser'); window.location.href = 'auth.html'; }
-
-    /* --- DEPOSIT --- */
-    function openDepositModal() { document.getElementById('depositModal').classList.add('show'); }
-    function closeDepositModal() { document.getElementById('depositModal').classList.remove('show'); setTimeout(resetDepositModal, 300); }
-    function resetDepositModal() {
-      document.getElementById('depositStep1').style.display = 'block';
-      document.getElementById('depositStep2').style.display = 'none';
-      document.getElementById('customAmount').value = '';
-      document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active')); selectedAmount = 0;
-    }
-    function setNominal(amount) {
-      selectedAmount = amount; document.getElementById('customAmount').value = amount;
-      document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-    function crc16(str) {
-      let c = 0xFFFF;
-      for(let i = 0; i < str.length; i++) { 
-        c ^= str.charCodeAt(i) << 8; 
-        for(let j = 0; j < 8; j++) { c = ((c & 0x8000) !== 0) ? (c << 1) ^ 0x1021 : c << 1; c &= 0xFFFF; } 
-      }
-      return c.toString(16).toUpperCase().padStart(4, '0');
-    }
-    function generateQRIS() {
-      const inputVal = parseInt(document.getElementById('customAmount').value);
-      if (isNaN(inputVal) || inputVal < 10000) return alert("Minimal deposit 10.000 Credits!");
-      selectedAmount = inputVal;
-      const amountStr = selectedAmount.toString(); const amountLen = amountStr.length.toString().padStart(2, '0');
-      const mid = '93600915300002827902090000282790'; const merch = 'Royal Casino'; const merchLen = merch.length.toString().padStart(2, '0');
-      const city = 'Pekanbaru'; const cityLen = city.length.toString().padStart(2, '0'); const postal = '28294'; const postalLen = postal.length.toString().padStart(2, '0');
-      let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
-      const qrisString = raw + crc16(raw);
-
-      const qrcodeContainer = document.getElementById('qrcode');
-      if (qrEngine) { qrEngine.clear(); qrEngine.makeCode(qrisString); } 
-      else { qrcodeContainer.innerHTML = ''; qrEngine = new QRCode(qrcodeContainer, { text: qrisString, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H }); }
-
-      document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
-      document.getElementById('depositStep1').style.display = 'none'; document.getElementById('depositStep2').style.display = 'block';
-    }
-    async function submitDeposit() {
-      const btn = document.getElementById('btnConfirmDeposit');
-      btn.textContent = "MEMPROSES..."; btn.disabled = true;
-      try {
-        if(typeof api !== 'undefined' && api.getDatabase) {
-          const db = await api.getDatabase(); if (!db) throw new Error("Koneksi gagal"); if (!db.deposits) db.deposits = [];
-          db.deposits.push({ date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}), username: user.username, method: 'QRIS', amount: selectedAmount, status: 'pending' });
-          if (await api.updateDatabase(db)) { alert("✅ Bukti Deposit Terkirim!\nTunggu beberapa saat hingga Admin menyetujui."); closeDepositModal(); } 
-          else { alert("❌ Terjadi kesalahan server."); }
-        }
-      } catch (error) { alert("Gagal terhubung ke server database."); } 
-      finally { btn.textContent = "SAYA SUDAH TRANSFER"; btn.disabled = false; }
-    }
-
-    /* --- WITHDRAWAL --- */
-    function openWithdrawModal() { document.getElementById('wdBankDetails').value = user.bank || ""; document.getElementById('withdrawModal').classList.add('show'); }
-    function closeWithdrawModal() { document.getElementById('withdrawModal').classList.remove('show'); document.getElementById('wdAmount').value = ''; }
-    async function submitWithdraw() {
-      const wdAmount = parseInt(document.getElementById('wdAmount').value);
-      const wdBank = document.getElementById('wdBankDetails').value.trim();
-      if (isNaN(wdAmount) || wdAmount < 50000) return alert("Minimal penarikan adalah 50.000 Credits!");
-      if (!wdBank) return alert("Mohon lengkapi informasi rekening/E-Wallet tujuan!");
-      if (wdAmount > user.balance) return alert(`Saldo tidak mencukupi!\nSaldo Anda saat ini: ${user.balance.toLocaleString()}`);
-
-      const btn = document.getElementById('btnConfirmWD');
-      btn.textContent = "MEMPROSES..."; btn.disabled = true;
-      try {
-        if(typeof api !== 'undefined' && api.getDatabase) {
-          const db = await api.getDatabase(); if (!db) throw new Error("Koneksi gagal"); if (!db.withdrawals) db.withdrawals = [];
-          db.withdrawals.push({ date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}), username: user.username, bankDetails: wdBank, amount: wdAmount, status: 'pending' });
-          if (await api.updateDatabase(db)) { alert("✅ Pengajuan Penarikan Dana Berhasil!\nSilakan tunggu Admin memproses dan mentransfer dana ke rekening Anda."); closeWithdrawModal(); } 
-          else { alert("❌ Terjadi kesalahan server."); }
-        }
-      } catch (error) { alert("Gagal terhubung ke server database."); } 
-      finally { btn.textContent = "AJUKAN PENARIKAN"; btn.disabled = false; }
-    }
-
-    /* --- EDIT PROFIL --- */
-    function openProfileModal() {
-      document.getElementById('profFullName').value = user.fullName || ""; document.getElementById('profPhone').value = user.phone || "";
-      document.getElementById('profBank').value = user.bank || ""; document.getElementById('profileModal').classList.add('show');
-    }
-    function closeProfileModal() { document.getElementById('profileModal').classList.remove('show'); }
-    async function saveProfile() {
-      const fullName = document.getElementById('profFullName').value.trim(); const phone = document.getElementById('profPhone').value.trim();
-      const bank = document.getElementById('profBank').value.trim(); const btn = document.getElementById('btnSaveProfile');
-      btn.textContent = "MENYIMPAN..."; btn.disabled = true;
-      try {
-        if(typeof api !== 'undefined' && api.getDatabase) {
-          const db = await api.getDatabase();
-          if (db && db.users) {
-            const userIndex = db.users.findIndex(u => u.username === user.username);
-            if (userIndex !== -1) {
-              db.users[userIndex].fullName = fullName; db.users[userIndex].phone = phone; db.users[userIndex].bank = bank;
-              if (await api.updateDatabase(db)) {
-                user.fullName = fullName; user.phone = phone; user.bank = bank;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                alert("✅ Profil berhasil diperbarui!"); closeProfileModal();
-              } else { alert("❌ Gagal menyimpan profil ke server."); }
-            }
-          }
-        }
-      } catch (error) { alert("Gagal terhubung ke server database."); } 
-      finally { btn.textContent = "SIMPAN PROFIL"; btn.disabled = false; }
-    }
-
-    /* --- RIWAYAT TRANSAKSI --- */
-    function parseIdDate(dateStr) {
-      if(!dateStr) return 0; let parts = dateStr.split(','); if(parts.length < 2) return 0;
-      let datePart = parts[0].trim().split('/'); let timePart = parts[1].replace('WIB','').trim().replace(/\./g, ':');
-      if(datePart.length === 3) return new Date(`${datePart[2]}-${datePart[1].padStart(2,'0')}-${datePart[0].padStart(2,'0')}T${timePart}`).getTime();
-      return 0;
-    }
-    function openHistoryModal() { document.getElementById('historyModal').classList.add('show'); loadHistory(); }
-    function closeHistoryModal() { document.getElementById('historyModal').classList.remove('show'); }
-    async function loadHistory() {
-      const container = document.getElementById('historyListContainer');
-      container.innerHTML = '<div style="text-align: center; color: var(--gold-main); font-size: 13px; padding: 20px;">Memuat data...</div>';
-      try {
-        if(typeof api !== 'undefined' && api.getDatabase) {
-          const db = await api.getDatabase(); if (!db) throw new Error("Gagal memuat db");
-          let history = [];
-          if (db.deposits) history = history.concat(db.deposits.filter(d => d.username === user.username).map(d => ({ ...d, type: 'DEPOSIT', amountType: 'in' })));
-          if (db.withdrawals) history = history.concat(db.withdrawals.filter(w => w.username === user.username).map(w => ({ ...w, type: 'PENARIKAN', amountType: 'out' })));
-          history.sort((a, b) => parseIdDate(b.date) - parseIdDate(a.date));
-
-          if (history.length === 0) { container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">Belum ada riwayat transaksi.</div>'; return; }
-          container.innerHTML = history.map(item => {
-            let badgeClass = 'badge-pending'; let statusText = 'PENDING';
-            if (item.status === 'approved') { badgeClass = 'badge-approved'; statusText = item.type === 'DEPOSIT' ? 'BERHASIL' : 'TERKIRIM'; } 
-            else if (item.status === 'rejected') { badgeClass = 'badge-rejected'; statusText = 'DITOLAK'; }
-            const sign = item.amountType === 'in' ? '+' : '-'; const amountClass = item.amountType === 'in' ? 'amount-in' : 'amount-out';
-            return `
-              <div class="list-item">
+    <main class="flex-1 flex flex-col relative">
+        <header class="h-14 bg-sidebar border-b border-stockbit flex items-center px-4 justify-between z-10">
+            <div class="flex items-center space-x-6">
                 <div>
-                  <div style="font-size:14px; font-weight:800; color:#fff;">${item.type} ${item.method ? `(${item.method})` : ''}</div>
-                  <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">${item.date || '-'}</div>
-                  <div class="badge ${badgeClass}">${statusText}</div>
+                    <span class="text-gray-500 text-[9px] block uppercase">Ticker</span>
+                    <span class="font-bold text-lg text-white">$BBCA</span>
                 </div>
-                <div style="font-family:var(--font-digital); font-size:18px; font-weight:bold;" class="${amountClass}">
-                  ${sign}${parseInt(item.amount).toLocaleString()}
+                <div>
+                    <span class="text-gray-500 text-[9px] block uppercase">Last Price</span>
+                    <div class="text-green-500 font-bold mono text-xl transition-all" id="live-price">9,850</div>
                 </div>
-              </div>`;
-          }).join('');
-        }
-      } catch (error) { container.innerHTML = '<div style="text-align: center; color: var(--danger); font-size: 13px;">Gagal memuat riwayat.</div>'; }
-    }
+                <div class="border-l border-gray-800 pl-6">
+                    <span class="text-gray-500 text-[9px] block uppercase">Net Position</span>
+                    <div class="text-white font-bold mono" id="my-pos">0 LOT</div>
+                </div>
+                <div class="border-l border-gray-800 pl-6">
+                    <span class="text-gray-500 text-[9px] block uppercase">Avg Price</span>
+                    <div class="text-blue-400 font-bold mono" id="avg-price">0</div>
+                </div>
+            </div>
 
-    /* --- LEADERBOARD --- */
-    function openLeaderboardModal() { document.getElementById('leaderboardModal').classList.add('show'); loadLeaderboard(); }
-    function closeLeaderboardModal() { document.getElementById('leaderboardModal').classList.remove('show'); }
-    async function loadLeaderboard() {
-      const container = document.getElementById('leaderboardContainer');
-      container.innerHTML = '<div style="text-align: center; color: var(--gold-main); font-size: 13px; padding: 20px;">Mencari Sultan...</div>';
-      try {
-        if(typeof api !== 'undefined' && api.getDatabase) {
-          const db = await api.getDatabase();
-          if (db && db.users) {
-            let topUsers = db.users.filter(u => u.username !== 'admin_casino' && u.username !== 'admin').sort((a, b) => (parseInt(b.balance) || 0) - (parseInt(a.balance) || 0)).slice(0, 10);
-            if (topUsers.length === 0) { container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 13px;">Belum ada pemain.</div>'; return; }
-            container.innerHTML = topUsers.map((u, index) => {
-              const rank = index + 1; let rankClass = 'lb-rank'; let rankDisplay = `#${rank}`;
-              if (rank === 1) { rankClass += ' rank-1'; rankDisplay = '🥇'; } else if (rank === 2) { rankClass += ' rank-2'; rankDisplay = '🥈'; } else if (rank === 3) { rankClass += ' rank-3'; rankDisplay = '🥉'; }
-              const maskedName = u.username.length > 3 ? u.username.substring(0, 3) + '***' : u.username + '***';
-              return `
-                <div class="list-item" style="padding: 14px 20px;">
-                  <div class="${rankClass}">${rankDisplay}</div>
-                  <div class="lb-name">${maskedName} <span style="font-size:10px; color:var(--text-muted); font-weight:normal; margin-left:10px; border:1px solid #334155; padding:3px 8px; border-radius:12px;">Lvl ${u.level || 1}</span></div>
-                  <div class="lb-score">${(parseInt(u.balance)||0).toLocaleString()}</div>
-                </div>`;
-            }).join('');
-          }
+            <div class="flex items-center space-x-4">
+                <div class="bg-black/50 px-2 py-1 rounded border border-gray-800">
+                    <select id="market-mode" onchange="changeMode()" class="bg-transparent text-yellow-500 font-bold outline-none cursor-pointer text-[10px] w-32">
+                        <option value="normal">MODE: NORMAL</option>
+                        <option value="hard">MODE: BATTLE (HARD)</option>
+                    </select>
+                </div>
+                <div class="text-right">
+                    <span class="text-gray-500 text-[9px] block uppercase">Floating P/L</span>
+                    <div class="font-bold mono text-sm" id="floating-pl">IDR 0</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            
+            <div class="w-[280px] bg-[#080a0f] border-r border-stockbit flex flex-col">
+                <div class="p-2 border-b border-stockbit bg-sidebar flex justify-between">
+                    <span class="text-[10px] font-bold text-gray-500 uppercase">Running Trade</span>
+                    <span class="text-[9px] text-blue-500 animate-pulse">LIVE FEED</span>
+                </div>
+                <div id="tape-list" class="flex-1 overflow-y-auto font-mono text-[10px]">
+                    </div>
+            </div>
+
+            <div class="flex-1 relative bg-[#050709] overflow-hidden">
+                <canvas id="mainChart" class="w-full h-full"></canvas>
+                <div class="absolute top-4 left-4 flex flex-col space-y-1">
+                    <div class="bg-black/40 p-2 rounded backdrop-blur-sm border border-white/5">
+                        <span class="text-[9px] text-gray-400 block">TOTAL VOLUME</span>
+                        <span id="total-vol" class="text-white font-bold mono text-sm">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-[360px] bg-sidebar border-l border-stockbit flex flex-col">
+                <div class="p-2 flex-1 overflow-hidden flex flex-col">
+                    <div class="flex justify-between items-center mb-1 px-1">
+                        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">DOM (Depth of Market)</h3>
+                        <span id="activity-light" class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    </div>
+
+                    <div class="grid grid-cols-4 text-[9px] text-gray-600 mb-1 px-2 font-bold uppercase border-b border-gray-800 pb-1">
+                        <span>Freq</span><span>Bid Vol</span><span class="text-center">Price</span><span class="text-right">Offer Vol</span>
+                    </div>
+
+                    <div id="order-book-list" class="flex-1 overflow-y-auto space-y-[1px] mono text-[11px]"></div>
+                </div>
+
+                <div class="p-3 bg-card border-t border-stockbit space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[9px] text-gray-500 uppercase">Lot Size</label>
+                            <input type="number" id="order-size" value="5000" class="w-full p-1.5 rounded text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[9px] text-gray-500 uppercase">Speed (ms)</label>
+                            <input type="number" id="algo-speed" value="100" class="w-full p-1.5 rounded text-xs font-bold">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="startAlgo('accum')" class="bg-green-700 hover:bg-green-600 py-2 rounded text-[10px] font-bold text-white uppercase transition shadow-[0_0_10px_rgba(34,197,94,0.3)]">HAKA (BUY)</button>
+                        <button onclick="startAlgo('distrib')" class="bg-red-700 hover:bg-red-600 py-2 rounded text-[10px] font-bold text-white uppercase transition shadow-[0_0_10px_rgba(239,68,68,0.3)]">HAKI (SELL)</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 pt-1 border-t border-gray-800">
+                        <button onclick="startAlgo('wash')" class="bg-blue-900/30 border border-blue-600/50 text-blue-400 py-1.5 rounded text-[9px] font-bold hover:bg-blue-600/20">WASH TRADE</button>
+                        <button onclick="spoofingOrder()" class="bg-yellow-900/30 border border-yellow-600/50 text-yellow-500 py-1.5 rounded text-[9px] font-bold hover:bg-yellow-600/20">FAKE WALL</button>
+                        <button onclick="stopAlgos()" class="bg-gray-700 text-white py-1.5 rounded text-[9px] font-bold hover:bg-gray-600">STOP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let currentPrice = 9850;
+        let myPos = 0, myAvg = 0, myCost = 0, totalVol = 0;
+        let bookData = { asks: [], bids: [] };
+        let history = [];
+        let algoInterval = null;
+        let marketInterval = null;
+        let mode = 'normal';
+
+        // --- CHART ENGINE ---
+        const canvas = document.getElementById('mainChart');
+        const ctx = canvas.getContext('2d');
+
+        function initChart() {
+            let p = 9800;
+            for(let i=0; i<80; i++) {
+                let open = p;
+                let close = p + (Math.random() - 0.5) * 20;
+                history.push({ open, close, high: Math.max(open, close)+5, low: Math.min(open, close)-5 });
+                p = close;
+            }
+            resize(); animate();
         }
-      } catch (e) { container.innerHTML = '<div style="text-align: center; color: var(--danger); font-size: 13px;">Gagal memuat leaderboard.</div>'; }
-    }
-  </script>
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.onresize = resize;
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const padding = 50;
+            const candleWidth = (canvas.width - padding*2) / history.length;
+            const prices = history.map(h => [h.high, h.low]).flat();
+            const maxP = Math.max(...prices) + 10;
+            const minP = Math.min(...prices) - 10;
+            const range = maxP - minP;
+            const getY = (p) => canvas.height - padding - ((p - minP) / range) * (canvas.height - padding*2);
+
+            // Grid Lines (Hanya Horizontal)
+            ctx.strokeStyle = '#1e222d';
+            ctx.lineWidth = 1;
+            for(let i=0; i<5; i++) {
+                let y = padding + (canvas.height - padding*2) * (i/4);
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            history.forEach((c, i) => {
+                const x = padding + i * candleWidth;
+                const color = c.close >= c.open ? '#22c55e' : '#ef4444';
+                
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x + candleWidth/2, getY(c.high));
+                ctx.lineTo(x + candleWidth/2, getY(c.low));
+                ctx.stroke();
+
+                ctx.fillStyle = color;
+                const h = Math.abs(getY(c.open) - getY(c.close));
+                ctx.fillRect(x + 2, getY(Math.max(c.open, c.close)), candleWidth - 4, Math.max(h, 1));
+            });
+            requestAnimationFrame(animate);
+        }
+
+        // --- MARKET LOGIC (PATOKAN UTAMA) ---
+        function initMarket() {
+            bookData.asks = []; bookData.bids = [];
+            for(let i=0; i<15; i++) {
+                bookData.asks.push({ price: currentPrice + ((i+1)*25), vol: randVol(), freq: randFreq() });
+                bookData.bids.push({ price: currentPrice - (i*25), vol: randVol(), freq: randFreq() });
+            }
+            runMarketEngine();
+        }
+
+        const randVol = () => Math.floor(Math.random() * 5000) + 100;
+        const randFreq = () => Math.floor(Math.random() * 20) + 1;
+
+        function runMarketEngine() {
+            if(marketInterval) clearInterval(marketInterval);
+            const speed = mode === 'hard' ? 100 : 800; // Hard mode lebih cepat
+
+            marketInterval = setInterval(() => {
+                // Simulasi Retail
+                const side = Math.random() > 0.5 ? 'BUY' : 'SELL';
+                const noiseSize = mode === 'hard' ? Math.random() * 2000 : Math.random() * 300;
+                
+                executeTrade(side, Math.floor(noiseSize), false);
+                
+                // Passive Liquidity Refill
+                if(Math.random() > 0.3) {
+                    bookData.asks.forEach(a => a.vol += Math.floor(Math.random()*50));
+                    bookData.bids.forEach(b => b.vol += Math.floor(Math.random()*50));
+                }
+                renderBook();
+            }, speed);
+        }
+
+        function executeTrade(side, amount, isSmartMoney) {
+            if(amount <= 0) return;
+            totalVol += amount;
+
+            // --- UPDATE TAPE (RUNNING TRADE) ---
+            addTapeLog(side, currentPrice, amount, isSmartMoney);
+
+            if(side === 'BUY') {
+                let target = bookData.asks[0];
+                if(amount >= target.vol) {
+                    // Makan Habis (Breakout)
+                    currentPrice = target.price;
+                    if(isSmartMoney) updatePortfolio('BUY', currentPrice, target.vol);
+                    bookData.asks.shift();
+                    // Buat level baru di atas
+                    let nextPrice = bookData.asks.length > 0 ? bookData.asks[bookData.asks.length-1].price + 25 : currentPrice + 25;
+                    bookData.asks.push({ price: nextPrice, vol: randVol(), freq: randFreq() });
+                    // Bid naik
+                    bookData.bids.unshift({ price: currentPrice, vol: randVol()/2, freq: 1 });
+                    if(bookData.bids.length > 15) bookData.bids.pop();
+                } else {
+                    // Makan Sebagian
+                    target.vol -= amount;
+                    target.freq += (isSmartMoney ? 5 : 1);
+                    currentPrice = target.price;
+                    if(isSmartMoney) updatePortfolio('BUY', currentPrice, amount);
+                }
+            } else {
+                let target = bookData.bids[0];
+                if(amount >= target.vol) {
+                    // Buang Habis (Breakdown)
+                    currentPrice = target.price;
+                    if(isSmartMoney) updatePortfolio('SELL', currentPrice, target.vol);
+                    bookData.bids.shift();
+                    // Buat level baru di bawah
+                    let nextPrice = bookData.bids.length > 0 ? bookData.bids[bookData.bids.length-1].price - 25 : currentPrice - 25;
+                    bookData.bids.push({ price: nextPrice, vol: randVol(), freq: randFreq() });
+                    // Ask turun
+                    bookData.asks.unshift({ price: currentPrice, vol: randVol()/2, freq: 1 });
+                    if(bookData.asks.length > 15) bookData.asks.pop();
+                } else {
+                    // Buang Sebagian
+                    target.vol -= amount;
+                    target.freq += (isSmartMoney ? 5 : 1);
+                    currentPrice = target.price;
+                    if(isSmartMoney) updatePortfolio('SELL', currentPrice, amount);
+                }
+            }
+
+            // Sync Chart
+            let last = history[history.length-1];
+            last.close = currentPrice;
+            last.high = Math.max(last.high, currentPrice);
+            last.low = Math.min(last.low, currentPrice);
+            
+            updateUI();
+        }
+
+        // --- FITUR BARU: SPOOFING (FAKE WALL) ---
+        function spoofingOrder() {
+            // Pasang tembok palsu 50.000 lot di Bid ke-3
+            if(bookData.bids.length > 3) {
+                let target = bookData.bids[2];
+                let fakeVol = 50000;
+                target.vol += fakeVol;
+                renderBook();
+                
+                // Cabut otomatis setelah 3 detik
+                setTimeout(() => {
+                    target.vol -= fakeVol;
+                    // Flash effect di UI nanti
+                    renderBook();
+                }, 3000);
+            }
+        }
+
+        // --- UI UTILS ---
+        function addTapeLog(side, price, vol, isSmartMoney) {
+            const tape = document.getElementById('tape-list');
+            const row = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            
+            // Format: TIME | PRICE | VOL | MM?
+            row.className = `grid grid-cols-4 gap-1 px-2 py-1 border-b border-gray-900 ${side === 'BUY' ? 'text-green-500 flash-buy' : 'text-red-500 flash-sell'}`;
+            row.innerHTML = `
+                <span class="text-gray-500">${time}</span>
+                <span class="font-bold text-center">${price}</span>
+                <span class="text-right">${vol}</span>
+                <span class="text-center font-bold text-[9px] ${isSmartMoney ? 'text-yellow-500' : 'text-gray-700'}">${isSmartMoney ? 'MM' : 'RT'}</span>
+            `;
+            
+            tape.insertBefore(row, tape.firstChild);
+            if(tape.children.length > 50) tape.lastChild.remove();
+        }
+
+        function renderBook() {
+            const list = document.getElementById('order-book-list');
+            let html = '';
+            
+            [...bookData.asks].reverse().forEach(item => {
+                let barWidth = Math.min(item.vol / 100, 100);
+                html += `
+                <div class="relative grid grid-cols-4 px-2 py-[2px] border-b border-gray-900/50 hover:bg-gray-800 cursor-pointer">
+                    <div class="absolute right-0 top-0 h-full bg-red-900/20" style="width: ${barWidth}%"></div>
+                    <span class="text-gray-500 text-[10px] z-10">${item.freq}</span>
+                    <span class="z-10"></span>
+                    <span class="text-red-500 font-bold text-center z-10">${item.price}</span>
+                    <span class="text-right text-gray-300 font-bold z-10">${item.vol.toLocaleString()}</span>
+                </div>`;
+            });
+
+            html += `<div class="bg-gray-800 text-yellow-500 py-1 text-center font-bold my-1 text-xs border border-gray-700">${currentPrice}</div>`;
+
+            bookData.bids.forEach(item => {
+                let barWidth = Math.min(item.vol / 100, 100);
+                html += `
+                <div class="relative grid grid-cols-4 px-2 py-[2px] border-b border-gray-900/50 hover:bg-gray-800 cursor-pointer">
+                    <div class="absolute left-0 top-0 h-full bg-green-900/20" style="width: ${barWidth}%"></div>
+                    <span class="text-gray-300 font-bold z-10">${item.vol.toLocaleString()}</span>
+                    <span class="text-green-500 font-bold text-center z-10">${item.price}</span>
+                    <span class="z-10"></span>
+                    <span class="text-gray-500 text-[10px] text-right z-10">${item.freq}</span>
+                </div>`;
+            });
+            list.innerHTML = html;
+            document.getElementById('activity-light').className = `w-2 h-2 rounded-full ${mode === 'hard' ? 'bg-red-500 animate-ping' : 'bg-green-500'}`;
+        }
+
+        function updatePortfolio(side, price, lot) {
+            if(side === 'BUY') {
+                myCost += (price * lot * 100);
+                myPos += lot;
+                myAvg = myCost / (myPos * 100);
+            } else if(myPos > 0) {
+                let sellLot = Math.min(lot, myPos);
+                myPos -= sellLot;
+                if(myPos === 0) { myCost = 0; myAvg = 0; }
+                else myCost = myAvg * myPos * 100;
+            }
+        }
+
+        function updateUI() {
+            const lp = document.getElementById('live-price');
+            const oldPrice = parseInt(lp.innerText.replace(',',''));
+            lp.innerText = currentPrice.toLocaleString();
+            lp.className = currentPrice > oldPrice ? 'text-green-500 font-bold mono text-xl' : (currentPrice < oldPrice ? 'text-red-500 font-bold mono text-xl' : 'text-white font-bold mono text-xl');
+
+            document.getElementById('my-pos').innerText = `${myPos.toLocaleString()} LOT`;
+            document.getElementById('avg-price').innerText = Math.round(myAvg).toLocaleString();
+            document.getElementById('total-vol').innerText = totalVol.toLocaleString();
+            
+            let pl = (currentPrice - myAvg) * myPos * 100;
+            if (myPos === 0) pl = 0;
+            const plEl = document.getElementById('floating-pl');
+            plEl.innerText = `IDR ${Math.round(pl).toLocaleString()}`;
+            plEl.className = `font-bold mono ${pl > 0 ? 'text-green-500' : pl < 0 ? 'text-red-500' : 'text-gray-500'}`;
+        }
+
+        function startAlgo(m) {
+            stopAlgos();
+            const s = parseInt(document.getElementById('algo-speed').value);
+            const sz = parseInt(document.getElementById('order-size').value);
+            algoInterval = setInterval(() => {
+                if(m === 'accum') executeTrade('BUY', sz, true);
+                if(m === 'distrib') executeTrade('SELL', sz, true);
+                if(m === 'wash') {
+                    executeTrade('BUY', sz, true);
+                    setTimeout(() => executeTrade('SELL', sz, true), s/2);
+                }
+            }, s);
+        }
+
+        function stopAlgos() { clearInterval(algoInterval); }
+        function changeMode() { mode = document.getElementById('market-mode').value; runMarketEngine(); }
+
+        setInterval(() => {
+            history.shift();
+            history.push({ open: currentPrice, close: currentPrice, high: currentPrice, low: currentPrice });
+        }, 5000); // Chart update lebih cepat
+
+        initChart(); initMarket(); updateUI();
+
+    </script>
 </body>
 </html>
