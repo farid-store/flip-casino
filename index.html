@@ -14,7 +14,7 @@
   :root {
     --bg-base: #030507;
     --bg-panel: #0a0e14;
-    --bg-glass: rgba(10, 14, 20, 0.8);
+    --bg-glass: rgba(10, 14, 20, 0.85);
     --bg-card: linear-gradient(145deg, #111827, #080b11);
     
     --gold-light: #fef08a;
@@ -29,6 +29,7 @@
     --info: #3b82f6;
     --purple: #8b5cf6;
     --orange: #f97316;
+    --emerald: #059669;
     
     --font-title: 'Cinzel', serif;
     --font-ui: 'Montserrat', sans-serif;
@@ -44,10 +45,10 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--gold-main); }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #162032 0%, var(--bg-base) 100%);
+    background: radial-gradient(circle at top, #162032 0%, var(--bg-base) 100%);
     color: var(--text-light);
     font-family: var(--font-ui);
-    min-height: 100vh; /* Fallback */
+    min-height: 100vh;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -69,7 +70,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
   }
 
   .brand-logo {
@@ -89,7 +90,7 @@
     border: 1px solid rgba(239, 68, 68, 0.5);
     color: var(--danger);
     padding: 6px 14px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-family: var(--font-ui);
     font-weight: 700;
     font-size: 11px;
@@ -241,6 +242,7 @@
   .badge-new { background: linear-gradient(135deg, var(--info), #1e3a8a); color: white; box-shadow: 0 4px 10px rgba(59,130,246,0.5); }
   .badge-trend { background: linear-gradient(135deg, var(--orange), #c2410c); color: white; box-shadow: 0 4px 10px rgba(249,115,22,0.5); }
   .badge-multi { background: linear-gradient(135deg, var(--purple), #5b21b6); color: white; box-shadow: 0 4px 10px rgba(139,92,246,0.5); }
+  .badge-trade { background: linear-gradient(135deg, var(--emerald), #047857); color: white; box-shadow: 0 4px 10px rgba(5,150,105,0.5); }
   .badge-lock { background: #1e293b; color: #94a3b8; border: 1px solid #334155;}
 
   .game-thumb {
@@ -463,7 +465,7 @@
         </div>
       </div>
 
-      <!-- Game 5: Ocean Emperor (Fish Hunter) - DITAMBAHKAN -->
+      <!-- Game 5: Ocean Emperor (Fish Hunter) -->
       <div class="game-card" onclick="window.location.href='fishing.html'">
         <div class="game-badge badge-new">NEW 🌊</div>
         <div class="game-thumb" style="font-size: 55px;">🦈🔫</div>
@@ -476,7 +478,20 @@
         </div>
       </div>
 
-      <!-- Game 6: Baccarat (LOCKED) -->
+      <!-- Game 6: Binary Option (DITAMBAHKAN) -->
+      <div class="game-card" onclick="window.location.href='trading.html'">
+        <div class="game-badge badge-trade">PROFIT 💹</div>
+        <div class="game-thumb" style="font-size: 55px;">📉📈</div>
+        <div class="game-info">
+          <div>
+            <div class="game-title">BINARY OPTION VIP</div>
+            <div class="game-desc">Tebak Arah Grafik & Profit Hingga 90%</div>
+          </div>
+          <button class="btn-play">MAIN SEKARANG</button>
+        </div>
+      </div>
+
+      <!-- Game 7: Baccarat (LOCKED) -->
       <div class="game-card" style="cursor: not-allowed;">
         <div class="game-badge badge-lock">LOCKED 🔒</div>
         <div class="game-thumb locked">🏦🎲</div>
@@ -489,7 +504,7 @@
         </div>
       </div>
       
-      <!-- Game 7: Blackjack (LOCKED) -->
+      <!-- Game 8: Blackjack (LOCKED) -->
       <div class="game-card" style="cursor: not-allowed;">
         <div class="game-badge badge-lock">LOCKED 🔒</div>
         <div class="game-thumb locked">🃏♠️</div>
