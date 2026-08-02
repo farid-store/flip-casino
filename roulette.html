@@ -56,6 +56,7 @@
 
         .casino-wrapper {
             display: flex; flex-direction: column; height: 100vh; padding: 10px; gap: 10px;
+            position: relative; z-index: 5;
         }
 
         /* HEADER */
@@ -77,8 +78,8 @@
         .logo-text span { font-size: 0.7rem; letter-spacing: 2px; color: var(--text-muted); }
         .header-right { display: flex; gap: 20px; }
         .player-card, .balance-card { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 8px; border: 1px solid #333; }
-        .avatar { width: 35px; height: 35px; background: var(--gold); color: #000; display: flex; justify-content: center; align-items: center; border-radius: 50%; }
-        .player-name { font-weight: bold; text-transform: uppercase; }
+        .avatar { width: 35px; height: 35px; background: var(--gold); color: #000; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-size: 1.2rem; }
+        .player-name { font-weight: bold; text-transform: uppercase;}
         .player-level { font-size: 0.7rem; color: var(--gold); }
         .balance-title { font-size: 0.7rem; color: var(--text-muted); }
         .balance-value { font-family: var(--font-num); font-size: 1.2rem; color: var(--green-spot); }
@@ -98,23 +99,27 @@
         .wheel-header p { font-size: 0.8rem; color: var(--text-muted); }
         .table-id { font-family: var(--font-num); font-size: 0.8rem; padding: 3px 8px; background: #000; border-radius: 4px; border: 1px solid #333; margin-top: 10px; display: inline-block; }
 
-        /* Fake Wheel Track for Visuals */
-        .wheel-wrapper { height: 100px; background: #000; border: 2px solid var(--gold-dark); border-radius: 10px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
-        .wheel-selector { position: absolute; z-index: 10; height: 100%; width: 4px; background: rgba(255,255,255,0.8); box-shadow: 0 0 10px #fff; }
-        .wheel-track { display: flex; gap: 5px; position: absolute; transition: transform 3s cubic-bezier(0.1, 0.7, 0.1, 1); }
-        .wheel-num { width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 1.2rem; border-radius: 5px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); }
-        .wheel-num.red { background: var(--red-spot); }
-        .wheel-num.black { background: var(--black-spot); }
-        .wheel-num.green { background: var(--green-spot); }
+        /* REALISTIC WHEEL TRACK */
+        .wheel-wrapper { height: 100px; background: #000; border: 2px solid var(--gold-dark); border-radius: 10px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: flex-start; margin: 20px 0; box-shadow: inset 0 0 40px rgba(0,0,0,0.8); }
+        .wheel-selector { position: absolute; z-index: 10; height: 100%; width: 4px; background: rgba(255,255,255,0.9); box-shadow: 0 0 15px #fff, 0 0 5px #fff; left: 50%; transform: translateX(-50%); }
+        .wheel-selector::before, .wheel-selector::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; }
+        .wheel-selector::before { top: 0; border-top: 10px solid #fff; }
+        .wheel-selector::after { bottom: 0; border-bottom: 10px solid #fff; }
+        
+        .wheel-track { display: flex; gap: 5px; position: absolute; will-change: transform; }
+        .wheel-num { width: 50px; height: 50px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 1.2rem; border-radius: 5px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .wheel-num.red { background: linear-gradient(180deg, #e74c3c, #c0392b); }
+        .wheel-num.black { background: linear-gradient(180deg, #34495e, #2c3e50); }
+        .wheel-num.green { background: linear-gradient(180deg, #2ecc71, #27ae60); }
 
         .bet-status { text-align: center; margin: 15px 0; }
-        .status-label { font-size: 1.2rem; font-weight: bold; color: var(--gold); letter-spacing: 1px; }
+        .status-label { font-size: 1.2rem; font-weight: bold; color: var(--gold); letter-spacing: 1px; transition: 0.3s;}
         .status-timer { font-family: var(--font-num); font-size: 2.5rem; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
 
-        .history-panel { background: #000; padding: 10px; border-radius: 8px; }
+        .history-panel { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222;}
         .panel-title { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
         .history-list { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; }
-        .hist-item { width: 30px; height: 30px; min-width: 30px; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 0.9rem; border-radius: 50%; font-weight: bold; }
+        .hist-item { width: 30px; height: 30px; min-width: 30px; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 0.9rem; border-radius: 50%; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.5);}
 
         .stats-panel { display: flex; justify-content: space-between; margin-top: 15px; }
         .stat-box { background: #000; padding: 10px; flex: 1; margin: 0 5px; border-radius: 5px; text-align: center; border: 1px solid #222; }
@@ -127,80 +132,91 @@
         .table-title { font-family: var(--font-title); font-size: 1.5rem; color: var(--gold); }
         .table-subtitle { color: var(--text-muted); font-size: 0.9rem; }
 
-        .betting-board { display: grid; grid-template-columns: 1fr repeat(12, 1fr); grid-template-rows: repeat(3, 1fr); gap: 2px; background: #333; border: 3px solid var(--gold-dark); padding: 2px; border-radius: 5px; }
-        .bet-spot { position: relative; background: #000; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 1.2rem; cursor: pointer; transition: 0.2s; border: 1px solid transparent; min-height: 50px; }
-        .bet-spot:hover { border-color: #fff; filter: brightness(1.2); }
-        .zero-slot { grid-column: 1; grid-row: 1 / span 3; background: var(--green-spot); }
-        .spot-red { background: var(--red-spot); }
-        .spot-black { background: var(--black-spot); }
+        .betting-board { display: grid; grid-template-columns: 1fr repeat(12, 1fr); grid-template-rows: repeat(3, 1fr); gap: 4px; background: #222; border: 3px solid var(--gold-dark); padding: 4px; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);}
+        .bet-spot { position: relative; background: #000; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 1.2rem; cursor: pointer; transition: 0.2s; border: 1px solid transparent; min-height: 50px; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .bet-spot:hover { filter: brightness(1.3); transform: translateY(-2px); border-color: rgba(255,255,255,0.5);}
+        .bet-spot:active { transform: scale(0.95); }
+        
+        .zero-slot { grid-column: 1; grid-row: 1 / span 3; background: linear-gradient(180deg, #2ecc71, #27ae60); }
+        .spot-red { background: linear-gradient(180deg, #e74c3c, #c0392b); }
+        .spot-black { background: linear-gradient(180deg, #34495e, #2c3e50); }
         
         .outside-title { margin-top: 20px; font-family: var(--font-title); color: var(--gold); font-size: 1rem; }
         .outside-board { display: flex; gap: 5px; margin-top: 5px; }
-        .outside { flex: 1; background: #111; border: 1px solid var(--gold-dark); padding: 15px 0; border-radius: 5px; display: flex; flex-direction: column; gap: 5px; font-weight: bold; }
+        .outside { flex: 1; background: #111; border: 1px solid var(--gold-dark); padding: 15px 0; border-radius: 5px; display: flex; flex-direction: column; gap: 5px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .outside:hover { filter: brightness(1.2); }
         .outside.red { border-bottom: 4px solid var(--red-spot); }
         .outside.black { border-bottom: 4px solid var(--black-spot); }
 
-        .chip-placed { position: absolute; width: 25px; height: 25px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="gold" stroke-width="8" stroke-dasharray="10 10"/><circle cx="50" cy="50" r="40" fill="%23222"/></svg>') center/cover; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.6rem; font-weight: bold; pointer-events: none; z-index: 5; text-shadow: 1px 1px 2px #000; border: 2px solid var(--gold); }
+        .chip-placed { position: absolute; width: 28px; height: 28px; background: radial-gradient(circle, #fff6b5, #f2c238, #9b6900); color: #000; border: 2px dashed #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.6rem; font-family: var(--font-num); font-weight: 900; pointer-events: none; z-index: 5; box-shadow: 0 4px 8px rgba(0,0,0,0.8); }
 
         .live-information { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
         .info-card { flex: 1; background: #000; border: 1px solid #333; padding: 15px; border-radius: 8px; text-align: center; }
         .info-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; }
         .info-value { font-family: var(--font-num); font-size: 1.2rem; color: var(--gold); }
 
-        /* CONSOLE (FOOTER) */
+        /* CONSOLE (FOOTER) - CHIPS SCROLLABLE */
         .casino-console { background: #111; padding: 15px; border-radius: 10px; border: 1px solid #333; border-top: 2px solid var(--gold); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
         .console-top { flex: 1; }
-        .table-status { background: #000; color: var(--gold); padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; border: 1px solid #333; letter-spacing: 1px; }
+        .table-status { background: #000; color: var(--gold); padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; border: 1px solid #333; letter-spacing: 1px; transition: 0.3s;}
         
-        .chip-selector { display: flex; gap: 10px; flex: 2; justify-content: center; }
-        .chip-btn { background: none; border: none; cursor: pointer; transition: 0.2s; position: relative; }
-        .chip-btn:hover, .chip-btn.active { transform: scale(1.15) translateY(-5px); }
-        .chip-btn.active::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: var(--gold); border-radius: 2px; }
-        .chip-face { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-family: var(--font-num); font-size: 0.9rem; border: 4px dashed rgba(255,255,255,0.5); color: #fff; box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 5px rgba(0,0,0,0.5); }
+        .chip-selector { display: flex; gap: 10px; flex: 2; justify-content: flex-start; overflow-x: auto; padding-bottom: 8px; }
+        .chip-selector::-webkit-scrollbar { height: 6px; }
+        .chip-selector::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 10px; }
+        .chip-btn { flex-shrink: 0; background: none; border: none; cursor: pointer; transition: 0.2s; position: relative; }
+        .chip-btn:hover, .chip-btn.active { transform: scale(1.1) translateY(-5px); }
+        .chip-btn.active::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 25px; height: 3px; background: var(--gold); border-radius: 2px; box-shadow: 0 0 10px var(--gold);}
+        
+        .chip-face { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-family: var(--font-num); font-size: 0.9rem; border: 4px dashed rgba(255,255,255,0.4); color: #fff; box-shadow: inset 0 0 10px rgba(0,0,0,0.7), 0 4px 6px rgba(0,0,0,0.5); }
         .chip-face.white { background: radial-gradient(circle, #ddd, #999); color: #000; border-color: #555; }
         .chip-face.red { background: radial-gradient(circle, #e74c3c, #c0392b); }
         .chip-face.blue { background: radial-gradient(circle, #3498db, #2980b9); }
         .chip-face.green { background: radial-gradient(circle, #2ecc71, #27ae60); }
         .chip-face.gold { background: radial-gradient(circle, #f1c40f, #f39c12); color: #000; border-color: #000; }
+        .chip-face.purple { background: radial-gradient(circle, #9b59b6, #8e44ad); }
+        .chip-face.dark { background: radial-gradient(circle, #34495e, #2c3e50); border-color: #7f8c8d;}
+        .chip-face.premium { background: radial-gradient(circle, #f5f6fa, #dcdde1); color: #000; border: 4px dashed #e1b12c; box-shadow: 0 0 15px rgba(225, 177, 44, 0.8), inset 0 0 10px rgba(0,0,0,0.5); font-size: 0.75rem;}
 
-        .action-buttons { display: flex; gap: 10px; flex: 1; justify-content: flex-end; }
+        .action-buttons { display: flex; gap: 10px; flex: 1.5; justify-content: flex-end; }
         .btn-clear { background: #333; color: #fff; border: 1px solid #555; padding: 0 20px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; transition: 0.3s; }
         .btn-clear:hover { background: #c0392b; border-color: #e74c3c; }
-        .btn-spin { background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-dark) 100%); color: #000; border: none; padding: 10px 30px; border-radius: 5px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.3s; font-family: var(--font-title); font-weight: bold; box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
+        .btn-clear:active { transform: scale(0.95); }
+        
+        .btn-spin { background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-dark) 100%); color: #000; border: none; padding: 10px 30px; border-radius: 5px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.3s; font-family: var(--font-title); font-weight: bold; box-shadow: 0 5px 15px rgba(212,175,55,0.4); position: relative; overflow: hidden;}
+        .btn-spin::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); animation: shine 3s infinite; }
+        @keyframes shine { 100% { left: 200%; } }
         .btn-spin:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .btn-spin:active { transform: translateY(0); }
+        .btn-spin:disabled { filter: grayscale(1); opacity: 0.6; pointer-events: none; box-shadow: none;}
+        .btn-spin:disabled::before { display: none; }
+        
         .spin-title { font-size: 1.2rem; }
         .spin-value { font-family: var(--font-num); font-size: 0.8rem; }
 
         /* MODALS & OVERLAYS */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .result-card { background: linear-gradient(135deg, #111, #222); padding: 40px; border-radius: 15px; border: 2px solid var(--gold); text-align: center; transform: scale(0.8); opacity: 0; transition: 0.3s; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 5000; }
+        .result-card { background: linear-gradient(135deg, #111, #222); padding: 40px; border-radius: 15px; border: 2px solid var(--gold); text-align: center; transform: scale(0.8); opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
         .overlay.active { display: flex; }
         .overlay.active .result-card { transform: scale(1); opacity: 1; }
-        .result-title { font-family: var(--font-title); color: var(--gold); font-size: 1.5rem; margin-bottom: 20px; }
-        .result-number { font-family: var(--font-num); font-size: 5rem; width: 120px; height: 120px; margin: 0 auto; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
-        .res-green { background: var(--green-spot); color: #fff; }
-        .res-red { background: var(--red-spot); color: #fff; }
-        .res-black { background: var(--black-spot); color: #fff; }
-        .result-text { margin: 20px 0; font-size: 1.5rem; color: #2ecc71; font-weight: bold; font-family: var(--font-num); }
-        .tap-text { font-size: 0.8rem; color: var(--text-muted); animation: pulse 1.5s infinite; }
-
-        .jackpot-box { text-align: center; color: var(--gold); text-shadow: 0 0 20px rgba(212,175,55,0.5); }
-        .jackpot-box i { font-size: 4rem; margin-bottom: 15px; }
-        .jackpot-box h1 { font-family: var(--font-title); font-size: 3rem; }
-        .jackpot-box h2 { font-family: var(--font-num); font-size: 2.5rem; color: #fff; }
+        .result-title { font-family: var(--font-title); color: var(--text-muted); font-size: 1.2rem; letter-spacing: 3px; margin-bottom: 20px; }
+        .result-number { font-family: var(--font-num); font-size: 5rem; width: 120px; height: 120px; margin: 0 auto; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.8); color: #fff;}
+        .res-green { background: var(--green-spot); }
+        .res-red { background: var(--red-spot); }
+        .res-black { background: var(--black-spot); }
+        .result-text { margin: 20px 0; font-size: 1.8rem; color: #2ecc71; font-weight: bold; font-family: var(--font-num); text-shadow: 0 0 10px rgba(46, 204, 113, 0.4);}
+        .tap-text { font-size: 0.8rem; color: var(--text-muted); animation: pulse 1.5s infinite; letter-spacing: 2px;}
 
         /* LOADING */
-        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: opacity 0.5s; }
-        .loading-logo i { font-size: 4rem; color: var(--gold); margin-bottom: 20px; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s; }
+        .loading-logo i { font-size: 4rem; color: var(--gold); margin-bottom: 20px; text-shadow: 0 0 20px rgba(212,175,55,0.5);}
         .loading-title { font-family: var(--font-title); font-size: 2rem; color: var(--gold-light); }
         .loading-subtitle { color: var(--text-muted); letter-spacing: 5px; margin-bottom: 40px; font-size: 0.9rem; }
         .loading-bar { width: 300px; height: 5px; background: #333; border-radius: 5px; overflow: hidden; }
         .loading-progress { width: 0%; height: 100%; background: var(--gold); transition: 2s ease-out; }
 
         /* TOAST */
-        .toast-message { position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: var(--gold); padding: 10px 20px; border-radius: 30px; border: 1px solid var(--gold-dark); font-weight: bold; transition: bottom 0.3s; z-index: 1500; font-family: var(--font-body); }
-        .toast-message.show { bottom: 20px; }
+        .toast-message { position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: var(--gold); padding: 12px 25px; border-radius: 30px; border: 1px solid var(--gold-dark); font-weight: bold; transition: bottom 0.3s; z-index: 99999; font-family: var(--font-body); box-shadow: 0 5px 15px rgba(0,0,0,0.8);}
+        .toast-message.show { bottom: 30px; }
 
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         
@@ -210,6 +226,7 @@
             .casino-wrapper { height: auto; }
             .betting-board { grid-template-columns: 1fr repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
             .zero-slot { grid-row: 1 / span 6; }
+            .action-buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -266,10 +283,10 @@
                         <div class="table-id">TABLE #01</div>
                     </div>
                     
-                    <div class="wheel-wrapper">
+                    <div class="wheel-wrapper" id="wheelWrapper">
                         <div class="wheel-selector"></div>
                         <div class="wheel-track" id="wheelTrack">
-                            <!-- Generated By JS -->
+                            <!-- Generated By JS (Super Long Track for real physics) -->
                         </div>
                     </div>
 
@@ -286,9 +303,9 @@
                     </div>
 
                     <div class="stats-panel">
-                        <div class="stat-box"><span>Players</span><strong id="playerCount">248</strong></div>
-                        <div class="stat-box"><span>Total Bet Live</span><strong id="totalBetLive">$ 12.4K</strong></div>
-                        <div class="stat-box"><span>RTP</span><strong>96.12%</strong></div>
+                        <div class="stat-box"><span>Players</span><strong id="playerCount">482</strong></div>
+                        <div class="stat-box"><span>Total Bet Live</span><strong id="totalBetLive">$ 24.8K</strong></div>
+                        <div class="stat-box"><span>RTP</span><strong>97.30%</strong></div>
                     </div>
                 </div>
             </section>
@@ -354,16 +371,21 @@
                 <div class="table-status" id="infoBanner">WAITING FOR BETS</div>
             </div>
             
+            <!-- MAKSIMAL 500K CHIPS -->
             <div class="chip-selector">
                 <button class="chip-btn active" onclick="selectChip(100, this)"><div class="chip-face white">100</div></button>
                 <button class="chip-btn" onclick="selectChip(500, this)"><div class="chip-face red">500</div></button>
                 <button class="chip-btn" onclick="selectChip(1000, this)"><div class="chip-face blue">1K</div></button>
                 <button class="chip-btn" onclick="selectChip(5000, this)"><div class="chip-face green">5K</div></button>
                 <button class="chip-btn" onclick="selectChip(10000, this)"><div class="chip-face gold">10K</div></button>
+                <!-- OPSI BARU -->
+                <button class="chip-btn" onclick="selectChip(50000, this)"><div class="chip-face purple">50K</div></button>
+                <button class="chip-btn" onclick="selectChip(100000, this)"><div class="chip-face dark">100K</div></button>
+                <button class="chip-btn" onclick="selectChip(500000, this)"><div class="chip-face premium">500K</div></button>
             </div>
 
             <div class="action-buttons">
-                <button class="btn-clear" id="btnClear" onclick="clearBets()"><i class="fa-solid fa-trash"></i> CLEAR BET</button>
+                <button class="btn-clear" id="btnClear" onclick="clearBets()"><i class="fa-solid fa-trash"></i> CLEAR</button>
                 <button class="btn-spin" id="btnSpin" onclick="spinWheel()">
                     <div class="spin-title">SPIN</div>
                     <div class="spin-value" id="spinTotal">Place Bet First</div>
@@ -402,7 +424,7 @@
         const userJson = localStorage.getItem('currentUser');
         if (!userJson) window.location.href = 'auth.html';
         let currentUser = JSON.parse(userJson) || { username: 'Guest', balance: 50000 };
-        let playerWinRate = 0.15;
+        let playerWinRate = 0.15; // Rigging / RTP parameter
         
         let balance = currentUser.balance;
         let currentChip = 100;
@@ -411,6 +433,10 @@
         
         const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
         const ROULETTE_SEQ = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+        
+        // PHYSICAL WHEEL STATE
+        let currentWheelIndex = 0; // Starts at index 0 (which is number 0)
+        const itemWidth = 55; // 50px width + 5px gap matching CSS perfectly
 
         const uiBalance = document.getElementById('displayBalance');
         const uiTotalBet = document.getElementById('totalBetDisplay');
@@ -444,9 +470,16 @@
             } catch(e) {} finally { window.location.href = 'index.html'; }
         }
 
-        function formatM(num) { return num.toLocaleString('en-US'); }
-        function showToast(msg) {
+        function formatM(num) {
+            if (num >= 1000) return (num / 1000) + 'K';
+            return num.toString();
+        }
+        function formatFull(num) { return num.toLocaleString('en-US'); }
+        
+        function showToast(msg, color="#d4af37") {
             toast.innerText = msg;
+            toast.style.borderColor = color;
+            toast.style.color = color;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
@@ -478,10 +511,11 @@
             }
         }
 
-        // INIT WHEEL TRACK
+        // INIT WHEEL TRACK (BUAT SANGAT PANJANG AGAR TIDAK TERPUTUS)
         function initWheel() {
             const track = document.getElementById('wheelTrack');
-            for(let i=0; i<3; i++) {
+            // Generate 150 repetisi (150 * 37 = 5550 kotak) sehingga tidak akan habis
+            for(let i=0; i<150; i++) {
                 ROULETTE_SEQ.forEach(num => {
                     let div = document.createElement('div');
                     div.className = `wheel-num ${getColor(num)}`;
@@ -489,6 +523,21 @@
                     track.appendChild(div);
                 });
             }
+            centerWheelInstantly();
+            window.addEventListener('resize', centerWheelInstantly);
+        }
+
+        // Fungsi akurat agar roda pas di tengah tanpa animasi
+        function centerWheelInstantly() {
+            const track = document.getElementById('wheelTrack');
+            const wrapper = document.getElementById('wheelWrapper');
+            if(!wrapper) return;
+            
+            const centerOffset = (wrapper.offsetWidth / 2) - 25; // 25 adalah setengah dari lebar item (50px)
+            const offset = (currentWheelIndex * itemWidth) - centerOffset;
+            
+            track.style.transition = 'none';
+            track.style.transform = `translateX(-${offset}px)`;
         }
 
         function selectChip(amount, btnElement) {
@@ -501,7 +550,7 @@
 
         function placeBet(spotId) {
             if(isSpinning) { showToast("Wait for next round!"); return; }
-            if(balance < currentChip) { showToast("Insufficient Balance!"); return; }
+            if(balance < currentChip) { showToast("Insufficient Balance!", "#e74c3c"); return; }
 
             balance -= currentChip;
             if(!bets[spotId]) bets[spotId] = 0;
@@ -511,9 +560,7 @@
             
             const chipUI = document.getElementById(`chip-${spotId}`);
             chipUI.style.display = 'flex';
-            
-            let displayVal = bets[spotId] >= 1000 ? (bets[spotId]/1000)+'K' : bets[spotId];
-            chipUI.innerText = displayVal;
+            chipUI.innerText = formatM(bets[spotId]);
             
             chipUI.style.transform = 'scale(1.5)';
             setTimeout(() => chipUI.style.transform = 'scale(1)', 150);
@@ -522,6 +569,8 @@
         function clearBets() {
             if(isSpinning) return;
             let totalBetted = Object.values(bets).reduce((a, b) => a + b, 0);
+            if(totalBetted === 0) return;
+            
             balance += totalBetted;
             bets = {};
             
@@ -534,13 +583,16 @@
         }
 
         function updateUI() {
-            uiBalance.innerText = formatM(balance);
+            uiBalance.innerText = formatFull(balance);
             let total = Object.values(bets).reduce((a, b) => a + b, 0);
-            uiTotalBet.innerText = formatM(total);
+            uiTotalBet.innerText = formatFull(total);
             uiSpinTotal.innerText = total > 0 ? `Total: ${formatM(total)}` : "Place Bet First";
             
             let highestBet = Math.max(0, ...Object.values(bets));
-            uiPossibleWin.innerText = highestBet > 0 ? formatM(highestBet * 36) : "--";
+            uiPossibleWin.innerText = highestBet > 0 ? formatFull(highestBet * 36) : "--";
+            
+            document.getElementById('btnSpin').disabled = isSpinning;
+            document.getElementById('btnClear').disabled = isSpinning;
         }
 
         // RIGGING / RTP ENGINE
@@ -582,28 +634,42 @@
             }
         }
 
+        // REALISTIC SPIN PHYSICS
         function spinWheel() {
             let totalBet = Object.values(bets).reduce((a, b) => a + b, 0);
-            if(totalBet === 0) { showToast("Please place a bet first!"); return; }
+            if(totalBet === 0) { showToast("Please place a bet first!", "#e74c3c"); return; }
             if(isSpinning) return;
 
             isSpinning = true;
+            updateUI(); // Disable buttons
             document.getElementById('statusLabel').innerText = "NO MORE BETS";
+            document.getElementById('statusLabel').style.color = "#e74c3c";
             document.getElementById('infoBanner').innerText = "WHEEL IS SPINNING...";
             document.getElementById('infoBanner').style.color = "#e74c3c";
 
             const track = document.getElementById('wheelTrack');
             const targetNum = determineWinningNumber();
-            const baseIndex = ROULETTE_SEQ.indexOf(targetNum);
             
-            // Middle section to ensure smooth sliding
-            const resultIndex = (ROULETTE_SEQ.length * 1) + baseIndex; 
-            const itemWidth = 55; // 50px width + 5px gap
+            // Kalkulasi pergerakan index dari posisi saat ini
+            let currentOffsetInSeq = currentWheelIndex % 37;
+            let targetOffsetInSeq = ROULETTE_SEQ.indexOf(targetNum);
             
-            const offset = (resultIndex * itemWidth) - (document.querySelector('.wheel-wrapper').offsetWidth / 2) + 25;
-            track.style.transform = `translateX(-${offset}px)`;
+            let diff = targetOffsetInSeq - currentOffsetInSeq;
+            if (diff < 0) diff += 37;
+            
+            // Roda berputar minimal 4 putaran penuh (4 * 37 = 148 item) agar realistis
+            let itemsToMove = (37 * 4) + diff;
+            currentWheelIndex += itemsToMove;
+            
+            const wrapper = document.getElementById('wheelWrapper');
+            const centerOffset = (wrapper.offsetWidth / 2) - 25; 
+            const finalOffset = (currentWheelIndex * itemWidth) - centerOffset;
 
-            setTimeout(() => { resolveGame(targetNum); }, 3000);
+            // Animasi melambat secara realistis (Deceleration)
+            track.style.transition = 'transform 5s cubic-bezier(0.12, 0.85, 0.15, 1)';
+            track.style.transform = `translateX(-${finalOffset}px)`;
+
+            setTimeout(() => { resolveGame(targetNum); }, 5200);
         }
 
         function resolveGame(winningNum) {
@@ -618,35 +684,35 @@
             const resText = document.getElementById('resText');
             if(winAmount > 0) {
                 balance += winAmount;
-                resText.innerText = `YOU WON ${formatM(winAmount)}!`;
+                resText.innerText = `YOU WON ${formatFull(winAmount)}!`;
                 resText.style.color = "#2ecc71";
                 confettiEngine.burst(150); // Memicu confetti
+                showToast(`YOU WON ${formatM(winAmount)}!`, "#2ecc71");
             } else {
                 resText.innerText = "NO WIN THIS TIME";
                 resText.style.color = "#e74c3c";
+                showToast("HOUSE WINS", "#e74c3c");
             }
             
             modal.classList.add('active');
             updateHistory(winningNum, winColor);
             
             bets = {};
-            updateUI();
             document.querySelectorAll('.chip-placed').forEach(chip => chip.style.display = 'none');
+            updateUI();
         }
 
         function closeResult() {
             document.getElementById('resultModal').classList.remove('active');
             document.getElementById('statusLabel').innerText = "PLACE YOUR BETS";
+            document.getElementById('statusLabel').style.color = "var(--gold)";
             document.getElementById('infoBanner').innerText = "WAITING FOR BETS";
             document.getElementById('infoBanner').style.color = "var(--gold)";
             
-            const track = document.getElementById('wheelTrack');
-            track.style.transition = 'none';
-            track.style.transform = 'translateX(0px)';
-            setTimeout(() => {
-                track.style.transition = 'transform 3s cubic-bezier(0.1, 0.7, 0.1, 1)';
-                isSpinning = false;
-            }, 50);
+            // JANGAN RESET TRACK! Roda akan melanjutkan posisinya di putaran berikutnya.
+            // Ini menghilangkan bug "terputus" atau lompatan kaku.
+            isSpinning = false;
+            updateUI(); // Enable buttons again
             
             // Auto save progress at end of round
             if(typeof api !== 'undefined' && api.saveProgress) {
@@ -663,7 +729,7 @@
             div.style.color = '#fff';
             div.innerText = num;
             histList.prepend(div);
-            if(histList.children.length > 10) histList.removeChild(histList.lastChild);
+            if(histList.children.length > 15) histList.removeChild(histList.lastChild);
         }
 
         // APP INIT
