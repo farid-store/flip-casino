@@ -1,660 +1,3644 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
-    <title>Golden Roulette Live</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Binary Options VIP - Royal Casino</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+ /* =====================================================
+   ROYAL TRADING VIP UI UX PREMIUM
+   PART 1A - CORE SYSTEM
+===================================================== */
 
-    <!-- FONT -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+:root {
 
-    <!-- FONT AWESOME -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+  --bg-main:#020617;
+  --bg-card:rgba(15,23,42,.78);
+  --bg-soft:#111827;
 
-    <!-- QR -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  --gold:#eab308;
+  --gold-light:#fde68a;
+  --gold-dark:#92400e;
 
-    <style>
-        /* =========================================================
-           CSS PREMIUM: CASINO ROULETTE
-           ========================================================= */
-        :root {
-            --gold: #d4af37;
-            --gold-light: #f3e5ab;
-            --gold-dark: #aa8529;
-            --bg-dark: #0a0a0a;
-            --panel-bg: #1a1a1a;
-            --red-spot: #c0392b;
-            --black-spot: #2c3e50;
-            --green-spot: #27ae60;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --font-title: 'Cinzel', serif;
-            --font-body: 'Inter', sans-serif;
-            --font-num: 'Orbitron', sans-serif;
-        }
+  --green:#10b981;
+  --green-light:#34d399;
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  --red:#ef4444;
+  --red-light:#fb7185;
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: var(--font-body);
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+  --blue:#3b82f6;
 
-        /* Effects */
-        canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; }
-        .ambient-light {
-            position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 60%);
-            pointer-events: none; z-index: -1;
-        }
+  --text:#f8fafc;
+  --muted:#94a3b8;
 
-        .casino-wrapper {
-            display: flex; flex-direction: column; height: 100vh; padding: 10px; gap: 10px;
-        }
 
-        /* HEADER */
-        .top-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(180deg, #222 0%, #111 100%);
-            border: 1px solid #333; border-bottom: 2px solid var(--gold);
-            padding: 10px 20px; border-radius: 10px;
-        }
-        .header-left .btn-back {
-            background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 8px 15px; border-radius: 5px; cursor: pointer; display: flex; gap: 10px; align-items: center;
-            font-family: var(--font-body); transition: 0.3s;
-        }
-        .header-left .btn-back:hover { background: var(--gold); color: #000; }
-        .header-center .casino-logo { display: flex; align-items: center; gap: 15px; }
-        .logo-icon i { font-size: 2rem; color: var(--gold); }
-        .logo-text h2 { font-family: var(--font-title); font-size: 1.5rem; color: var(--gold-light); margin-bottom: -5px; }
-        .logo-text span { font-size: 0.7rem; letter-spacing: 2px; color: var(--text-muted); }
-        .header-right { display: flex; gap: 20px; }
-        .player-card, .balance-card { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 8px; border: 1px solid #333; }
-        .avatar { width: 35px; height: 35px; background: var(--gold); color: #000; display: flex; justify-content: center; align-items: center; border-radius: 50%; }
-        .player-name { font-weight: bold; }
-        .player-level { font-size: 0.7rem; color: var(--gold); }
-        .balance-title { font-size: 0.7rem; color: var(--text-muted); }
-        .balance-value { font-family: var(--font-num); font-size: 1.2rem; color: var(--green-spot); }
+  --shadow:
+  0 20px 60px rgba(0,0,0,.8);
 
-        /* MAIN LAYOUT */
-        .main-layout { display: flex; gap: 10px; flex: 1; min-height: 0; }
-        .left-panel { flex: 1; background: var(--panel-bg); border-radius: 10px; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; position: relative; }
-        .right-panel { flex: 2; background: var(--panel-bg); border-radius: 10px; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; }
 
-        /* LEFT PANEL (WHEEL / STATS) */
-        .live-banner { position: absolute; top: 15px; right: 15px; display: flex; align-items: center; gap: 8px; color: #ff4757; font-weight: bold; font-size: 0.9rem; }
-        .live-dot { width: 10px; height: 10px; background: #ff4757; border-radius: 50%; animation: pulse 1.5s infinite; }
-        .live-banner span { color: var(--text-muted); font-size: 0.7rem; font-weight: normal; }
-        
-        .roulette-card { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
-        .wheel-header h3 { font-family: var(--font-title); color: var(--gold); }
-        .wheel-header p { font-size: 0.8rem; color: var(--text-muted); }
-        .table-id { font-family: var(--font-num); font-size: 0.8rem; padding: 3px 8px; background: #000; border-radius: 4px; border: 1px solid #333; margin-top: 10px; display: inline-block; }
+  --glass:
+  backdrop-filter:blur(20px);
+  
 
-        /* Fake Wheel Track for Visuals */
-        .wheel-wrapper { height: 100px; background: #000; border: 2px solid var(--gold-dark); border-radius: 10px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
-        .wheel-selector { position: absolute; z-index: 10; height: 100%; width: 4px; background: rgba(255,255,255,0.8); box-shadow: 0 0 10px #fff; }
-        .wheel-track { display: flex; gap: 5px; position: absolute; transition: transform 3s cubic-bezier(0.1, 0.7, 0.1, 1); }
-        .wheel-num { width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 1.2rem; border-radius: 5px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); }
-        .wheel-num.red { background: var(--red-spot); }
-        .wheel-num.black { background: var(--black-spot); }
-        .wheel-num.green { background: var(--green-spot); }
+  --font-main:
+  'Montserrat',sans-serif;
 
-        .bet-status { text-align: center; margin: 15px 0; }
-        .status-label { font-size: 1.2rem; font-weight: bold; color: var(--gold); letter-spacing: 1px; }
-        .status-timer { font-family: var(--font-num); font-size: 2.5rem; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+  --font-number:
+  'Orbitron',sans-serif;
 
-        .history-panel { background: #000; padding: 10px; border-radius: 8px; }
-        .panel-title { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
-        .history-list { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; }
-        .hist-item { width: 30px; height: 30px; min-width: 30px; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 0.9rem; border-radius: 50%; font-weight: bold; }
+  --font-title:
+  'Cinzel',serif;
 
-        .stats-panel { display: flex; justify-content: space-between; margin-top: 15px; }
-        .stat-box { background: #000; padding: 10px; flex: 1; margin: 0 5px; border-radius: 5px; text-align: center; border: 1px solid #222; }
-        .stat-box span { display: block; font-size: 0.6rem; color: var(--text-muted); }
-        .stat-box strong { font-family: var(--font-num); color: var(--gold-light); }
+}
 
-        /* RIGHT PANEL (BOARD) */
-        .board-wrapper { display: flex; flex-direction: column; height: 100%; }
-        .table-top { margin-bottom: 20px; }
-        .table-title { font-family: var(--font-title); font-size: 1.5rem; color: var(--gold); }
-        .table-subtitle { color: var(--text-muted); font-size: 0.9rem; }
 
-        .betting-board { display: grid; grid-template-columns: 1fr repeat(12, 1fr); grid-template-rows: repeat(3, 1fr); gap: 2px; background: #333; border: 3px solid var(--gold-dark); padding: 2px; border-radius: 5px; }
-        .bet-spot { position: relative; background: #000; display: flex; justify-content: center; align-items: center; font-family: var(--font-num); font-size: 1.2rem; cursor: pointer; transition: 0.2s; border: 1px solid transparent; min-height: 50px; }
-        .bet-spot:hover { border-color: #fff; filter: brightness(1.2); }
-        .zero-slot { grid-column: 1; grid-row: 1 / span 3; background: var(--green-spot); }
-        .spot-red { background: var(--red-spot); }
-        .spot-black { background: var(--black-spot); }
-        
-        .outside-title { margin-top: 20px; font-family: var(--font-title); color: var(--gold); font-size: 1rem; }
-        .outside-board { display: flex; gap: 5px; margin-top: 5px; }
-        .outside { flex: 1; background: #111; border: 1px solid var(--gold-dark); padding: 15px 0; border-radius: 5px; display: flex; flex-direction: column; gap: 5px; font-weight: bold; }
-        .outside.red { border-bottom: 4px solid var(--red-spot); }
-        .outside.black { border-bottom: 4px solid var(--black-spot); }
+/* ==============================
+ GLOBAL RESET
+============================== */
 
-        .chip-placed { position: absolute; width: 25px; height: 25px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="gold" stroke-width="8" stroke-dasharray="10 10"/><circle cx="50" cy="50" r="40" fill="%23222"/></svg>') center/cover; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.6rem; font-weight: bold; pointer-events: none; z-index: 5; text-shadow: 1px 1px 2px #000; border: 2px solid var(--gold); }
 
-        .live-information { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
-        .info-card { flex: 1; background: #000; border: 1px solid #333; padding: 15px; border-radius: 8px; text-align: center; }
-        .info-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; }
-        .info-value { font-family: var(--font-num); font-size: 1.2rem; color: var(--gold); }
+*{
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+ user-select:none;
+ -webkit-tap-highlight-color:transparent;
+}
 
-        /* CONSOLE (FOOTER) */
-        .casino-console { background: #111; padding: 15px; border-radius: 10px; border: 1px solid #333; border-top: 2px solid var(--gold); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-        .console-top { flex: 1; }
-        .table-status { background: #000; color: var(--gold); padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; border: 1px solid #333; letter-spacing: 1px; }
-        
-        .chip-selector { display: flex; gap: 10px; flex: 2; justify-content: center; }
-        .chip-btn { background: none; border: none; cursor: pointer; transition: 0.2s; position: relative; }
-        .chip-btn:hover, .chip-btn.active { transform: scale(1.15) translateY(-5px); }
-        .chip-btn.active::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: var(--gold); border-radius: 2px; }
-        .chip-face { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-family: var(--font-num); font-size: 0.9rem; border: 4px dashed rgba(255,255,255,0.5); color: #fff; box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 5px rgba(0,0,0,0.5); }
-        .chip-face.white { background: radial-gradient(circle, #ddd, #999); color: #000; border-color: #555; }
-        .chip-face.red { background: radial-gradient(circle, #e74c3c, #c0392b); }
-        .chip-face.blue { background: radial-gradient(circle, #3498db, #2980b9); }
-        .chip-face.green { background: radial-gradient(circle, #2ecc71, #27ae60); }
-        .chip-face.gold { background: radial-gradient(circle, #f1c40f, #f39c12); color: #000; border-color: #000; }
 
-        .action-buttons { display: flex; gap: 10px; flex: 1; justify-content: flex-end; }
-        .btn-clear { background: #333; color: #fff; border: 1px solid #555; padding: 0 20px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; transition: 0.3s; }
-        .btn-clear:hover { background: #c0392b; border-color: #e74c3c; }
-        .btn-spin { background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-dark) 100%); color: #000; border: none; padding: 10px 30px; border-radius: 5px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.3s; font-family: var(--font-title); font-weight: bold; box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
-        .btn-spin:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        .btn-spin:active { transform: translateY(0); }
-        .spin-title { font-size: 1.2rem; }
-        .spin-value { font-family: var(--font-num); font-size: 0.8rem; }
+html,
+body{
 
-        /* MODALS & OVERLAYS */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .result-card { background: linear-gradient(135deg, #111, #222); padding: 40px; border-radius: 15px; border: 2px solid var(--gold); text-align: center; transform: scale(0.8); opacity: 0; transition: 0.3s; }
-        .overlay.active { display: flex; }
-        .overlay.active .result-card { transform: scale(1); opacity: 1; }
-        .result-title { font-family: var(--font-title); color: var(--gold); font-size: 1.5rem; margin-bottom: 20px; }
-        .result-number { font-family: var(--font-num); font-size: 5rem; width: 120px; height: 120px; margin: 0 auto; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
-        .res-green { background: var(--green-spot); color: #fff; }
-        .res-red { background: var(--red-spot); color: #fff; }
-        .res-black { background: var(--black-spot); color: #fff; }
-        .result-text { margin: 20px 0; font-size: 1.5rem; color: #2ecc71; font-weight: bold; font-family: var(--font-num); }
-        .tap-text { font-size: 0.8rem; color: var(--text-muted); animation: pulse 1.5s infinite; }
+ width:100%;
+ height:100dvh;
 
-        .jackpot-box { text-align: center; color: var(--gold); text-shadow: 0 0 20px rgba(212,175,55,0.5); }
-        .jackpot-box i { font-size: 4rem; margin-bottom: 15px; }
-        .jackpot-box h1 { font-family: var(--font-title); font-size: 3rem; }
-        .jackpot-box h2 { font-family: var(--font-num); font-size: 2.5rem; color: #fff; }
+ overflow:hidden;
 
-        /* LOADING */
-        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: opacity 0.5s; }
-        .loading-logo i { font-size: 4rem; color: var(--gold); margin-bottom: 20px; }
-        .loading-title { font-family: var(--font-title); font-size: 2rem; color: var(--gold-light); }
-        .loading-subtitle { color: var(--text-muted); letter-spacing: 5px; margin-bottom: 40px; font-size: 0.9rem; }
-        .loading-bar { width: 300px; height: 5px; background: #333; border-radius: 5px; overflow: hidden; }
-        .loading-progress { width: 0%; height: 100%; background: var(--gold); transition: 2s ease-out; }
+ background:
+ radial-gradient(
+ circle at top,
+ #1e293b,
+ #020617 60%
+ );
 
-        /* TOAST */
-        .toast-message { position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: var(--gold); padding: 10px 20px; border-radius: 30px; border: 1px solid var(--gold-dark); font-weight: bold; transition: bottom 0.3s; z-index: 1500; font-family: var(--font-body); }
-        .toast-message.show { bottom: 20px; }
+ color:white;
 
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        
-        /* Responsive tweaks */
-        @media (max-width: 1024px) {
-            .main-layout { flex-direction: column; overflow-y: auto; }
-            .casino-wrapper { height: auto; }
-            .betting-board { grid-template-columns: 1fr repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
-            .zero-slot { grid-row: 1 / span 6; }
-        }
-    </style>
+ font-family:var(--font-main);
+
+ display:flex;
+ justify-content:center;
+ align-items:center;
+
+}
+
+
+/* scrollbar */
+
+::-webkit-scrollbar{
+ display:none;
+}
+
+
+
+/* ==============================
+ APP WRAPPER
+============================== */
+
+
+#app-wrapper{
+
+ width:100%;
+ max-width:1250px;
+
+ height:100dvh;
+
+ background:
+ linear-gradient(
+ 180deg,
+ rgba(15,23,42,.95),
+ #020617
+ );
+
+
+ display:flex;
+ flex-direction:column;
+
+
+ position:relative;
+
+
+ overflow:hidden;
+
+
+ box-shadow:
+ 0 0 80px rgba(0,0,0,.9);
+
+
+}
+
+
+
+/* moving ambient light */
+
+
+#app-wrapper::before{
+
+ content:"";
+
+ position:absolute;
+
+ width:600px;
+ height:600px;
+
+ top:-300px;
+ left:50%;
+
+ transform:translateX(-50%);
+
+ background:
+ radial-gradient(
+ circle,
+ rgba(234,179,8,.15),
+ transparent 70%
+ );
+
+ pointer-events:none;
+
+}
+
+
+
+/* ==============================
+ TOP BAR
+============================== */
+
+
+.top-bar{
+
+
+ height:72px;
+
+ padding:
+ calc(12px + env(safe-area-inset-top))
+ 22px
+ 12px;
+
+
+ display:flex;
+
+ justify-content:space-between;
+
+ align-items:center;
+
+
+ background:
+
+ linear-gradient(
+ 180deg,
+ rgba(15,23,42,.9),
+ rgba(2,6,23,.7)
+ );
+
+
+ border-bottom:
+
+ 1px solid
+ rgba(234,179,8,.25);
+
+
+ backdrop-filter:
+ blur(20px);
+
+
+ z-index:100;
+
+
+}
+
+
+
+
+/* BACK BUTTON */
+
+
+.btn-back{
+
+
+ height:38px;
+
+
+ padding:
+ 0 18px;
+
+
+ border-radius:12px;
+
+
+ border:
+
+ 1px solid
+ rgba(239,68,68,.5);
+
+
+ background:
+
+ rgba(239,68,68,.08);
+
+
+ color:#f87171;
+
+
+ font-size:11px;
+
+
+ font-weight:900;
+
+
+ letter-spacing:1px;
+
+
+ transition:.25s;
+
+
+}
+
+
+.btn-back:hover,
+.btn-back:active{
+
+
+ background:#ef4444;
+
+ color:white;
+
+
+ transform:
+ translateY(-2px);
+
+
+ box-shadow:
+
+ 0 10px 30px
+ rgba(239,68,68,.4);
+
+}
+
+
+
+/* ==============================
+ PLAYER STATUS
+============================== */
+
+
+.stats-group{
+
+ display:flex;
+
+ align-items:center;
+
+ gap:12px;
+
+}
+
+
+
+.stat-box{
+
+
+ padding:
+
+ 8px 16px;
+
+
+ border-radius:14px;
+
+
+ background:
+
+ rgba(15,23,42,.7);
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.25);
+
+
+ box-shadow:
+
+ inset 0 0 20px
+ rgba(0,0,0,.5);
+
+
+
+}
+
+
+.stat-title{
+
+ font-size:9px;
+
+ letter-spacing:1.5px;
+
+ color:var(--muted);
+
+ font-weight:800;
+
+}
+
+
+
+.stat-amount{
+
+
+ font-family:
+
+ var(--font-number);
+
+
+ font-size:18px;
+
+
+ font-weight:900;
+
+
+ color:
+
+ var(--gold-light);
+
+
+
+ text-shadow:
+
+ 0 0 20px
+ rgba(234,179,8,.5);
+
+
+}
+
+
+
+/* icon buttons */
+
+
+.icon-btn{
+
+
+ width:42px;
+
+ height:42px;
+
+
+ border-radius:14px;
+
+
+ background:
+
+ rgba(15,23,42,.8);
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.25);
+
+
+ color:
+
+ var(--gold-light);
+
+
+ font-size:18px;
+
+
+ transition:.25s;
+
+
+}
+
+
+
+.icon-btn:hover{
+
+
+ background:
+
+ rgba(234,179,8,.15);
+
+
+ transform:
+
+ translateY(-3px);
+
+
+ box-shadow:
+
+ 0 10px 30px
+ rgba(234,179,8,.2);
+
+
+}
+
+
+ 
+/* =====================================================
+   PART 1B - PREMIUM CHART TERMINAL
+===================================================== */
+
+
+/* ==============================
+ MAIN LAYOUT
+============================== */
+
+
+.main-layout{
+
+ display:flex;
+
+ flex-direction:column;
+
+ flex:1;
+
+ overflow:hidden;
+
+ position:relative;
+
+}
+
+
+
+
+/* ==============================
+ CHART SECTION
+============================== */
+
+
+.chart-section{
+
+
+ flex:1;
+
+
+ position:relative;
+
+
+ display:flex;
+
+ flex-direction:column;
+
+
+
+ background:
+
+ radial-gradient(
+ circle at center,
+ rgba(30,41,59,.7),
+ #020617 75%
+ );
+
+
+ border-bottom:
+
+ 1px solid
+ rgba(234,179,8,.35);
+
+
+ overflow:hidden;
+
+
+
+}
+
+
+
+/* ambient glow */
+
+.chart-section::before{
+
+
+ content:"";
+
+
+ position:absolute;
+
+
+ width:500px;
+
+ height:500px;
+
+
+ top:50%;
+
+ left:50%;
+
+
+ transform:
+
+ translate(-50%,-50%);
+
+
+ background:
+
+ radial-gradient(
+ circle,
+ rgba(59,130,246,.08),
+ transparent 70%
+ );
+
+
+ pointer-events:none;
+
+
+
+}
+
+
+
+
+
+/* ==============================
+ CHART TOOLBAR
+============================== */
+
+
+.chart-toolbar{
+
+
+ height:62px;
+
+
+ padding:
+
+ 10px 18px;
+
+
+ display:flex;
+
+
+ justify-content:space-between;
+
+
+ align-items:center;
+
+
+
+ background:
+
+ rgba(2,6,23,.75);
+
+
+
+ border-bottom:
+
+ 1px solid
+ rgba(148,163,184,.15);
+
+
+ backdrop-filter:
+
+ blur(15px);
+
+
+ z-index:10;
+
+
+}
+
+
+
+
+
+.toolbar-group{
+
+
+ display:flex;
+
+ align-items:center;
+
+ gap:10px;
+
+}
+
+
+
+
+/* MARKET SELECT */
+
+
+.asset-selector{
+
+
+ height:40px;
+
+
+ padding:
+
+ 0 15px;
+
+
+ border-radius:12px;
+
+
+
+ background:
+
+ linear-gradient(
+ 135deg,
+ rgba(234,179,8,.15),
+ rgba(15,23,42,.8)
+ );
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.35);
+
+
+
+ color:white;
+
+
+ font-size:13px;
+
+
+ font-weight:900;
+
+
+
+ display:flex;
+
+
+ align-items:center;
+
+
+ gap:8px;
+
+
+
+ box-shadow:
+
+ inset 0 0 15px
+ rgba(234,179,8,.1);
+
+
+
+}
+
+
+
+
+
+/* PROFIT BADGE */
+
+
+.profit-badge{
+
+
+ height:34px;
+
+
+ display:flex;
+
+ align-items:center;
+
+
+
+ padding:
+
+ 0 14px;
+
+
+
+ border-radius:20px;
+
+
+
+ background:
+
+ rgba(16,185,129,.12);
+
+
+
+ border:
+
+ 1px solid
+ rgba(16,185,129,.4);
+
+
+
+ color:#34d399;
+
+
+
+ font-family:
+
+ var(--font-number);
+
+
+ font-size:11px;
+
+
+ font-weight:900;
+
+
+
+ box-shadow:
+
+
+ 0 0 20px
+ rgba(16,185,129,.25);
+
+
+
+}
+
+
+
+
+/* chart toggle */
+
+
+.chart-toggle-btn{
+
+
+ height:38px;
+
+
+ padding:
+
+ 0 14px;
+
+
+ border-radius:10px;
+
+
+ background:
+
+ rgba(15,23,42,.8);
+
+
+
+ border:
+
+ 1px solid
+ rgba(148,163,184,.25);
+
+
+
+ color:
+
+ var(--muted);
+
+
+
+ font-weight:800;
+
+
+ font-size:11px;
+
+
+ transition:.25s;
+
+
+}
+
+
+
+.chart-toggle-btn:hover{
+
+
+ transform:
+
+ translateY(-2px);
+
+}
+
+
+
+.chart-toggle-btn.active{
+
+
+ color:
+
+ var(--gold-light);
+
+
+ border-color:
+
+ var(--gold);
+
+
+ background:
+
+ rgba(234,179,8,.15);
+
+
+ box-shadow:
+
+ 0 0 20px
+ rgba(234,179,8,.2);
+
+
+
+}
+
+
+
+
+/* ==============================
+ CANVAS AREA
+============================== */
+
+
+.chart-container{
+
+
+ flex:1;
+
+
+ position:relative;
+
+
+ overflow:hidden;
+
+
+}
+
+
+
+
+/* grid premium */
+
+
+.grid-overlay{
+
+
+ position:absolute;
+
+
+ inset:0;
+
+
+ opacity:.08;
+
+
+
+ background-image:
+
+
+ linear-gradient(
+ rgba(255,255,255,.25) 1px,
+ transparent 1px
+ ),
+
+
+ linear-gradient(
+ 90deg,
+ rgba(255,255,255,.25) 1px,
+ transparent 1px
+ );
+
+
+
+ background-size:
+
+ 55px 55px;
+
+
+ mask-image:
+
+ radial-gradient(
+ circle,
+ black,
+ transparent 90%
+ );
+
+
+}
+
+
+
+
+
+#tradeCanvas{
+
+
+ position:absolute;
+
+
+ inset:0;
+
+
+ width:100%;
+
+ height:100%;
+
+
+ z-index:5;
+
+
+
+}
+
+
+
+
+/* ==============================
+ PRICE TAG
+============================== */
+
+
+.price-tag{
+
+
+ position:absolute;
+
+
+ right:0;
+
+
+
+ transform:
+
+ translateY(-50%);
+
+
+
+ padding:
+
+ 8px 16px;
+
+
+
+ border-radius:
+
+ 12px 0 0 12px;
+
+
+
+ background:
+
+ linear-gradient(
+ 90deg,
+ #2563eb,
+ #3b82f6
+ );
+
+
+
+ font-family:
+
+ var(--font-number);
+
+
+
+ font-size:12px;
+
+
+
+ font-weight:900;
+
+
+
+ z-index:20;
+
+
+
+ box-shadow:
+
+ 0 0 25px
+ rgba(59,130,246,.5);
+
+
+
+ transition:
+
+ top .15s linear;
+
+
+
+}
+
+
+
+
+
+.price-tag.up{
+
+
+ background:
+
+ linear-gradient(
+ 90deg,
+ #047857,
+ #10b981
+ );
+
+
+ box-shadow:
+
+ 0 0 30px
+ rgba(16,185,129,.6);
+
+
+}
+
+
+
+
+.price-tag.down{
+
+
+ background:
+
+ linear-gradient(
+ 90deg,
+ #991b1b,
+ #ef4444
+ );
+
+
+ box-shadow:
+
+ 0 0 30px
+ rgba(239,68,68,.6);
+
+
+}
+
+
+
+
+
+/* ==============================
+ TIMER
+============================== */
+
+
+.timer-display{
+
+
+ position:absolute;
+
+
+
+ top:25px;
+
+
+ left:50%;
+
+
+
+ transform:
+
+ translateX(-50%);
+
+
+
+ font-family:
+
+ var(--font-number);
+
+
+
+ font-size:42px;
+
+
+
+ font-weight:900;
+
+
+
+ letter-spacing:3px;
+
+
+
+ color:
+
+ rgba(255,255,255,.12);
+
+
+
+ z-index:10;
+
+
+
+ transition:.3s;
+
+
+}
+
+
+
+
+
+.timer-display.active{
+
+
+ color:white;
+
+
+ text-shadow:
+
+
+ 0 0 30px
+ rgba(255,255,255,.7);
+
+
+
+ animation:
+
+ timerPulse 1s infinite;
+
+
+
+}
+
+
+
+@keyframes timerPulse{
+
+
+0%,100%{
+
+opacity:.7;
+
+transform:
+
+translateX(-50%) scale(1);
+
+}
+
+
+50%{
+
+opacity:1;
+
+transform:
+
+translateX(-50%) scale(1.08);
+
+}
+
+
+}
+
+
+
+/* ==============================
+ RESULT SPLASH
+============================== */
+
+
+.result-splash{
+
+
+ position:absolute;
+
+
+ inset:0;
+
+
+
+ display:flex;
+
+
+ flex-direction:column;
+
+
+ justify-content:center;
+
+
+ align-items:center;
+
+
+
+ background:
+
+
+ rgba(0,0,0,.75);
+
+
+
+ backdrop-filter:
+
+ blur(15px);
+
+
+
+ opacity:0;
+
+
+ pointer-events:none;
+
+
+
+ transition:.35s;
+
+
+
+ z-index:50;
+
+
+
+}
+
+
+
+.result-splash.show{
+
+
+ opacity:1;
+
+
+
+}
+
+
+
+.result-title{
+
+
+ font-family:
+
+ var(--font-title);
+
+
+
+ font-size:42px;
+
+
+
+ letter-spacing:3px;
+
+
+ font-weight:900;
+
+
+
+ animation:
+
+ resultPop .5s ease;
+
+
+
+}
+
+
+
+.result-amount{
+
+
+ margin-top:15px;
+
+
+ font-family:
+
+ var(--font-number);
+
+
+
+ font-size:34px;
+
+
+
+ font-weight:900;
+
+
+}
+
+
+
+@keyframes resultPop{
+
+
+0%{
+
+transform:scale(.5);
+
+opacity:0;
+
+}
+
+
+100%{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+
+}
+
+
+
+
+.win-text{
+
+
+ color:
+
+ #34d399;
+
+
+ text-shadow:
+
+
+ 0 0 50px
+ rgba(16,185,129,.8);
+
+
+
+}
+
+
+
+.loss-text{
+
+
+ color:
+
+ #fb7185;
+
+
+ text-shadow:
+
+
+ 0 0 50px
+ rgba(239,68,68,.8);
+
+
+
+}
+
+/* =====================================================
+   PART 1C - PREMIUM TRADING CONSOLE
+===================================================== */
+
+
+/* ==============================
+ CONTROL SECTION
+============================== */
+
+
+.control-section{
+
+
+ background:
+
+ linear-gradient(
+ 180deg,
+ rgba(15,23,42,.95),
+ #020617
+ );
+
+
+
+ padding:
+
+ 20px
+ calc(20px + env(safe-area-inset-right))
+ calc(20px + env(safe-area-inset-bottom));
+
+
+
+ display:flex;
+
+
+ flex-direction:column;
+
+
+ gap:18px;
+
+
+
+ border-top:
+
+ 1px solid
+ rgba(234,179,8,.25);
+
+
+
+ box-shadow:
+
+
+ 0 -20px 50px
+ rgba(0,0,0,.7);
+
+
+
+ backdrop-filter:
+
+ blur(20px);
+
+
+
+}
+
+
+
+
+
+/* LABEL */
+
+.control-label{
+
+
+ font-size:10px;
+
+
+ color:
+
+ var(--muted);
+
+
+
+ font-weight:900;
+
+
+
+ letter-spacing:1.5px;
+
+
+
+ text-transform:uppercase;
+
+
+}
+
+
+
+
+/* ==============================
+ TIME SELECTOR
+============================== */
+
+
+.time-grid{
+
+
+ display:grid;
+
+
+ grid-template-columns:
+
+ repeat(5,1fr);
+
+
+
+ gap:8px;
+
+
+
+}
+
+
+
+.time-btn{
+
+
+ height:38px;
+
+
+
+ border-radius:12px;
+
+
+
+ background:
+
+ rgba(15,23,42,.8);
+
+
+
+ border:
+
+ 1px solid
+ rgba(148,163,184,.2);
+
+
+
+ color:
+
+ var(--muted);
+
+
+
+ font-family:
+
+ var(--font-number);
+
+
+
+ font-size:11px;
+
+
+
+ font-weight:900;
+
+
+
+ transition:.25s;
+
+
+
+}
+
+
+
+.time-btn:hover{
+
+
+ transform:
+
+ translateY(-2px);
+
+
+}
+
+
+
+.time-btn.active{
+
+
+ background:
+
+
+ linear-gradient(
+ 135deg,
+ rgba(59,130,246,.25),
+ rgba(30,64,175,.2)
+ );
+
+
+
+ border-color:
+
+ #3b82f6;
+
+
+
+ color:white;
+
+
+
+ box-shadow:
+
+
+ 0 0 25px
+ rgba(59,130,246,.4);
+
+
+
+}
+
+
+
+
+
+/* ==============================
+ INVESTMENT CONTROL
+============================== */
+
+
+.bet-control-grid{
+
+
+ background:
+
+ rgba(2,6,23,.6);
+
+
+
+ padding:
+
+ 15px;
+
+
+
+ border-radius:18px;
+
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.15);
+
+
+
+ box-shadow:
+
+ inset 0 0 30px
+ rgba(0,0,0,.5);
+
+
+
+}
+
+
+
+.bet-input-row{
+
+
+ display:flex;
+
+
+ gap:12px;
+
+
+
+ height:60px;
+
+
+ margin-top:10px;
+
+
+
+}
+
+
+
+
+
+.bet-btn-ctrl{
+
+
+ width:60px;
+
+
+ border-radius:16px;
+
+
+
+ background:
+
+ linear-gradient(
+ 145deg,
+ #1e293b,
+ #020617
+ );
+
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.3);
+
+
+
+ color:
+
+ var(--gold-light);
+
+
+
+ font-family:
+
+ var(--font-number);
+
+
+
+ font-size:14px;
+
+
+
+ font-weight:900;
+
+
+
+ transition:.2s;
+
+
+
+}
+
+
+
+.bet-btn-ctrl:hover{
+
+
+ background:
+
+ rgba(234,179,8,.15);
+
+
+}
+
+
+
+.bet-btn-ctrl:active{
+
+
+ transform:
+
+ scale(.9);
+
+
+}
+
+
+
+
+/* DISPLAY AMOUNT */
+
+
+.bet-display-box{
+
+
+ flex:1;
+
+
+
+ border-radius:16px;
+
+
+
+ background:
+
+ #020617;
+
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.5);
+
+
+
+ display:flex;
+
+
+ align-items:center;
+
+
+ justify-content:center;
+
+
+ flex-direction:column;
+
+
+
+ box-shadow:
+
+
+ inset 0 0 25px
+ rgba(0,0,0,.8);
+
+
+
+}
+
+
+
+.bet-display-label{
+
+
+ color:
+
+ var(--gold);
+
+
+
+ font-size:9px;
+
+
+ font-weight:900;
+
+
+ letter-spacing:2px;
+
+
+}
+
+
+
+.bet-display-val{
+
+
+ font-family:
+
+ var(--font-number);
+
+
+
+ font-size:23px;
+
+
+
+ font-weight:900;
+
+
+
+ color:white;
+
+
+
+ text-shadow:
+
+
+ 0 0 20px
+ rgba(255,255,255,.3);
+
+
+
+}
+
+
+
+
+
+/* ==============================
+ CHIP SELECTOR
+============================== */
+
+
+.chip-selector{
+
+
+ display:flex;
+
+
+
+ gap:7px;
+
+
+
+ margin-top:14px;
+
+
+
+}
+
+
+
+.chip-btn{
+
+
+ flex:1;
+
+
+
+ height:38px;
+
+
+
+ border-radius:10px;
+
+
+
+ background:
+
+ rgba(15,23,42,.8);
+
+
+
+ border:
+
+ 1px solid
+ rgba(148,163,184,.2);
+
+
+
+ color:
+
+ var(--muted);
+
+
+
+ font-family:
+
+ var(--font-number);
+
+
+
+ font-size:11px;
+
+
+
+ font-weight:900;
+
+
+
+ transition:.25s;
+
+
+
+}
+
+
+
+.chip-btn:hover{
+
+
+ transform:
+
+ translateY(-2px);
+
+
+
+}
+
+
+
+
+.chip-btn.active{
+
+
+ background:
+
+ linear-gradient(
+ 135deg,
+ rgba(234,179,8,.25),
+ rgba(146,64,14,.25)
+ );
+
+
+
+ color:
+
+ var(--gold-light);
+
+
+
+ border-color:
+
+ var(--gold);
+
+
+
+ box-shadow:
+
+
+ 0 0 20px
+ rgba(234,179,8,.35);
+
+
+
+}
+
+
+
+
+
+/* ==============================
+ ACTION BUTTONS
+============================== */
+
+
+.action-buttons{
+
+
+ display:flex;
+
+
+ gap:14px;
+
+
+}
+
+
+
+.btn-trade{
+
+
+ flex:1;
+
+
+
+ height:70px;
+
+
+
+ border-radius:20px;
+
+
+
+ border:none;
+
+
+
+ font-size:17px;
+
+
+
+ font-weight:900;
+
+
+
+ letter-spacing:1px;
+
+
+
+ color:white;
+
+
+
+ cursor:pointer;
+
+
+
+ position:relative;
+
+
+ overflow:hidden;
+
+
+
+ transition:.25s;
+
+
+
+}
+
+
+
+.btn-trade::before{
+
+
+ content:"";
+
+
+ position:absolute;
+
+
+ inset:0;
+
+
+
+ background:
+
+ linear-gradient(
+ 120deg,
+ transparent,
+ rgba(255,255,255,.25),
+ transparent
+ );
+
+
+ transform:
+
+ translateX(-120%);
+
+
+
+ transition:.5s;
+
+
+
+}
+
+
+
+.btn-trade:hover::before{
+
+
+ transform:
+
+ translateX(120%);
+
+
+
+}
+
+
+
+
+.btn-trade:hover{
+
+
+ transform:
+
+ translateY(-4px);
+
+
+}
+
+
+
+
+
+.btn-trade:active{
+
+
+ transform:
+
+ scale(.95);
+
+
+
+}
+
+
+
+
+/* CALL */
+
+
+.btn-call{
+
+
+ background:
+
+ linear-gradient(
+ 180deg,
+ #34d399,
+ #047857
+ );
+
+
+
+ box-shadow:
+
+
+ 0 15px 40px
+ rgba(16,185,129,.45);
+
+
+
+ border:
+
+ 1px solid
+ rgba(52,211,153,.8);
+
+
+
+}
+
+
+
+/* PUT */
+
+
+.btn-put{
+
+
+ background:
+
+ linear-gradient(
+ 180deg,
+ #fb7185,
+ #991b1b
+ );
+
+
+
+ box-shadow:
+
+
+ 0 15px 40px
+ rgba(239,68,68,.45);
+
+
+
+ border:
+
+ 1px solid
+ rgba(251,113,133,.8);
+
+
+
+}
+
+
+
+/* disabled */
+
+.btn-trade:disabled{
+
+
+ filter:
+
+ grayscale(1);
+
+
+
+ opacity:.45;
+
+
+
+ box-shadow:none;
+
+
+}
+
+/* =====================================================
+   PART 1D - PREMIUM FINISHING SYSTEM
+===================================================== */
+
+
+/* ==============================
+ TOAST NOTIFICATION
+============================== */
+
+
+.toast{
+
+
+ position:absolute;
+
+
+ top:90px;
+
+
+ left:50%;
+
+
+
+ transform:
+
+ translateX(-50%)
+ translateY(-30px);
+
+
+
+ min-width:260px;
+
+
+
+ padding:
+
+ 14px 22px;
+
+
+
+ border-radius:16px;
+
+
+
+ background:
+
+
+ rgba(2,6,23,.95);
+
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.5);
+
+
+
+ color:
+
+ var(--gold-light);
+
+
+
+ font-size:13px;
+
+
+
+ font-weight:800;
+
+
+
+ text-align:center;
+
+
+
+ z-index:5000;
+
+
+
+ opacity:0;
+
+
+
+ pointer-events:none;
+
+
+
+ backdrop-filter:
+
+ blur(20px);
+
+
+
+ box-shadow:
+
+
+ 0 20px 50px
+ rgba(0,0,0,.8),
+
+
+ 0 0 30px
+ rgba(234,179,8,.15);
+
+
+
+ transition:
+
+ .4s cubic-bezier(
+ .175,
+ .885,
+ .32,
+ 1.275
+ );
+
+}
+
+
+
+.toast.show{
+
+
+ opacity:1;
+
+
+ transform:
+
+ translateX(-50%)
+ translateY(0);
+
+
+
+}
+
+
+
+/* ==============================
+ MODAL SYSTEM
+============================== */
+
+
+.modal-overlay{
+
+
+ position:absolute;
+
+
+
+ inset:0;
+
+
+
+ background:
+
+
+ rgba(0,0,0,.85);
+
+
+
+ backdrop-filter:
+
+ blur(15px);
+
+
+
+ display:flex;
+
+
+
+ align-items:center;
+
+
+
+ justify-content:center;
+
+
+
+ padding:20px;
+
+
+
+ z-index:3000;
+
+
+
+ opacity:0;
+
+
+
+ pointer-events:none;
+
+
+
+ transition:.35s;
+
+
+
+}
+
+
+
+.modal-overlay.show{
+
+
+ opacity:1;
+
+
+
+ pointer-events:auto;
+
+
+
+}
+
+
+
+
+
+.modal-box{
+
+
+ width:100%;
+
+
+
+ max-width:430px;
+
+
+
+ padding:30px;
+
+
+
+ border-radius:24px;
+
+
+
+ background:
+
+
+ linear-gradient(
+ 180deg,
+ rgba(30,41,59,.95),
+ rgba(2,6,23,.95)
+ );
+
+
+
+ border:
+
+ 1px solid
+ rgba(234,179,8,.45);
+
+
+
+ box-shadow:
+
+
+ 0 40px 80px
+ rgba(0,0,0,.9);
+
+
+
+ transform:
+
+ translateY(30px)
+ scale(.95);
+
+
+
+ transition:.35s;
+
+
+
+}
+
+
+
+.modal-overlay.show
+.modal-box{
+
+
+ transform:
+
+ translateY(0)
+ scale(1);
+
+
+
+}
+
+
+
+
+.modal-box h2{
+
+
+ font-family:
+
+ var(--font-title);
+
+
+
+ text-align:center;
+
+
+
+ color:
+
+ var(--gold-light);
+
+
+
+ font-size:23px;
+
+
+
+ letter-spacing:2px;
+
+
+
+ margin-bottom:25px;
+
+
+
+}
+
+
+
+
+
+.btn-close-modal{
+
+
+ position:absolute;
+
+
+
+ right:18px;
+
+
+
+ top:18px;
+
+
+
+ width:36px;
+
+
+
+ height:36px;
+
+
+
+ border-radius:50%;
+
+
+
+ border:none;
+
+
+
+ background:
+
+ rgba(239,68,68,.15);
+
+
+
+ color:#fb7185;
+
+
+
+ font-size:25px;
+
+
+
+ cursor:pointer;
+
+
+
+ transition:.25s;
+
+
+
+}
+
+
+
+.btn-close-modal:hover{
+
+
+ transform:
+
+ rotate(90deg);
+
+
+
+ background:
+
+ rgba(239,68,68,.4);
+
+
+
+}
+
+
+
+
+.how-to-list{
+
+
+ color:
+
+ var(--muted);
+
+
+
+ line-height:1.8;
+
+
+
+ font-size:13px;
+
+
+
+}
+
+
+
+.how-to-list b{
+
+
+ color:
+
+ var(--gold-light);
+
+
+
+}
+
+
+
+
+.btn-modal-action{
+
+
+ width:100%;
+
+
+
+ height:48px;
+
+
+
+ margin-top:20px;
+
+
+
+ border:none;
+
+
+
+ border-radius:14px;
+
+
+
+ background:
+
+
+ linear-gradient(
+ 135deg,
+ var(--gold),
+ #92400e
+ );
+
+
+
+ color:#000;
+
+
+
+ font-weight:900;
+
+
+
+ cursor:pointer;
+
+
+
+ transition:.25s;
+
+
+
+}
+
+
+
+.btn-modal-action:hover{
+
+
+ transform:
+
+ translateY(-3px);
+
+
+
+ box-shadow:
+
+
+ 0 15px 35px
+ rgba(234,179,8,.4);
+
+
+
+}
+
+
+
+
+/* ==============================
+ CONFETTI LAYER
+============================== */
+
+
+canvas.confetti{
+
+
+ position:absolute;
+
+
+
+ inset:0;
+
+
+
+ pointer-events:none;
+
+
+
+ z-index:9999;
+
+
+
+}
+
+
+
+/* ==============================
+ DESKTOP MODE
+============================== */
+
+
+@media(min-width:768px){
+
+
+ body{
+
+  padding:20px;
+
+ }
+
+
+ #app-wrapper{
+
+
+  height:
+
+  calc(100dvh - 40px);
+
+
+
+  border-radius:24px;
+
+
+
+  border:
+
+  1px solid
+  rgba(234,179,8,.25);
+
+
+
+ }
+
+
+
+
+ .main-layout{
+
+
+  flex-direction:row;
+
+
+ }
+
+
+
+ .chart-section{
+
+
+  border-right:
+
+  1px solid
+  rgba(234,179,8,.3);
+
+
+
+  border-bottom:none;
+
+
+ }
+
+
+
+ .control-section{
+
+
+  width:390px;
+
+
+
+  padding:26px;
+
+
+
+ }
+
+
+
+ .action-buttons{
+
+
+  flex-direction:column;
+
+
+
+  margin-top:20px;
+
+
+
+ }
+
+
+
+ .btn-trade{
+
+
+  height:75px;
+
+
+
+ }
+
+
+
+}
+
+
+
+
+/* ==============================
+ SMALL MOBILE OPTIMIZATION
+============================== */
+
+
+@media(max-width:420px){
+
+
+
+ .top-bar{
+
+
+  padding-left:12px;
+
+  padding-right:12px;
+
+
+ }
+
+
+
+ .stat-box{
+
+
+  padding:
+
+ 7px 10px;
+
+
+
+ }
+
+
+ .stat-amount{
+
+
+  font-size:14px;
+
+
+
+ }
+
+
+
+ .timer-display{
+
+
+  font-size:34px;
+
+
+
+ }
+
+
+
+ .btn-trade{
+
+
+  height:62px;
+
+
+
+  font-size:14px;
+
+
+
+ }
+
+
+
+ .control-section{
+
+
+  gap:12px;
+
+
+
+  padding:14px;
+
+
+
+ }
+
+
+
+}
+
+</style>
 </head>
-
 <body>
-    <!-- EFFECT -->
-    <canvas id="particleCanvas"></canvas>
-    <canvas id="confettiCanvas"></canvas>
-    <div class="ambient-light"></div>
 
-    <div class="casino-wrapper">
-        <!-- ================= HEADER ================= -->
-        <header class="top-header">
-            <div class="header-left">
-                <button class="btn-back" id="btnExit" onclick="location.reload()">
-                    <i class="fa-solid fa-arrow-left"></i><span>Lobby</span>
-                </button>
-            </div>
-            <div class="header-center">
-                <div class="casino-logo">
-                    <div class="logo-icon"><i class="fa-solid fa-dice"></i></div>
-                    <div class="logo-text">
-                        <h2>Golden Roulette</h2>
-                        <span>LIVE CASINO</span>
-                    </div>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="player-card">
-                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                    <div class="player-info">
-                        <div id="playerName" class="player-name">VIP_Player88</div>
-                        <div class="player-level">VIP MEMBER</div>
-                    </div>
-                </div>
-                <div class="balance-card">
-                    <div class="balance-title">BALANCE</div>
-                    <div class="balance-value" id="displayBalance">50,000</div>
-                </div>
-            </div>
-        </header>
+<div id="app-wrapper">
+  <canvas id="confettiCanvas" class="confetti"></canvas>
 
-        <!-- ================= MAIN ================= -->
-        <main class="main-layout">
-            <!-- ================= LEFT ================= -->
-            <section class="left-panel">
-                <div class="live-banner"><div class="live-dot"></div>LIVE <span>Evolution Style</span></div>
-                <div class="roulette-card">
-                    <div class="wheel-header">
-                        <div>
-                            <h3>LIVE ROULETTE</h3>
-                            <p>European Table</p>
-                        </div>
-                        <div class="table-id">TABLE #01</div>
-                    </div>
-                    
-                    <div class="wheel-wrapper">
-                        <div class="wheel-selector"></div>
-                        <div class="wheel-track" id="wheelTrack">
-                            <!-- Generated By JS -->
-                        </div>
-                    </div>
-
-                    <div class="bet-status">
-                        <div class="status-label" id="statusLabel">PLACE YOUR BETS</div>
-                        <div class="status-timer" id="countdownTimer">--</div>
-                    </div>
-
-                    <div class="history-panel">
-                        <div class="panel-title">LAST RESULTS</div>
-                        <div class="history-list" id="historyList">
-                            <!-- JS Generated -->
-                        </div>
-                    </div>
-
-                    <div class="stats-panel">
-                        <div class="stat-box"><span>Players</span><strong id="playerCount">248</strong></div>
-                        <div class="stat-box"><span>Total Bet Live</span><strong id="totalBetLive">$ 12.4K</strong></div>
-                        <div class="stat-box"><span>RTP</span><strong>96.12%</strong></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ================= RIGHT PANEL ================= -->
-            <section class="right-panel">
-                <div class="board-wrapper">
-                    <div class="table-top">
-                        <div class="table-title"><i class="fa-solid fa-chess-board"></i> BETTING TABLE</div>
-                        <div class="table-subtitle">Choose your lucky number</div>
-                    </div>
-
-                    <div class="betting-board" id="bettingBoard">
-                        <!-- ZERO -->
-                        <div class="bet-spot zero-slot" onclick="placeBet('0')">
-                            <div class="spot-label">0</div>
-                            <div class="chip-placed" id="chip-0" style="display:none;">0</div>
-                        </div>
-                        <!-- Number 1-36 Generated By JS -->
-                    </div>
-
-                    <div class="outside-title">OUTSIDE BET</div>
-                    <div class="outside-board">
-                        <div class="bet-spot outside even" onclick="placeBet('EVEN')">
-                            <span>EVEN</span>
-                            <div id="chip-EVEN" class="chip-placed" style="display:none;">0</div>
-                        </div>
-                        <div class="bet-spot outside odd" onclick="placeBet('ODD')">
-                            <span>ODD</span>
-                            <div id="chip-ODD" class="chip-placed" style="display:none;">0</div>
-                        </div>
-                        <div class="bet-spot outside red" onclick="placeBet('RED')">
-                            <i class="fa-solid fa-diamond"></i><span>RED</span>
-                            <div id="chip-RED" class="chip-placed" style="display:none;">0</div>
-                        </div>
-                        <div class="bet-spot outside black" onclick="placeBet('BLACK')">
-                            <i class="fa-solid fa-diamond"></i><span>BLACK</span>
-                            <div id="chip-BLACK" class="chip-placed" style="display:none;">0</div>
-                        </div>
-                    </div>
-
-                    <div class="live-information">
-                        <div class="info-card">
-                            <div class="info-label">TOTAL BET</div>
-                            <div class="info-value" id="totalBetDisplay">0</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">CURRENT CHIP</div>
-                            <div class="info-value" id="currentChipDisplay">100</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">POSSIBLE WIN</div>
-                            <div class="info-value" id="possibleWin">--</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- ================= CONTROL CONSOLE ================= -->
-        <footer class="casino-console">
-            <div class="console-top">
-                <div class="table-status" id="infoBanner">WAITING FOR BETS</div>
-            </div>
-            
-            <div class="chip-selector">
-                <button class="chip-btn active" onclick="selectChip(100, this)"><div class="chip-face white">100</div></button>
-                <button class="chip-btn" onclick="selectChip(500, this)"><div class="chip-face red">500</div></button>
-                <button class="chip-btn" onclick="selectChip(1000, this)"><div class="chip-face blue">1K</div></button>
-                <button class="chip-btn" onclick="selectChip(5000, this)"><div class="chip-face green">5K</div></button>
-                <button class="chip-btn" onclick="selectChip(10000, this)"><div class="chip-face gold">10K</div></button>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn-clear" id="btnClear" onclick="clearBets()"><i class="fa-solid fa-trash"></i> CLEAR BET</button>
-                <button class="btn-spin" id="btnSpin" onclick="spinWheel()">
-                    <div class="spin-title">SPIN</div>
-                    <div class="spin-value" id="spinTotal">Place Bet First</div>
-                </button>
-            </div>
-        </footer>
+  <header class="top-bar">
+    <button class="btn-back" id="btnExit" onclick="saveAndExit()">◀ KEMBALI</button>
+    <div class="stats-group">
+      <div class="stat-box">
+        <div class="stat-title">SALDO CREDITS</div>
+        <div class="stat-amount" id="displayBalance">0</div>
+      </div>
+      <button class="icon-btn" id="btnSound" onclick="toggleSound()" title="Suara">🔊</button>
+      <button class="icon-btn" onclick="openHelpModal()" title="Cara Main">❓</button>
     </div>
+  </header>
 
-    <!-- ================= RESULT MODAL ================= -->
-    <div class="overlay result-overlay" id="resultModal" onclick="closeResult()">
-        <div class="result-card">
-            <div class="result-title" id="resLabel">WINNING NUMBER</div>
-            <div class="result-number" id="resNumber">0</div>
-            <div class="result-text" id="resText"></div>
-            <div class="tap-text">TAP ANYWHERE TO CONTINUE</div>
+  <div class="main-layout">
+    
+    <div class="chart-section">
+      <div class="chart-toolbar">
+        <div class="toolbar-group">
+          <div class="asset-selector">
+            <span style="color: #f7931a;">₿</span> BTC / USDT ▾
+          </div>
+          <div class="profit-badge">PROFIT 90%</div>
         </div>
+        <div class="toolbar-group">
+          <button class="chart-toggle-btn active" id="btnCandle" onclick="setChartType('CANDLE')">🕯️ CANDLE</button>
+          <button class="chart-toggle-btn" id="btnLine" onclick="setChartType('LINE')">📈 LINE</button>
+        </div>
+      </div>
+
+      <div class="chart-container" id="chartArea">
+        <div class="grid-overlay"></div>
+        <canvas id="tradeCanvas"></canvas>
+        
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        <div class="price-tag" id="priceTag">50000.00</div>
+
+        <div class="result-splash" id="resultSplash">
+          <div class="result-title" id="resultTitle">PROFIT</div>
+          <div class="result-amount" id="resultAmount">+ 0</div>
+        </div>
+      </div>
     </div>
 
-    <!-- ================= LOADING ================= -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-logo"><i class="fa-solid fa-dice"></i></div>
-        <div class="loading-title">GOLDEN ROULETTE</div>
-        <div class="loading-subtitle">LIVE CASINO</div>
-        <div class="loading-bar"><div class="loading-progress" id="loadingProgress"></div></div>
+    <div class="control-section">
+      <div class="time-selector-wrap">
+        <span class="control-label">WAKTU KONTRAK</span>
+        <div class="time-grid">
+          <button class="time-btn" onclick="setDuration(3000, this)">3s</button>
+          <button class="time-btn active" onclick="setDuration(5000, this)">5s</button>
+          <button class="time-btn" onclick="setDuration(15000, this)">15s</button>
+          <button class="time-btn" onclick="setDuration(30000, this)">30s</button>
+          <button class="time-btn" onclick="setDuration(60000, this)">1m</button>
+        </div>
+      </div>
+
+      <div class="bet-control-grid">
+        <span class="control-label" style="margin-top: 5px;">JUMLAH INVESTASI</span>
+        <div class="bet-input-row">
+          <button class="bet-btn-ctrl" id="btnHalf" onclick="adjustBet(0.5)">/2</button>
+          <div class="bet-display-box">
+            <span class="bet-display-val" id="betDisplay">100</span>
+          </div>
+          <button class="bet-btn-ctrl" id="btnDouble" onclick="adjustBet(2)">x2</button>
+        </div>
+
+        <div class="chip-selector">
+          <button class="chip-btn active" onclick="setBetAmount(100, this)">100</button>
+          <button class="chip-btn" onclick="setBetAmount(1000, this)">1K</button>
+          <button class="chip-btn" onclick="setBetAmount(5000, this)">5K</button>
+          <button class="chip-btn" onclick="setBetAmount(10000, this)">10K</button>
+          <button class="chip-btn" onclick="setBetAmount(50000, this)">50K</button>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-trade btn-call" id="btnCall" onclick="placeTrade('CALL')">
+          <span style="font-size: 24px;">📈</span> NAIK (CALL)
+        </button>
+        <button class="btn-trade btn-put" id="btnPut" onclick="placeTrade('PUT')">
+          <span style="font-size: 24px;">📉</span> TURUN (PUT)
+        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- ================= TOAST ================= -->
-    <div class="toast-message" id="toastMessage">Welcome</div>
+  <div class="toast" id="toast"></div>
 
-    <!-- ================= JAVASCRIPT ================= -->
-    <script>
-        /* --- API & GAME LOGIC (Merger dari api.js & casino-premium.js) --- */
-        let balance = 50000;
-        let currentChip = 100;
-        let bets = {}; 
-        let isSpinning = false;
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-box">
+      <button class="btn-close-modal" onclick="closeHelpModal()">×</button>
+      <h2>CARA BERMAIN TRADING VIP</h2>
+      <ol class="how-to-list">
+        <li>Pilih <b>Waktu Kontrak</b> (3 Detik hingga 1 Menit).</li>
+        <li>Tentukan jumlah investasi Anda pada kolom yang tersedia.</li>
+        <li>Prediksi arah pergerakan harga Bitcoin (BTC). Pilih <b>NAIK (CALL)</b> atau <b>TURUN (PUT)</b>.</li>
+        <li>Jika tebakan Anda benar saat waktu habis, Anda mendapatkan pengembalian investasi ditambah <b>Profit 90%</b>!</li>
+      </ol>
+      <button class="btn-modal-action" onclick="closeHelpModal()">SAYA MENGERTI</button>
+    </div>
+  </div>
 
-        const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-        const uiBalance = document.getElementById('displayBalance');
-        const uiTotalBet = document.getElementById('totalBetDisplay');
-        const uiPossibleWin = document.getElementById('possibleWin');
-        const uiSpinTotal = document.getElementById('spinTotal');
-        const toast = document.getElementById('toastMessage');
+</div>
 
-        function formatM(num) { return num.toLocaleString('en-US'); }
-        function showToast(msg) {
-            toast.innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+<script src="api.js"></script>
+<script>
+/**
+ * ==============================================================
+ * 1. AUTH & SETUP
+ * ==============================================================
+ */
+// Mock data untuk keperluan testing UI (Bisa disesuaikan dengan sistem Anda)
+if (!localStorage.getItem('currentUser')) {
+    localStorage.setItem('currentUser', JSON.stringify({username: 'Player1', balance: 100000}));
+}
+const userJson = localStorage.getItem('currentUser');
+let currentUser = JSON.parse(userJson);
+
+// Config
+let playerWinRate = 0.15; // Set win rate (0.15 = 15% kemungkinan menang)
+const MIN_BET = 100;
+const PROFIT_MULTIPLIER = 1.90; 
+const SOUND_KEY = 'trading_sound';
+
+let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
+let tradeDuration = 5000; 
+
+if (typeof api !== 'undefined' && api.getDatabase) {
+  api.getDatabase().then(db => {
+    if (db && db.users) {
+      const freshUser = db.users.find(u => u.username === currentUser.username);
+      if (freshUser) {
+        if (freshUser.winRate !== undefined) playerWinRate = parseFloat(freshUser.winRate) / 100;
+        currentUser.balance = freshUser.balance;
+        updateBalanceUI(false);
+      }
+    }
+  }).catch(e => console.error(e));
+}
+
+async function saveToServer() {
+  if (typeof api !== 'undefined' && api.saveProgress) {
+    try { await api.saveProgress(currentUser.username, currentUser.balance, currentUser.level || 1, currentUser.exp || 0); } 
+    catch(e) { console.error("Gagal save", e); }
+  }
+}
+
+async function saveAndExit() {
+  document.getElementById('btnExit').innerHTML = "SAVING...";
+  await saveToServer();
+  window.location.href = 'index.html';
+}
+
+function updateBalanceUI(bump) {
+  const balEl = document.getElementById('displayBalance');
+  balEl.textContent = currentUser.balance.toLocaleString();
+  if (bump) {
+    balEl.classList.remove('bump'); void balEl.offsetWidth; balEl.classList.add('bump');
+  }
+}
+updateBalanceUI(false);
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function openHelpModal() { document.getElementById('helpModal').classList.add('show'); }
+function closeHelpModal() { document.getElementById('helpModal').classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+});
+
+/**
+ * ==============================================================
+ * SOUND (WebAudio beeps)
+ * ==============================================================
+ */
+let audioCtx = null;
+function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
+function beep(freq, duration, type, gainVal) {
+  if (!soundOn || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.value = freq;
+  gain.gain.value = gainVal || 0.05;
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+  osc.stop(audioCtx.currentTime + duration);
+}
+function sfxClick() { beep(600, 0.1, 'sine', 0.02); }
+function sfxTradeStart() { beep(400, 0.3, 'square', 0.03); }
+function sfxWin() { beep(600, 0.1, 'triangle', 0.05); setTimeout(() => beep(900, 0.2, 'triangle', 0.05), 100); }
+function sfxLoss() { beep(200, 0.4, 'sawtooth', 0.05); }
+
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off');
+  document.getElementById('btnSound').textContent = soundOn ? '🔊' : '🔇';
+  document.getElementById('btnSound').classList.toggle('muted', !soundOn);
+  if (soundOn) ensureAudio();
+}
+document.getElementById('btnSound').textContent = soundOn ? '🔊' : '🔇';
+document.getElementById('btnSound').classList.toggle('muted', !soundOn);
+
+/**
+ * ==============================================================
+ * UI CONTROLS (Bet & Time)
+ * ==============================================================
+ */
+let currentBet = 100;
+let gameState = 'IDLE'; 
+
+function clearChipActive() { document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); }
+
+function setBetAmount(amount, btnEl) {
+  if (gameState !== 'IDLE') return;
+  sfxClick();
+  const cap = currentUser.balance > 0 ? currentUser.balance : amount;
+  currentBet = Math.max(MIN_BET, Math.min(amount, cap));
+  document.getElementById('betDisplay').textContent = currentBet.toLocaleString();
+  clearChipActive();
+  if (btnEl) btnEl.classList.add('active');
+}
+
+function adjustBet(factor) {
+  if (gameState !== 'IDLE') return;
+  sfxClick();
+  let next = Math.floor(currentBet * factor);
+  if (next < MIN_BET) next = MIN_BET;
+  if (next > currentUser.balance) next = currentUser.balance > 0 ? currentUser.balance : MIN_BET;
+  currentBet = next;
+  document.getElementById('betDisplay').textContent = currentBet.toLocaleString();
+  clearChipActive();
+}
+
+function setDuration(ms, btnEl) {
+  if (gameState !== 'IDLE') return;
+  sfxClick();
+  tradeDuration = ms;
+  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+}
+
+function setControlsEnabled(enabled) {
+  document.querySelectorAll('.chip-btn, .bet-btn-ctrl, .time-btn').forEach(b => b.disabled = !enabled);
+  document.getElementById('btnCall').disabled = !enabled;
+  document.getElementById('btnPut').disabled = !enabled;
+}
+
+/**
+ * ==============================================================
+ * REVISED CHART ENGINE (SOLID OHLC CANDLES, FIXED WIDTH, SMOOTH SCROLL)
+ * ==============================================================
+ */
+const canvas = document.getElementById('tradeCanvas');
+const ctx = canvas.getContext('2d');
+let animFrame;
+let chartType = 'CANDLE'; 
+
+function setChartType(type) {
+  chartType = type;
+  document.getElementById('btnCandle').classList.toggle('active', type === 'CANDLE');
+  document.getElementById('btnLine').classList.toggle('active', type === 'LINE');
+}
+
+// Chart Configurations
+let currentPrice = 50000.00;
+const MAX_CANDLES = 20; // Kunci tepat 20 Candle Tampil di layar
+const CANDLE_PERIOD = 1000; // 1 Detik per 1 Candle terbentuk
+
+let candles = []; 
+let currentCandle = null;
+
+let tradeEntryPrice = 0;
+let tradeDirection = ''; 
+let isWinRound = false;
+let tradeStartTime = 0;
+
+function resizeCanvas() {
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Fungsi untuk membuat/memperbarui history Candle secara solid
+function updatePriceTick(price, now) {
+  if (!currentCandle) return;
+  
+  if (now - currentCandle.openTime >= CANDLE_PERIOD) {
+    // Tutup candle lama, Buka candle baru (Tidak akan berubah bentuk lagi)
+    let newCandle = {
+      openTime: currentCandle.openTime + CANDLE_PERIOD,
+      o: currentCandle.c,
+      h: currentCandle.c,
+      l: currentCandle.c,
+      c: price
+    };
+    candles.push(newCandle);
+    if (candles.length > MAX_CANDLES) {
+      candles.shift(); // Buang yang paling tua, jaga tetap 20
+    }
+    currentCandle = newCandle;
+  } else {
+    // Update live candle (candle ke 20 yg sedang berjalan)
+    currentCandle.c = price;
+    if (price > currentCandle.h) currentCandle.h = price;
+    if (price < currentCandle.l) currentCandle.l = price;
+  }
+}
+
+function drawChart(now) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (candles.length === 0) return;
+
+  const paddingTop = canvas.height * 0.15;
+  const paddingBottom = canvas.height * 0.15;
+  const renderHeight = canvas.height - paddingTop - paddingBottom;
+
+  // Find Min/Max dynamically dari seluruh kumpulan candle
+  let minP = Math.min(...candles.map(c => c.l));
+  let maxP = Math.max(...candles.map(c => c.h));
+  let paddingY = (maxP - minP) * 0.2;
+  if (paddingY < 5) paddingY = 5;
+  
+  const scaleY = (val) => {
+    let normalized = (val - (minP - paddingY)) / ((maxP + paddingY) - (minP - paddingY));
+    return canvas.height - paddingBottom - (normalized * renderHeight);
+  };
+
+  // Kalkulasi lebar tiap candle dan efek Smooth Scrolling
+  const candleSpacing = canvas.width / MAX_CANDLES;
+  const candleWidth = candleSpacing * 0.7; // Lebar badan candle
+  
+  // Efek geser layar perlahan ke kiri (berdasarkan milidetik yg sudah berjalan di candle saat ini)
+  let elapsedInCandle = now - currentCandle.openTime;
+  let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
+  
+  let baseX = canvas.width - (candleSpacing / 2); // Titik mulai dari kanan mentok
+
+  // Hitung posisi kursor saat ini (Glow putih)
+  let lastX = baseX - shiftX;
+  let lastY = scaleY(currentCandle.c);
+
+  // Draw Entry Line & Shaded Area jika sedang TRADING
+  if (gameState === 'TRADING') {
+    const entryY = scaleY(tradeEntryPrice);
+    
+    ctx.fillStyle = tradeDirection === 'CALL' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+    if (tradeDirection === 'CALL') {
+      ctx.fillRect(0, 0, canvas.width, entryY);
+    } else {
+      ctx.fillRect(0, entryY, canvas.width, canvas.height);
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(0, entryY);
+    ctx.lineTo(canvas.width, entryY);
+    ctx.strokeStyle = tradeDirection === 'CALL' ? '#10b981' : '#ef4444';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = tradeDirection === 'CALL' ? '#10b981' : '#ef4444';
+    ctx.font = 'bold 12px Montserrat';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${tradeDirection} ENTRY: ${tradeEntryPrice.toFixed(2)}`, 10, entryY - 8);
+  }
+
+  // Warna indikator utama saat trade berjalan
+  let activeColor = '#3b82f6';
+  if (gameState === 'TRADING') {
+    activeColor = (currentPrice >= tradeEntryPrice) ? '#10b981' : '#ef4444';
+  }
+
+  if (chartType === 'LINE') {
+    // DRAW LINE CHART
+    ctx.beginPath();
+    for (let i = 0; i < candles.length; i++) {
+      let offsetIndex = (candles.length - 1 - i);
+      let x = baseX - (offsetIndex * candleSpacing) - shiftX;
+      let y = scaleY(candles[i].c);
+      
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+
+    ctx.strokeStyle = activeColor;
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    ctx.lineTo(lastX, canvas.height);
+    ctx.lineTo(baseX - ((candles.length - 1) * candleSpacing) - shiftX, canvas.height);
+    ctx.closePath();
+    let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, activeColor + '40');
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+  } else {
+    // DRAW SOLID CANDLESTICK CHART
+    for (let i = 0; i < candles.length; i++) {
+      let c = candles[i];
+      let isGreen = c.c >= c.o;
+      let color = isGreen ? '#10b981' : '#ef4444'; 
+      
+      let offsetIndex = (candles.length - 1 - i);
+      let x = baseX - (offsetIndex * candleSpacing) - shiftX;
+      
+      let yOpen = scaleY(c.o);
+      let yClose = scaleY(c.c);
+      let yHigh = scaleY(c.h);
+      let yLow = scaleY(c.l);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 1.5;
+
+      // Draw Wick (Sumbu panjang)
+      ctx.beginPath();
+      ctx.moveTo(x, yHigh);
+      ctx.lineTo(x, yLow);
+      ctx.stroke();
+
+      // Draw Body (Badan padat)
+      const bodyY = Math.min(yOpen, yClose);
+      let bodyH = Math.abs(yOpen - yClose);
+      if (bodyH < 2) bodyH = 2; // Paksa tebal minimal 2px jika doji
+      
+      ctx.fillRect(x - (candleWidth / 2), bodyY, candleWidth, bodyH);
+    }
+  }
+
+  // Draw Titik Glow pada harga terakhir (ujung kanan)
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 5, 0, Math.PI*2);
+  ctx.fillStyle = '#fff';
+  ctx.shadowColor = activeColor;
+  ctx.shadowBlur = 15;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Update Badge Label Harga UI
+  const tag = document.getElementById('priceTag');
+  tag.textContent = currentPrice.toFixed(2);
+  tag.style.top = `${lastY}px`;
+  tag.className = 'price-tag ' + ((gameState === 'TRADING' && currentPrice >= tradeEntryPrice) ? 'up' : (gameState === 'TRADING' ? 'down' : ''));
+}
+
+/**
+ * ==============================================================
+ * GAME LOOP & LOGIKA "BANDAR SPIKE" (RTP)
+ * ==============================================================
+ */
+let lastTickTime = performance.now();
+
+function gameLoop(now) {
+  let dt = now - lastTickTime;
+  
+  // Update harga dilakukan setiap 150ms agar santai
+  if (dt > 150) {
+    let volatility = 0.8; 
+    let bias = 0;
+    
+    if (gameState === 'IDLE') {
+      currentPrice += (Math.random() - 0.5) * volatility; 
+    } 
+    else if (gameState === 'TRADING') {
+      let elapsed = now - tradeStartTime;
+      if (elapsed >= tradeDuration) {
+        finishTrade();
+        return; 
+      }
+
+      let progress = elapsed / tradeDuration;
+      let noise = (Math.random() - 0.5) * (volatility * 0.8);
+
+      // ALGORITMA "GOCEKAN BANDAR" (LAST-SECOND SPIKE)
+      if (progress < 0.8) {
+        // FASE 1 (80% waktu awal): Harapan Palsu
+        let fakeHope = (Math.random() - 0.5) * 1.5;
+        bias = fakeHope;
+      } else {
+        // FASE 2 (20% waktu akhir): Eksekusi Brutal RTP
+        let spikeMagnitude = 3.0 + (Math.random() * 3.0); 
+        let urgency = (progress - 0.8) * 5; // Eksponensial dari 0 ke 1
+
+        if (isWinRound) {
+          bias = (tradeDirection === 'CALL' ? spikeMagnitude : -spikeMagnitude) * urgency;
+        } else {
+          bias = (tradeDirection === 'CALL' ? -spikeMagnitude : spikeMagnitude) * urgency;
         }
+      }
+      
+      currentPrice = tradeEntryPrice + bias + noise;
+    }
+    
+    updatePriceTick(currentPrice, now);
+    lastTickTime = now;
+  }
 
-        function getColor(num) {
-            if(num === 0) return 'green';
-            return redNums.includes(num) ? 'red' : 'black';
-        }
+  if (gameState === 'TRADING') {
+    let elapsed = now - tradeStartTime;
+    let remaining = Math.max(0, tradeDuration - elapsed);
+    let seconds = Math.ceil(remaining / 1000);
+    document.getElementById('timerDisplay').textContent = `00:${seconds.toString().padStart(2, '0')}`;
+  }
 
-        // INIT BOARD 1-36
-        function initBoard() {
-            const board = document.getElementById('bettingBoard');
-            // European Board Layout order (Col 1: 3,6,9... Col 2: 2,5,8... Col 3: 1,4,7...)
-            for(let col = 1; col <= 12; col++) {
-                for(let row = 3; row >= 1; row--) {
-                    let num = (col - 1) * 3 + row;
-                    let colorClass = redNums.includes(num) ? 'spot-red' : 'spot-black';
-                    
-                    let spot = document.createElement('div');
-                    spot.className = `bet-spot ${colorClass}`;
-                    spot.onclick = () => placeBet(num.toString());
-                    spot.innerHTML = `
-                        <div class="spot-label">${num}</div>
-                        <div class="chip-placed" id="chip-${num}" style="display:none;">0</div>
-                    `;
-                    // CSS grid positioning
-                    spot.style.gridColumn = col + 1;
-                    spot.style.gridRow = (4 - row);
-                    board.appendChild(spot);
-                }
-            }
-        }
+  drawChart(now);
+  animFrame = requestAnimationFrame(gameLoop);
+}
 
-        // INIT WHEEL TRACK
-        function initWheel() {
-            const track = document.getElementById('wheelTrack');
-            const sequence = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
-            // Repeat sequence to simulate endless spinning
-            for(let i=0; i<3; i++) {
-                sequence.forEach(num => {
-                    let div = document.createElement('div');
-                    div.className = `wheel-num ${getColor(num)}`;
-                    div.innerText = num;
-                    track.appendChild(div);
-                });
-            }
-        }
+// Inisialisasi awal agar grafik sudah terisi penuh 20 candle saat web dibuka
+let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
+for(let i=0; i<MAX_CANDLES; i++) {
+  let cOpen = currentPrice;
+  let cClose = cOpen + ((Math.random() - 0.5) * 3);
+  candles.push({
+    openTime: initTime,
+    o: cOpen,
+    h: Math.max(cOpen, cClose) + (Math.random() * 1.5),
+    l: Math.min(cOpen, cClose) - (Math.random() * 1.5),
+    c: cClose
+  });
+  currentPrice = cClose;
+  initTime += CANDLE_PERIOD;
+}
+currentCandle = candles[candles.length - 1];
+currentCandle.openTime = performance.now();
 
-        function selectChip(amount, btnElement) {
-            if(isSpinning) return;
-            currentChip = amount;
-            document.getElementById('currentChipDisplay').innerText = formatM(amount);
-            document.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-        }
+animFrame = requestAnimationFrame(gameLoop);
 
-        function placeBet(spotId) {
-            if(isSpinning) { showToast("Wait for next round!"); return; }
-            if(balance < currentChip) { showToast("Insufficient Balance!"); return; }
+/**
+ * ==============================================================
+ * TRADING LOGIC
+ * ==============================================================
+ */
+function placeTrade(direction) {
+  ensureAudio();
+  if (gameState !== 'IDLE') return;
+  if (currentUser.balance < MIN_BET) return showToast('Saldo habis! Silakan Deposit.');
+  if (currentBet > currentUser.balance) return showToast('Saldo tidak cukup!');
+  
+  sfxTradeStart();
+  currentUser.balance -= currentBet;
+  updateBalanceUI(true);
+  setControlsEnabled(false);
+  
+  gameState = 'TRADING';
+  tradeDirection = direction;
+  tradeEntryPrice = currentPrice;
+  tradeStartTime = performance.now();
+  
+  document.getElementById('resultSplash').classList.remove('show');
+  document.getElementById('timerDisplay').classList.add('active');
 
-            balance -= currentChip;
-            if(!bets[spotId]) bets[spotId] = 0;
-            bets[spotId] += currentChip;
+  isWinRound = Math.random() < playerWinRate;
+}
 
-            updateUI();
-            
-            const chipUI = document.getElementById(`chip-${spotId}`);
-            chipUI.style.display = 'flex';
-            
-            let displayVal = bets[spotId] >= 1000 ? (bets[spotId]/1000)+'K' : bets[spotId];
-            chipUI.innerText = displayVal;
-            
-            // Bounce anim
-            chipUI.style.transform = 'scale(1.5)';
-            setTimeout(() => chipUI.style.transform = 'scale(1)', 150);
-        }
+function finishTrade() {
+  gameState = 'RESULT';
+  document.getElementById('timerDisplay').classList.remove('active');
+  document.getElementById('timerDisplay').textContent = `00:00`;
+  
+  // Safety Net Jaga-jaga jika kalkulasi float visual meleset (tanpa efek loncat kasar)
+  if (isWinRound) {
+    if (tradeDirection === 'CALL' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 0.1;
+    if (tradeDirection === 'PUT' && currentPrice >= tradeEntryPrice) currentPrice = tradeEntryPrice - 0.1;
+  } else {
+    if (tradeDirection === 'CALL' && currentPrice >= tradeEntryPrice) currentPrice = tradeEntryPrice - 0.1;
+    if (tradeDirection === 'PUT' && currentPrice <= tradeEntryPrice) currentPrice = tradeEntryPrice + 0.1;
+  }
+  
+  updatePriceTick(currentPrice, performance.now());
+  drawChart(performance.now()); 
 
-        function clearBets() {
-            if(isSpinning) return;
-            let totalBetted = Object.values(bets).reduce((a, b) => a + b, 0);
-            balance += totalBetted;
-            bets = {};
-            
-            document.querySelectorAll('.chip-placed').forEach(chip => {
-                chip.style.display = 'none';
-                chip.innerText = '0';
-            });
-            updateUI();
-            showToast("Bets Cleared");
-        }
+  const won = (tradeDirection === 'CALL' && currentPrice > tradeEntryPrice) || 
+              (tradeDirection === 'PUT' && currentPrice < tradeEntryPrice);
 
-        function updateUI() {
-            uiBalance.innerText = formatM(balance);
-            let total = Object.values(bets).reduce((a, b) => a + b, 0);
-            uiTotalBet.innerText = formatM(total);
-            uiSpinTotal.innerText = total > 0 ? `Total: ${formatM(total)}` : "Place Bet First";
-            
-            // Calculate dummy possible win (Max payout 36x)
-            let highestBet = Math.max(0, ...Object.values(bets));
-            uiPossibleWin.innerText = highestBet > 0 ? formatM(highestBet * 36) : "--";
-        }
+  const splash = document.getElementById('resultSplash');
+  const title = document.getElementById('resultTitle');
+  const amt = document.getElementById('resultAmount');
 
-        function spinWheel() {
-            let totalBet = Object.values(bets).reduce((a, b) => a + b, 0);
-            if(totalBet === 0) { showToast("Please place a bet first!"); return; }
-            if(isSpinning) return;
+  if (won) {
+    sfxWin();
+    const winAmount = Math.floor(currentBet * PROFIT_MULTIPLIER);
+    currentUser.balance += winAmount;
+    updateBalanceUI(true);
+    
+    title.textContent = 'PROFIT SUKSES';
+    title.className = 'result-title win-text';
+    amt.textContent = `+ ${winAmount.toLocaleString()}`;
+    amt.className = 'result-amount win-text';
+    confettiEngine.burst(50);
+  } else {
+    sfxLoss();
+    title.textContent = 'LOSS';
+    title.className = 'result-title loss-text';
+    amt.textContent = `- ${currentBet.toLocaleString()}`;
+    amt.className = 'result-amount loss-text';
+  }
 
-            isSpinning = true;
-            document.getElementById('statusLabel').innerText = "NO MORE BETS";
-            document.getElementById('infoBanner').innerText = "WHEEL IS SPINNING...";
-            document.getElementById('infoBanner').style.color = "#e74c3c";
+  splash.classList.add('show');
+  saveToServer();
 
-            // Visual Spin Animation
-            const track = document.getElementById('wheelTrack');
-            // Random index from middle set of sequences
-            const resultIndex = Math.floor(Math.random() * 37) + 37; 
-            const itemWidth = 55; // 50px width + 5px gap
-            
-            // Translate track
-            const offset = (resultIndex * itemWidth) - (document.querySelector('.wheel-wrapper').offsetWidth / 2) + 25;
-            track.style.transform = `translateX(-${offset}px)`;
+  setTimeout(() => {
+    splash.classList.remove('show');
+    gameState = 'IDLE';
+    setControlsEnabled(true);
+    lastTickTime = performance.now(); 
+    animFrame = requestAnimationFrame(gameLoop); 
+  }, 3000);
+}
 
-            // Get Winning Number from text context of the selected div
-            setTimeout(() => {
-                const targetDiv = track.children[resultIndex];
-                const winningNum = parseInt(targetDiv.innerText);
-                resolveGame(winningNum);
-            }, 3000);
-        }
+/**
+ * ==============================================================
+ * CONFETTI ENGINE
+ * ==============================================================
+ */
+const confettiEngine = {
+  canvas: document.getElementById('confettiCanvas'), ctx: null, parts: [],
+  colors: ['#10b981', '#34d399', '#fef08a', '#ffffff'],
+  init() { this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); this.run(); },
+  resize() { 
+    const wrapper = document.getElementById('app-wrapper');
+    this.canvas.width = wrapper.clientWidth; 
+    this.canvas.height = wrapper.clientHeight; 
+  },
+  burst(count) {
+    for (let i = 0; i < count; i++) {
+      this.parts.push({
+        x: this.canvas.width / 2, y: this.canvas.height / 2, vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 1) * 30,
+        size: Math.random() * 8 + 4, color: this.colors[Math.floor(Math.random() * this.colors.length)], rot: Math.random() * 360, rotSpd: (Math.random() - 0.5) * 20, life: 1
+      });
+    }
+  },
+  run() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    for (let i = this.parts.length - 1; i >= 0; i--) {
+      let p = this.parts[i];
+      p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
+      this.ctx.save(); this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rot * Math.PI / 180);
+      this.ctx.fillStyle = p.color; this.ctx.globalAlpha = Math.max(p.life, 0);
+      this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size); this.ctx.restore();
+      if (p.y > this.canvas.height || p.life <= 0) this.parts.splice(i, 1);
+    }
+    requestAnimationFrame(() => this.run());
+  }
+};
+confettiEngine.init();
 
-        function resolveGame(winningNum) {
-            let winAmount = 0;
-            const winColor = getColor(winningNum);
-            
-            // Check Number Bet (36x)
-            if(bets[winningNum]) winAmount += bets[winningNum] * 36;
-            
-            // Check Outside Bets (2x)
-            if(bets['RED'] && winColor === 'red') winAmount += bets['RED'] * 2;
-            if(bets['BLACK'] && winColor === 'black') winAmount += bets['BLACK'] * 2;
-            if(bets['EVEN'] && winningNum !== 0 && winningNum % 2 === 0) winAmount += bets['EVEN'] * 2;
-            if(bets['ODD'] && winningNum !== 0 && winningNum % 2 !== 0) winAmount += bets['ODD'] * 2;
-
-            // Show Result
-            const modal = document.getElementById('resultModal');
-            const resNum = document.getElementById('resNumber');
-            resNum.innerText = winningNum;
-            resNum.className = `result-number res-${winColor}`;
-            
-            const resText = document.getElementById('resText');
-            if(winAmount > 0) {
-                balance += winAmount;
-                resText.innerText = `YOU WON ${formatM(winAmount)}!`;
-                resText.style.color = "#2ecc71";
-            } else {
-                resText.innerText = "NO WIN THIS TIME";
-                resText.style.color = "#e74c3c";
-            }
-            
-            modal.classList.add('active');
-            updateHistory(winningNum, winColor);
-            
-            // Reset for next round
-            bets = {};
-            updateUI();
-            document.querySelectorAll('.chip-placed').forEach(chip => chip.style.display = 'none');
-        }
-
-        function closeResult() {
-            document.getElementById('resultModal').classList.remove('active');
-            document.getElementById('statusLabel').innerText = "PLACE YOUR BETS";
-            document.getElementById('infoBanner').innerText = "WAITING FOR BETS";
-            document.getElementById('infoBanner').style.color = "var(--gold)";
-            
-            // Reset track without animation
-            const track = document.getElementById('wheelTrack');
-            track.style.transition = 'none';
-            track.style.transform = 'translateX(0px)';
-            setTimeout(() => {
-                track.style.transition = 'transform 3s cubic-bezier(0.1, 0.7, 0.1, 1)';
-                isSpinning = false;
-            }, 50);
-        }
-
-        function updateHistory(num, color) {
-            const histList = document.getElementById('historyList');
-            let div = document.createElement('div');
-            let bg = color === 'red' ? '#c0392b' : color === 'black' ? '#2c3e50' : '#27ae60';
-            div.className = 'hist-item';
-            div.style.background = bg;
-            div.style.color = '#fff';
-            div.innerText = num;
-            histList.prepend(div);
-            if(histList.children.length > 10) histList.removeChild(histList.lastChild);
-        }
-
-        // APP INIT
-        window.onload = () => {
-            initBoard();
-            initWheel();
-            updateUI();
-            
-            // Loading Screen Animation
-            setTimeout(() => {
-                document.getElementById('loadingProgress').style.width = '100%';
-                setTimeout(() => {
-                    document.getElementById('loadingScreen').style.opacity = '0';
-                    setTimeout(() => document.getElementById('loadingScreen').style.display = 'none', 500);
-                    showToast("Welcome to Golden Roulette!");
-                }, 2000);
-            }, 100);
-            
-            // Initial History Mock
-            [32, 0, 15, 19, 4].forEach(n => updateHistory(n, getColor(n)));
-        };
-
-        // Simple Ambient Particle Canvas (Cosmetic)
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        let particles = [];
-        for(let i=0; i<30; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                r: Math.random() * 2 + 1,
-                dx: (Math.random() - 0.5) * 0.5,
-                dy: Math.random() * -1 - 0.5
-            });
-        }
-        function animateParticles() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
-            particles.forEach(p => {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fill();
-                p.x += p.dx; p.y += p.dy;
-                if(p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-    </script>
+</script>
 </body>
 </html>
