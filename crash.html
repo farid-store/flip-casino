@@ -513,7 +513,7 @@
 <script>
 /**
  * ==============================================================
- * 1. AUTH, SETUP & API INTEGRATION (LOGIKA UTUH)
+ * 1. AUTH, SETUP & API INTEGRATION
  * ==============================================================
  */
 const userJson = localStorage.getItem('currentUser');
@@ -794,7 +794,7 @@ function handleAction() {
 
 /**
  * ==============================================================
- * STRICT RTP ENGINE (LOGIKA UTUH)
+ * STRICT RTP ENGINE
  * ==============================================================
  */
 function calculateCrashPoint() {
@@ -855,7 +855,7 @@ requestAnimationFrame(renderStars);
 
 /**
  * ==============================================================
- * CANVAS ANIMATION: CHART & GLOWING LINE (Neon Blue Theme)
+ * CANVAS ANIMATION & CORE LOOP (Fixed Auto Cashout Freeze)
  * ==============================================================
  */
 const canvas = document.getElementById('crashCanvas');
@@ -887,16 +887,14 @@ function drawGraph(elapsedMs) {
     let cpY = canvas.height;
     ctx.quadraticCurveTo(cpX, cpY, progressX, progressY);
 
-    // Style Garis
     if (gameState === 'CRASHED') ctx.strokeStyle = 'transparent';
-    else if (gameState === 'CASHED_OUT') ctx.strokeStyle = '#64748b'; // Muted
-    else ctx.strokeStyle = '#00e5ff'; // Neon Blue
+    else if (gameState === 'CASHED_OUT') ctx.strokeStyle = '#64748b'; 
+    else ctx.strokeStyle = '#00e5ff'; 
 
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Fill Gradien dibawah garis
     if (gameState !== 'CRASHED') {
       ctx.lineTo(progressX, canvas.height);
       ctx.lineTo(0, canvas.height);
@@ -911,7 +909,6 @@ function drawGraph(elapsedMs) {
       ctx.fill();
     }
 
-    // Rocket / Point Animation
     let angle = Math.atan2(progressY - cpY, progressX - cpX);
     ctx.save();
     ctx.translate(progressX, progressY);
@@ -923,7 +920,6 @@ function drawGraph(elapsedMs) {
       ctx.fillText("💥", 0, 0);
     } else {
       ctx.rotate(angle);
-      // Glow dot
       ctx.beginPath();
       ctx.arc(0, 0, 6, 0, Math.PI*2);
       ctx.fillStyle = gameState === 'CASHED_OUT' ? '#e2e8f0' : '#fff';
@@ -948,9 +944,9 @@ function updateMultiplierColor() {
     multText.className = 'multiplier-text crashed-text';
   } else {
     let colorClass = 'mult-tier-1';
-    if (currentMultiplier >= 10) colorClass = 'mult-tier-4'; // Gold
-    else if (currentMultiplier >= 5) colorClass = 'mult-tier-3'; // Neon Pink
-    else if (currentMultiplier >= 2) colorClass = 'mult-tier-2'; // Neon Blue
+    if (currentMultiplier >= 10) colorClass = 'mult-tier-4'; 
+    else if (currentMultiplier >= 5) colorClass = 'mult-tier-3'; 
+    else if (currentMultiplier >= 2) colorClass = 'mult-tier-2'; 
     multText.className = `multiplier-text ${colorClass}`;
   }
 }
@@ -984,19 +980,21 @@ function startRound() {
     const wholeSecond = Math.floor(elapsed / 1000);
     if (wholeSecond !== lastTickSecond) { lastTickSecond = wholeSecond; sfxTick(); }
 
+    // --- FIX: LOGIKA AUTO CASHOUT AGAR TIDAK FREEZE ---
     if (autoArmed && !autoTriggered && currentMultiplier >= getAutoTarget()) {
       autoTriggered = true;
-      currentMultiplier = getAutoTarget();
-      cashOut();
-      drawGraph(elapsed);
-      return;
+      let realMultiplier = currentMultiplier; // Simpan progres aslinya
+      currentMultiplier = getAutoTarget(); // Set sesuai target auto
+      cashOut(); 
+      currentMultiplier = realMultiplier; // Kembalikan agar roket tetap terbang
     }
 
+    // --- LOGIKA ROKET MELEDAK ---
     if (currentMultiplier >= crashPoint) {
       currentMultiplier = crashPoint;
       crashRound();
       drawGraph(elapsed);
-      return;
+      return; 
     }
 
     multText.textContent = currentMultiplier.toFixed(2) + 'x';
@@ -1086,7 +1084,13 @@ function resetBoard() {
 
   const btn = document.getElementById('mainBtn');
   btn.className = 'btn-action-main btn-bet';
-  btn.innerHTML = 'MULAI TARUHAN';
+  
+  if (mode === 'auto' && autoEnabled) {
+    btn.innerHTML = `AUTO ARMED @ ${getAutoTarget().toFixed(2)}x`;
+    btn.className = 'btn-action-main btn-auto-armed';
+  } else {
+    btn.innerHTML = 'MULAI TARUHAN';
+  }
 }
 
 /**
