@@ -12,20 +12,22 @@
      CSS VARIABLES - TEMA KASINO VIP PREMIUM
      ========================================= */
   :root {
-    --bg-base: #0a0a0c;
-    --bg-panel: #121418;
-    --bg-glass: rgba(18, 20, 24, 0.85);
-    --gold-light: #fef08a;
-    --gold-main: #eab308;
-    --gold-dark: #a16207;
-    --gold-glow: rgba(234, 179, 8, 0.4);
-    --text-light: #f8fafc;
-    --text-muted: #94a3b8;
+    --bg-base: #040404;
+    --bg-panel: #161b22;
+    --bg-glass: rgba(255, 255, 255, 0.05);
     
-    --danger: #e11d48;
-    --danger-dark: #9f1239;
-    --success: #10b981;
-    --success-dark: #047857;
+    --gold-light: #FFD700;
+    --gold-main: #F8C851;
+    --gold-dark: #B8860B;
+    --gold-glow: 0 0 20px rgba(255, 215, 0, 0.3);
+    
+    --text-light: #E8EDF5;
+    --text-muted: #93A3B8;
+    
+    --danger: #D92D43;
+    --danger-dark: #8E1024;
+    --success: #1FC66A;
+    --success-dark: #0B8E46;
     
     --font-title: 'Cinzel', serif;
     --font-ui: 'Montserrat', sans-serif;
@@ -35,7 +37,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #1e2532 0%, var(--bg-base) 100%);
+    background: radial-gradient(circle at top, #1f2430 0%, #090b10 40%, var(--bg-base) 100%);
     color: var(--text-light);
     font-family: var(--font-ui);
     height: 100dvh;
@@ -44,208 +46,255 @@
     overflow: hidden;
   }
 
+  /* AMBIENT EFFECTS */
+  .background-noise {
+    position: fixed; inset: 0; opacity: 0.05;
+    background-image: radial-gradient(#ffffff 1px, transparent 1px);
+    background-size: 5px 5px; pointer-events: none; z-index: 1;
+  }
+  .ambient-light {
+    position: fixed; width: 900px; height: 900px; left: 50%; top: -450px;
+    transform: translateX(-50%); background: radial-gradient(circle, rgba(255,215,0,0.12), transparent 70%);
+    filter: blur(40px); animation: ambientMove 10s ease-in-out infinite; pointer-events: none; z-index: 0;
+  }
+  @keyframes ambientMove { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.2); } }
+  canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+
   /* =========================================
-     TOP BAR
+     TOP BAR (PREMIUM GLASS)
      ========================================= */
   .top-bar {
-    background: var(--bg-glass); 
-    backdrop-filter: blur(16px); 
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(234, 179, 8, 0.2);
-    padding: calc(10px + env(safe-area-inset-top)) 20px 10px;
+    background: linear-gradient(180deg, rgba(25,28,35,0.96), rgba(12,15,20,0.94));
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.08);
+    padding: calc(10px + env(safe-area-inset-top)) 24px 10px;
     display: flex; justify-content: space-between; align-items: center; z-index: 100;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
   }
   
   .btn-back { 
-    background: transparent; border: 1px solid var(--danger); color: var(--danger); 
-    padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 11px; 
-    cursor: pointer; text-transform: uppercase; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 1px;
+    background: linear-gradient(180deg, #262d39, #171d26); border: 1px solid rgba(255,255,255,0.08); 
+    color: #fff; padding: 10px 22px; border-radius: 14px; font-weight: 700; font-size: 11px; 
+    cursor: pointer; text-transform: uppercase; transition: 0.25s; letter-spacing: 1px;
   }
   .btn-back:hover, .btn-back:active { 
-    background: var(--danger); color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.5); transform: scale(0.95);
+    border-color: var(--gold-light); box-shadow: 0 0 25px rgba(255,215,0,0.25); transform: translateY(-2px);
   }
   
-  .balance-display { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
-  .balance-title { font-size: 10px; color: var(--text-muted); font-weight: 700; letter-spacing: 2px; margin-bottom: 2px;}
-  .balance-amount { font-family: var(--font-digital); font-size: 20px; color: var(--gold-light); text-shadow: 0 0 12px var(--gold-glow); font-weight: 900;}
+  .balance-display { 
+    background: linear-gradient(180deg, rgba(255,215,0,0.08), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,215,0,0.15); padding: 8px 16px; border-radius: 16px;
+    text-align: right; display: flex; flex-direction: column; align-items: flex-end; min-width: 150px;
+  }
+  .balance-title { font-size: 10px; color: var(--text-muted); font-weight: 700; letter-spacing: 3px; margin-bottom: 2px;}
+  .balance-amount { font-family: var(--font-digital); font-size: 22px; color: var(--gold-light); text-shadow: var(--gold-glow); font-weight: 900;}
 
   /* =========================================
-     MAIN GAME LAYOUT (RESPONSIVE 2 COLUMNS)
+     MAIN GAME LAYOUT
      ========================================= */
-  .game-layout {
-    display: flex; flex-direction: column; flex: 1; overflow: hidden;
-  }
+  .game-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; z-index: 5; }
   
-  /* KIRI: ROULETTE WHEEL */
+  /* KIRI: ROULETTE WHEEL & STATS */
   .left-pane {
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    background: #000; border-bottom: 2px solid var(--gold-dark); position: relative;
-    padding: 20px 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+    border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; padding: 25px 20px 10px; gap: 15px;
   }
   
   .live-indicator {
     position: absolute; top: 15px; left: 20px;
-    font-family: var(--font-digital); font-size: 11px; color: var(--danger); font-weight: bold; letter-spacing: 2px;
-    display: flex; align-items: center; gap: 6px; z-index: 50; text-shadow: 0 0 10px rgba(225, 29, 72, 0.8);
+    background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.25); border-radius: 14px;
+    padding: 6px 14px; font-family: var(--font-digital); font-size: 11px; color: #fff; 
+    font-weight: bold; letter-spacing: 2px; display: flex; align-items: center; gap: 8px;
   }
-  .live-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; animation: blink 1s infinite alternate; box-shadow: 0 0 8px var(--danger);}
+  .live-dot { width: 10px; height: 10px; background: #ff2c55; border-radius: 50%; box-shadow: 0 0 15px #ff2c55; animation: liveBlink 0.9s infinite alternate;}
+  @keyframes liveBlink { from { opacity: 1; } to { opacity: 0.2; } }
 
   .wheel-wrapper {
-    position: relative; width: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    position: relative; width: 100%; height: 140px; border-radius: 20px; overflow: hidden;
+    background: #080909; display: flex; justify-content: center; align-items: center;
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.4);
   }
-  .wheel-wrapper::before, .wheel-wrapper::after {
-    content: ''; position: absolute; top: 0; bottom: 0; width: 60px; z-index: 15; pointer-events: none;
-  }
-  .wheel-wrapper::before { left: 0; background: linear-gradient(90deg, #000 0%, transparent 100%); }
-  .wheel-wrapper::after { right: 0; background: linear-gradient(-90deg, #000 0%, transparent 100%); }
-
-  .wheel-container {
-    width: 100%; padding: 20px 0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.9); height: 110px;
-  }
+  .wheel-shadow { position: absolute; inset: 0; background: radial-gradient(circle, transparent 45%, rgba(0,0,0,0.65)); pointer-events: none; z-index: 10; }
+  
+  .wheel-container { width: 100%; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100%; perspective: 1000px;}
   .wheel-selector {
-    position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; background: #fff; z-index: 20; 
-    box-shadow: 0 0 15px var(--gold-light), 0 0 30px var(--gold-main); border-radius: 2px;
+    position: absolute; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #fff; z-index: 20; 
+    box-shadow: 0 0 30px rgba(255,215,0,0.8);
   }
-  .wheel-selector::before, .wheel-selector::after {
-    content: ''; position: absolute; left: 50%; transform: translateX(-50%); border-left: 12px solid transparent; border-right: 12px solid transparent;
+  .selector-light {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 28px; height: 28px; border-radius: 50%; background: rgba(255,215,0,0.35); filter: blur(12px); z-index: 15;
   }
-  .wheel-selector::before { top: -2px; border-top: 16px solid var(--gold-light); }
-  .wheel-selector::after { bottom: -2px; border-bottom: 16px solid var(--gold-light); }
 
-  .wheel-track { display: flex; gap: 4px; transition: transform 4s cubic-bezier(0.15, 0.85, 0.15, 1); will-change: transform; }
+  .wheel-track { display: flex; gap: 6px; padding: 0 80px; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform; }
   .wheel-number {
-    min-width: 55px; height: 70px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-title); font-size: 26px; font-weight: 800; color: white;
+    min-width: 60px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-title); font-size: 28px; font-weight: 800; color: white;
     box-shadow: inset 0 2px 10px rgba(255,255,255,0.2), inset 0 -4px 10px rgba(0,0,0,0.6);
     border: 1px solid rgba(255,255,255,0.1); text-shadow: 1px 2px 4px rgba(0,0,0,0.8);
   }
-  .bg-red { background: linear-gradient(145deg, var(--danger), var(--danger-dark)); }
-  .bg-black { background: linear-gradient(145deg, #334155, #0f172a); }
-  .bg-green { background: linear-gradient(145deg, var(--success), var(--success-dark)); }
+  .bg-red { background: linear-gradient(180deg, #ef4a62, #99182c); }
+  .bg-black { background: linear-gradient(180deg, #414141, #111111); }
+  .bg-green { background: linear-gradient(180deg, #29dd80, #0f8b49); }
+
+  /* PREMIUM HISTORY & STATS */
+  .stats-panel { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
+  .history-bar { display: flex; gap: 6px; overflow-x: hidden; padding: 5px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);}
+  .history-item { 
+    width: 28px; height: 28px; min-width: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    font-family: var(--font-digital); font-size: 11px; font-weight: 700; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    animation: popup 0.3s cubic-bezier(.2,.8,.2,1);
+  }
+  .history-item.red { background: var(--danger); }
+  .history-item.black { background: #111; border: 1px solid #444; }
+  .history-item.green { background: var(--success); }
+  .live-stats { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; padding: 0 5px;}
+  .live-stats span { font-family: var(--font-digital); color: var(--gold-light); margin-left: 5px; font-size: 12px;}
 
   /* KANAN: BOARD & CONTROL */
-  .right-pane { display: flex; flex-direction: column; flex: 1; overflow: hidden; background: radial-gradient(circle at center, rgba(30, 41, 59, 0.4) 0%, transparent 100%); }
+  .right-pane { display: flex; flex-direction: column; flex: 1; overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); }
   
-  .board-container {
-    flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; align-items: center;
-  }
+  .board-container { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; }
   .board-container::-webkit-scrollbar { width: 6px; }
-  .board-container::-webkit-scrollbar-thumb { background: rgba(234, 179, 8, 0.5); border-radius: 10px; }
+  .board-container::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 10px; }
 
-  .table-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 420px; width: 100%; }
+  .table-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 440px; width: 100%; 
+    background: linear-gradient(180deg, #0f2c17, #0b1d11); padding: 15px; border-radius: 22px; border: 2px solid rgba(255,215,0,0.15);
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.55), 0 20px 60px rgba(0,0,0,0.35);
+  }
   
   .bet-spot {
-    background: #0f172a; border: 2px solid #1e293b; border-radius: 8px; height: 50px;
-    display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: 18px; font-weight: 800;
-    cursor: pointer; position: relative; transition: all 0.2s ease; color: white; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.1);
+    height: 55px; display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: 20px; font-weight: 700;
+    cursor: pointer; position: relative; transition: 0.25s; color: white; border-radius: 12px; overflow: hidden;
   }
-  .bet-spot:active { transform: scale(0.92); box-shadow: 0 0 15px var(--gold-glow); border-color: var(--gold-main); z-index: 10;}
+  .bet-spot::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.22), transparent); opacity: 0.5;
+  }
+  .bet-spot:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.35); filter: brightness(1.15); }
+  .bet-spot:active { transform: scale(0.96); }
   
-  .spot-red { background: linear-gradient(180deg, var(--danger), var(--danger-dark)); border-color: #f43f5e; }
-  .spot-black { background: linear-gradient(180deg, #1e293b, #020617); border-color: #64748b; }
-  .spot-green { background: linear-gradient(180deg, var(--success), var(--success-dark)); border-color: #34d399; grid-column: span 3; font-size: 22px; height: 55px;}
-  .spot-outside { background: #1e293b; color: var(--gold-light); font-family: var(--font-ui); font-size: 13px; font-weight: 700; border-color: var(--gold-dark); letter-spacing: 1px;}
-  .outside-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-width: 420px; width: 100%; margin-top: 6px; }
+  .spot-red { background: linear-gradient(180deg, #ef4a62, #99182c); }
+  .spot-black { background: linear-gradient(180deg, #414141, #111111); }
+  .spot-green { background: linear-gradient(180deg, #29dd80, #0f8b49); grid-column: span 3; font-size: 26px; height: 65px;}
+  
+  .outside-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 440px; width: 100%; margin-top: 15px; }
+  .spot-outside { 
+    height: 60px; font-family: var(--font-ui); font-size: 15px; letter-spacing: 1px; color: #fff;
+    background: linear-gradient(180deg, #364152, #202631); 
+  }
+  .spot-outside.spot-red { background: linear-gradient(180deg, #d73d55, #861425); }
+  .spot-outside.spot-black { background: linear-gradient(180deg, #434343, #0d0d0d); }
 
-  /* Animated Chip */
+  /* Animated Premium Chip */
   .chip-placed {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: radial-gradient(circle, var(--gold-light) 0%, var(--gold-main) 60%, var(--gold-dark) 100%);
-    color: #000; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-digital); font-size: 10px; font-weight: 900; border: 3px dashed #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.8), inset 0 0 4px rgba(0,0,0,0.5); 
-    z-index: 5; pointer-events: none; animation: chipDrop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    background: radial-gradient(circle, #fff6b5, #f2c238, #9b6900); color: #111;
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-digital); font-size: 10px; font-weight: 800; border: 3px solid #fff; 
+    box-shadow: 0 8px 18px rgba(0,0,0,0.45); z-index: 20; pointer-events: none; 
+    animation: chipDrop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
-  @keyframes chipDrop { 0% { transform: translate(-50%, -150%) scale(1.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+  @keyframes chipDrop { 0% { transform: translate(-50%, -150%) scale(1.6); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
   .chip-update { animation: chipPulse 0.3s ease forwards !important; }
   @keyframes chipPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.3); } }
 
   /* CONTROL CONSOLE */
   .control-console {
-    background: var(--bg-panel); border-top: 1px solid rgba(255,255,255,0.05); padding: 15px 20px calc(15px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(24,27,34,0.98), rgba(14,16,21,0.98));
+    border-top: 1px solid rgba(255,255,255,0.05); padding: 15px 20px calc(15px + env(safe-area-inset-bottom));
     box-shadow: 0 -15px 40px rgba(0,0,0,0.7); position: relative; z-index: 100;
   }
   
-  .chip-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; max-width: 500px; margin-left: auto; margin-right: auto;}
+  .info-banner { 
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px; text-align: center; border-radius: 12px; margin-bottom: 15px; 
+    font-family: var(--font-digital); font-size: 14px; color: var(--gold-light); font-weight: 700; letter-spacing: 2px; max-width: 500px; margin-left: auto; margin-right: auto; transition: 0.3s;
+  }
+  .win-text { background: rgba(31, 198, 106, 0.2); border-color: var(--success); color: var(--success); text-shadow: 0 0 10px rgba(31,198,106,0.5);}
+  
+  .chip-selector { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; max-width: 500px; margin-left: auto; margin-right: auto;}
   .chip-btn {
-    flex: 1; aspect-ratio: 1/1; max-width: 65px; border-radius: 50%; border: 3px dashed #475569; background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); 
-    color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-digital); font-size: 13px; font-weight: bold; cursor: pointer; 
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+    flex: 1; aspect-ratio: 1/1; max-width: 60px; border-radius: 50%; border: 4px dashed rgba(255,255,255,0.5); 
+    background: radial-gradient(circle, #364152 0%, #1e293b 100%); color: #fff; 
+    display: flex; align-items: center; justify-content: center; font-family: var(--font-digital); font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.25s;
   }
   .chip-btn.active { 
-    border-color: #fff; background: radial-gradient(circle, var(--gold-light) 0%, var(--gold-main) 70%, var(--gold-dark) 100%); 
-    color: #000; transform: translateY(-8px) scale(1.1); box-shadow: 0 10px 20px var(--gold-glow);
+    border-color: #fff; background: radial-gradient(circle, #ffe278, #c99817); color: #111; 
+    transform: translateY(-8px) scale(1.1); box-shadow: 0 0 30px rgba(255,215,0,0.45);
   }
 
   .actions-row { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; max-width: 500px; margin: 0 auto; }
-  .btn-clear { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: var(--text-light); border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; transition: 0.2s;}
-  .btn-clear:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
+  .btn-clear { background: #232831; border: none; color: #fff; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s;}
+  .btn-clear:hover { background: #2d3542; }
+  .btn-clear:active { transform: scale(0.95); }
   
   .btn-spin {
-    background: linear-gradient(180deg, var(--gold-light), var(--gold-main)); color: #000; border: none; padding: 16px; border-radius: 12px; font-family: var(--font-ui); font-weight: 900; font-size: 16px;
-    cursor: pointer; box-shadow: 0 6px 20px var(--gold-glow); text-transform: uppercase; letter-spacing: 2px; transition: all 0.2s; position: relative; overflow: hidden;
+    background: linear-gradient(180deg, #ffe37a, #c79518); color: #111; border: none; padding: 16px; border-radius: 14px; 
+    font-family: var(--font-ui); font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 0 35px rgba(255,215,0,0.35); 
+    text-transform: uppercase; letter-spacing: 2px; transition: all 0.2s; position: relative; overflow: hidden;
   }
-  .btn-spin::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); animation: shine 3s infinite; }
-  @keyframes shine { 100% { left: 200%; } }
-  .btn-spin:active { transform: scale(0.95); box-shadow: 0 2px 10px var(--gold-glow); }
-  .btn-spin:disabled { background: #334155; color: #94a3b8; box-shadow: none; pointer-events: none; }
-  .btn-spin:disabled::after { display: none; }
-
-  .info-banner { 
-    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 8px; text-align: center; border-radius: 8px; margin-bottom: 15px; 
-    font-family: var(--font-digital); font-size: 13px; color: var(--gold-light); letter-spacing: 2px; max-width: 500px; margin-left: auto; margin-right: auto; transition: 0.3s;
+  .btn-spin::before { 
+    content: ''; position: absolute; top: 0; left: -120%; width: 70%; height: 100%; 
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent); animation: shine 2.8s infinite; 
   }
-  .win-text { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: var(--success); animation: pulse 1s infinite alternate;}
-  @keyframes pulse { from { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); } to { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); } }
+  @keyframes shine { 100% { left: 160%; } }
+  .btn-spin:active { transform: scale(0.96); box-shadow: 0 2px 10px var(--gold-glow); }
+  .btn-spin:disabled { filter: grayscale(1); opacity: 0.6; pointer-events: none; box-shadow: none; }
+  .btn-spin:disabled::before { display: none; }
 
   /* OVERLAYS (JACKPOT / ZONK) */
   .overlay { 
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 5000; 
-    opacity: 0; pointer-events: none; transition: all 0.4s ease; flex-direction: column; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.82); display: flex; justify-content: center; align-items: center; z-index: 9999; 
+    opacity: 0; pointer-events: none; transition: 0.35s; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
   .overlay.show { opacity: 1; pointer-events: auto; }
-  .modal-content { text-align: center; transform: scale(0.8); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .modal-content { 
+    background: linear-gradient(180deg, #1b2029, #0d1015); border: 2px solid rgba(255,215,0,0.18);
+    box-shadow: 0 35px 90px rgba(0,0,0,0.6), 0 0 45px rgba(255,215,0,0.18); border-radius: 28px;
+    padding: 45px; width: 90%; max-width: 420px; text-align: center; transform: scale(0.75); opacity: 0; transition: 0.45s cubic-bezier(.2,.8,.2,1); 
+  }
   .overlay.show .modal-content { transform: scale(1); opacity: 1; }
   
-  .result-label { font-size: 16px; color: var(--text-muted); font-weight: 700; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase;}
-  .result-num { font-family: var(--font-title); font-size: 120px; color: white; line-height: 1; margin-bottom: 15px; text-shadow: 0 10px 40px rgba(0,0,0,0.9);}
-  .result-payout { font-family: var(--font-digital); font-size: 32px; color: var(--gold-light); font-weight: 900; text-shadow: 0 0 20px var(--gold-glow);}
-  .result-zonk { font-family: var(--font-digital); font-size: 32px; color: var(--danger); font-weight: 900; text-shadow: 0 0 20px rgba(225, 29, 72, 0.5);}
-  .tap-continue { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 30px; letter-spacing: 2px; animation: blink 1.5s infinite alternate;}
-  @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
-  
-  canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+  .result-label { font-size: 14px; color: #9aa3b2; font-weight: 700; letter-spacing: 4px; margin-bottom: 15px;}
+  .result-num { font-family: var(--font-title); font-size: 100px; color: var(--gold-light); line-height: 1; margin-bottom: 10px; text-shadow: 0 0 40px rgba(255,215,0,0.45);}
+  .result-payout { font-family: var(--font-digital); font-size: 32px; color: var(--success); font-weight: 700;}
+  .result-zonk { font-family: var(--font-digital); font-size: 32px; color: var(--danger); font-weight: 700;}
+  .tap-continue { color: #888; font-size: 12px; margin-top: 30px; letter-spacing: 3px; animation: blink 1.3s infinite alternate;}
+  @keyframes blink { from { opacity: 1; } to { opacity: 0.25; } }
+
+  /* TOAST NOTIFICATION */
+  .toast-message {
+    position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); padding: 14px 26px; border-radius: 15px;
+    background: rgba(20,22,28,0.96); border: 1px solid rgba(255,215,0,0.2); font-weight: 600; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 99999;
+  }
+  .toast-message.show { opacity: 1; bottom: 80px; }
 
   /* =========================================
-     RESPONSIVE DESKTOP TWEAKS (Kunci 2 Kolom)
+     RESPONSIVE DESKTOP
      ========================================= */
   @media (min-width: 1024px) {
     .game-layout { flex-direction: row; }
-    
-    .left-pane {
-      width: 45%; border-bottom: none; border-right: 2px solid var(--gold-dark);
-      padding: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.8); z-index: 10;
-    }
-    .wheel-container { height: 160px; }
-    .wheel-number { min-width: 70px; height: 90px; font-size: 34px; }
-    .live-indicator { top: 30px; left: 30px; font-size: 14px; }
+    .left-pane { width: 45%; border-bottom: none; border-right: 1px solid rgba(255,255,255,0.06); padding: 40px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); z-index: 10; justify-content: flex-start;}
+    .wheel-wrapper { height: 180px; }
+    .wheel-number { min-width: 70px; height: 100px; font-size: 34px; }
+    .live-indicator { top: 30px; left: 30px; font-size: 13px; }
+    .stats-panel { margin-top: 30px; }
     
     .right-pane { width: 55%; justify-content: space-between; }
-    .board-container { justify-content: center; } /* Vertically centers the board on large screens */
-    .table-grid, .outside-grid { max-width: 500px; gap: 8px;}
-    .bet-spot { height: 60px; font-size: 20px; }
-    .spot-green { height: 70px; font-size: 26px; }
-    
+    .board-container { justify-content: center; } 
+    .table-grid, .outside-grid { max-width: 520px; gap: 8px;}
+    .bet-spot { height: 60px; font-size: 22px; }
+    .spot-green { height: 75px; font-size: 28px; }
     .control-console { border-radius: 0; padding-top: 25px; padding-bottom: 25px;}
   }
-
 </style>
 </head>
 <body>
 
+  <!-- AMBIENT BACKGROUND -->
+  <div class="ambient-light"></div>
+  <div class="background-noise"></div>
   <canvas id="confettiCanvas"></canvas>
 
   <header class="top-bar">
@@ -256,18 +305,31 @@
     </div>
   </header>
 
-  <!-- BUNGKUSAN UTAMA UNTUK 2 KOLOM DI DESKTOP -->
   <div class="game-layout">
     
-    <!-- KIRI: ROULETTE WHEEL -->
+    <!-- KIRI: ROULETTE WHEEL & STATS -->
     <div class="left-pane">
-      <div class="live-indicator"><span class="live-dot"></span> LIVE ROULETTE</div>
+      <div class="live-indicator"><span class="live-dot"></span> LIVE VIP</div>
       <div class="wheel-wrapper">
+        <div class="wheel-shadow"></div>
         <div class="wheel-container">
+          <div class="selector-light"></div>
           <div class="wheel-selector"></div>
           <div class="wheel-track" id="wheelTrack">
             <!-- Generated via JS -->
           </div>
+        </div>
+      </div>
+      
+      <!-- PREMIUM STATS -->
+      <div class="stats-panel">
+        <div class="history-bar" id="historyBar">
+          <!-- Generated via JS -->
+        </div>
+        <div class="live-stats">
+          <div>HOT: <span id="hotNumber">-</span></div>
+          <div>COLD: <span id="coldNumber">-</span></div>
+          <div>SPINS: <span id="statSpin">0</span></div>
         </div>
       </div>
     </div>
@@ -307,7 +369,7 @@
       </div>
     </div>
 
-  </div> <!-- End game-layout -->
+  </div>
 
   <!-- MODAL RESULT -->
   <div class="overlay" id="resultModal" onclick="closeResult()">
@@ -323,7 +385,7 @@
 <script>
 /**
  * ==============================================================
- * 1. AUTH & SETUP
+ * 1. AUTH & SETUP (Dipertahankan)
  * ==============================================================
  */
 const userJson = localStorage.getItem('currentUser');
@@ -395,9 +457,25 @@ buildTrack();
 
 /**
  * ==============================================================
- * 3. BETTING SYSTEM
+ * 3. BETTING SYSTEM & PREMIUM TOAST
  * ==============================================================
  */
+function premiumToast(text, color="#FFD700") {
+  let toast = document.getElementById("premiumToast");
+  if(!toast) {
+    toast = document.createElement("div");
+    toast.id = "premiumToast";
+    toast.className = "toast-message";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.style.borderColor = color;
+  toast.style.boxShadow = `0 0 25px ${color}`;
+  toast.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { toast.classList.remove("show"); }, 2200);
+}
+
 function selectChip(val) {
   if (isSpinning) return;
   currentChip = val;
@@ -430,7 +508,7 @@ function placeBet(spotId) {
   void chipUI.offsetWidth; 
   chipUI.classList.add('chip-update');
   
-  setBanner("BET PLACED");
+  setBanner("BET ACCEPTED");
 }
 
 function clearBets() {
@@ -440,7 +518,7 @@ function clearBets() {
   document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
   document.getElementById('spinTotal').textContent = '';
   document.querySelectorAll('.chip-placed').forEach(el => { el.style.display = 'none'; el.classList.remove('chip-update'); });
-  setBanner("BETS CLEARED");
+  setBanner("ALL BETS CLEARED");
 }
 
 function setBanner(msg, isWin=false) {
@@ -451,7 +529,7 @@ function setBanner(msg, isWin=false) {
 
 /**
  * ==============================================================
- * 4. RTP & RIGGING ENGINE
+ * 4. RTP & RIGGING ENGINE (Dipertahankan)
  * ==============================================================
  */
 function calculatePayoutForNumber(num) {
@@ -492,12 +570,48 @@ function determineWinningNumber() {
 
 /**
  * ==============================================================
- * 5. DYNAMIC SPIN ANIMATION (ANTI TERPOTONG DI DESKTOP)
+ * 5. PREMIUM 3D SPIN ANIMATION & STATISTICS
  * ==============================================================
  */
+const gameStats = { history: [], spin: 0 };
+
+function updateStatistics(number) {
+  gameStats.spin++;
+  gameStats.history.unshift(number);
+  if(gameStats.history.length > 15) gameStats.history.pop();
+  
+  const historyBar = document.getElementById("historyBar");
+  historyBar.innerHTML = "";
+  gameStats.history.forEach(num => {
+    const div = document.createElement("div");
+    div.className = "history-item";
+    if(num === 0) div.classList.add("green");
+    else if(RED_NUMS.includes(num)) div.classList.add("red");
+    else div.classList.add("black");
+    div.textContent = num;
+    historyBar.appendChild(div);
+  });
+  
+  document.getElementById("statSpin").textContent = gameStats.spin;
+  
+  // Calculate Hot/Cold
+  const map = {};
+  gameStats.history.forEach(n => map[n] = (map[n]||0)+1);
+  let hot = "-", cold = "-", hotCount = 0, coldCount = 999;
+  Object.keys(map).forEach(k => {
+    if(map[k] > hotCount) { hot = k; hotCount = map[k]; }
+    if(map[k] < coldCount) { cold = k; coldCount = map[k]; }
+  });
+  document.getElementById("hotNumber").textContent = hot;
+  document.getElementById("coldNumber").textContent = cold;
+}
+
 function spinWheel() {
   if (isSpinning) return;
-  if (totalBet === 0) return setBanner("PLACE A BET FIRST!");
+  if (totalBet === 0) {
+    premiumToast("PLACE A BET FIRST!", "#e11d48");
+    return setBanner("PLACE A BET FIRST!");
+  }
 
   isSpinning = true;
   document.getElementById('btnSpin').disabled = true;
@@ -508,44 +622,65 @@ function spinWheel() {
   let baseIndex = ROULETTE_SEQ.indexOf(targetNum);
   let targetIndex = (ROULETTE_SEQ.length * 3) + baseIndex; 
   
-  // PENGUKURAN DINAMIS: Mengambil lebar elemen saat ini dari CSS layarnya
   let itemNode = document.querySelector('.wheel-number');
-  let gap = parseInt(window.getComputedStyle(track).gap) || 4;
+  let gap = parseInt(window.getComputedStyle(track).gap) || 6;
   let itemWidth = itemNode.offsetWidth + gap; 
   
-  // Offset diambil dari lebar container KIRI saja, bukan seluruh window.innerWidth
   let centerOffset = document.querySelector('.wheel-container').offsetWidth / 2;
-  let randomDrift = (Math.random() * (itemNode.offsetWidth - 10)) - ((itemNode.offsetWidth - 10)/2); 
+  let randomDrift = (Math.random() - 0.5) * 10;
   
-  // Kalkulasi jarak akhir animasi
   let finalTransform = (targetIndex * itemWidth) - centerOffset + (itemNode.offsetWidth / 2) + randomDrift; 
 
-  track.style.transition = 'none'; track.style.transform = `translateX(0px)`;
+  // Reset Track (GPU Accelerated via translate3d)
+  track.style.willChange = "transform";
+  track.style.transition = 'none'; 
+  track.style.transform = `translate3d(0,0,0)`;
   void track.offsetWidth; 
 
-  track.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.85, 0.15, 1)';
-  track.style.transform = `translateX(-${finalTransform}px)`;
+  // Animate
+  track.style.transition = 'transform 4.8s cubic-bezier(.08,.86,.18,1)';
+  track.style.transform = `translate3d(-${finalTransform}px,0,0)`;
 
-  setTimeout(() => { resolveSpin(targetNum); }, 4700);
+  setTimeout(() => { 
+    track.style.willChange = "auto";
+    resolveSpin(targetNum); 
+  }, 4900);
 }
 
 function resolveSpin(winNum) {
+  updateStatistics(winNum);
   let winAmount = calculatePayoutForNumber(winNum);
-  let numColor = winNum === 0 ? 'var(--success)' : (RED_NUMS.includes(winNum) ? 'var(--danger)' : '#334155');
+  let numColor = winNum === 0 ? 'var(--success)' : (RED_NUMS.includes(winNum) ? 'var(--danger)' : '#cbd5e1');
 
   const modal = document.getElementById('resultModal');
   const resNum = document.getElementById('resNumber');
   const resText = document.getElementById('resText');
+  const resLabel = document.getElementById('resLabel');
 
-  resNum.textContent = winNum; resNum.style.color = numColor;
+  resLabel.textContent = "WINNING NUMBER";
+  resNum.textContent = winNum; 
+  resNum.style.color = numColor;
 
   if (winAmount > 0) {
-    currentUser.balance += winAmount; document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
-    resText.className = 'result-payout'; resText.textContent = `+ ${winAmount.toLocaleString()}`;
-    setBanner(`YOU WON ${winAmount.toLocaleString()}!`, true); confettiEngine.burst(80);
+    currentUser.balance += winAmount; 
+    document.getElementById('displayBalance').textContent = currentUser.balance.toLocaleString();
+    resText.className = 'result-payout'; 
+    resText.textContent = `+ ${winAmount.toLocaleString()}`;
+    setBanner(`YOU WON ${winAmount.toLocaleString()}!`, true); 
+    premiumToast(`YOU WIN ${formatChip(winAmount)}`, "var(--success)");
+    
+    // Scale confetti based on multiplier (Jackpot logic)
+    if(winAmount >= totalBet * 30) {
+        resLabel.textContent = "MEGA WIN"; confettiEngine.burst(300);
+    } else if (winAmount >= totalBet * 15) {
+        resLabel.textContent = "BIG WIN"; confettiEngine.burst(200);
+    } else {
+        confettiEngine.burst(120);
+    }
   } else {
     resText.className = 'result-zonk'; resText.textContent = `HOUSE WINS`;
     setBanner("BETTER LUCK NEXT TIME");
+    premiumToast("HOUSE WINS", "var(--danger)");
   }
   modal.classList.add('show');
 }
@@ -554,7 +689,8 @@ function closeResult() {
   document.getElementById('resultModal').classList.remove('show');
   totalBet = 0; bets = {};
   document.getElementById('spinTotal').textContent = '';
-  document.getElementById('btnSpin').disabled = false; document.getElementById('btnClear').disabled = false;
+  document.getElementById('btnSpin').disabled = false; 
+  document.getElementById('btnClear').disabled = false;
   document.querySelectorAll('.chip-placed').forEach(el => { el.style.display = 'none'; el.classList.remove('chip-update'); });
   isSpinning = false; setBanner("PLACE YOUR BETS");
   
@@ -565,7 +701,7 @@ function closeResult() {
 
 /**
  * ==============================================================
- * 6. CONFETTI ENGINE
+ * 6. CONFETTI ENGINE (Dipertahankan)
  * ==============================================================
  */
 const confettiEngine = {
@@ -598,6 +734,9 @@ const confettiEngine = {
   }
 };
 confettiEngine.init();
+
+// Anti double-click
+document.addEventListener("dblclick", e => e.preventDefault());
 
 </script>
 </body>
