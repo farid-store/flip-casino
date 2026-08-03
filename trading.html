@@ -685,35 +685,56 @@ function drawChart(now) {
 }
 
 /**
+/**
  * ==============================================================
- * GAME LOOP & MULTI-TRADE GRAVITY ENGINE (RTP)
+ * GAME LOOP, BINANCE WEBSOCKET & STEALTH RTP ENGINE
  * ==============================================================
  */
 let lastTickTime = performance.now();
+let realMarketPrice = currentPrice; // Variabel penyimpan harga dunia nyata
+
+// MENGHUBUNGKAN KE LIVE MARKET BINANCE VIA WEBSOCKET (REAL-TIME)
+const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+ws.onmessage = (event) => {
+  let data = JSON.parse(event.data);
+  realMarketPrice = parseFloat(data.p);
+};
 
 function gameLoop(now) {
   let dt = now - lastTickTime;
   
   if (dt > 100) {
-    let volatility = 2.0; // Fluktuasi normal BTC dalam hitungan detik
-    let bias = 0;
-    
-    if (activeTrades.length > 0) {
-        // Cari trade yang paling awal akan expired
+    // -------------------------------------------------------------
+    // LOGIKA PERPINDAHAN MARKET ASLI VS MANIPULASI
+    // -------------------------------------------------------------
+    if (activeTrades.length === 0) {
+        // MODE 1: MARKET ASLI (TIDAK ADA POSISI)
+        // Grafik menempel ketat ke harga Binance.
+        // Jika baru selesai Trade (harga terlempar jauh), grafik akan meluncur/glide 
+        // dengan sangat mulus kembali ke harga asli agar pemain tidak sadar ada lompatan.
+        let diff = realMarketPrice - currentPrice;
+        currentPrice += diff * 0.15; 
+    } 
+    else {
+        // MODE 2: MANIPULASI RTP BANDAR (ADA POSISI AKTIF)
+        // Koneksi ke pasar asli diabaikan sementara.
+        let volatility = 2.0; 
+        let bias = 0;
+        
         let sortedTrades = [...activeTrades].sort((a,b) => a.expiryTime - b.expiryTime);
         let nearestTrade = sortedTrades[0];
         let remaining = nearestTrade.expiryTime - now;
         
-        // Di 2 detik terakhir, berikan "Tarikan Gravitasi" menuju target Price yang sudah dikunci RTP
+        // Di 2 detik terakhir, berikan "Tarikan Gravitasi" menuju target Price RTP
         if (remaining > 0 && remaining < 2000) {
             let diff = nearestTrade.targetPrice - currentPrice;
-            bias = diff * 0.15; // Menarik harga pelan-pelan ke target
-            volatility = 0.5; // Mengurangi noise saat akan expired agar presisi
+            bias = diff * 0.15; 
+            volatility = 0.5; 
         }
+        
+        // Pergerakan acak (noise) agar tetap terlihat seperti market asli
+        currentPrice += bias + (Math.random() - 0.5) * volatility;
     }
-    
-    // Pergerakan acak natural dengan / tanpa bias gravitasi
-    currentPrice += bias + (Math.random() - 0.5) * volatility;
     
     updatePriceTick(currentPrice, now);
     lastTickTime = now;
@@ -724,7 +745,7 @@ function gameLoop(now) {
       let t = activeTrades[i];
       if (now >= t.expiryTime) {
           
-          // Memastikan mendarat tepat sesuai rumus matematika meskipun lag
+          // Memastikan mendarat tepat sesuai rumus RTP, menghilangkan margin error
           if (t.isWin) {
               if(t.direction === 'CALL' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + 0.5;
               if(t.direction === 'PUT' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - 0.5;
@@ -742,6 +763,40 @@ function gameLoop(now) {
   drawChart(now);
   animFrame = requestAnimationFrame(gameLoop);
 }
+
+// Inisialisasi awal Candle (Dilakukan setelah dapat harga Fetch pertama)
+function initChartAndLoop() {
+  let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
+  for(let i=0; i<MAX_CANDLES; i++) {
+    let cOpen = currentPrice;
+    let cClose = cOpen + ((Math.random() - 0.5) * 15);
+    candles.push({
+      openTime: initTime, o: cOpen,
+      h: Math.max(cOpen, cClose) + (Math.random() * 8),
+      l: Math.min(cOpen, cClose) - (Math.random() * 8),
+      c: cClose
+    });
+    currentPrice = cClose;
+    initTime += CANDLE_PERIOD;
+  }
+  currentCandle = candles[candles.length - 1];
+  currentCandle.openTime = performance.now();
+  animFrame = requestAnimationFrame(gameLoop);
+}
+
+// Mengambil harga valid pertama kali web dibuka agar tidak mulai dari $0
+fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT')
+  .then(res => res.json())
+  .then(data => {
+    currentPrice = parseFloat(data.price);
+    realMarketPrice = currentPrice;
+    initChartAndLoop();
+  })
+  .catch(() => {
+    currentPrice = 64500.00; // Fallback jika no internet
+    realMarketPrice = currentPrice;
+    initChartAndLoop();
+  });
 
 // Inisialisasi awal Candle (Dummy Data mundur)
 // Fungsi untuk membangkitkan grafik SETELAH harga didapatkan
