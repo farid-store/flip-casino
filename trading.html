@@ -744,22 +744,37 @@ function gameLoop(now) {
 }
 
 // Inisialisasi awal Candle (Dummy Data mundur)
-let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
-for(let i=0; i<MAX_CANDLES; i++) {
-  let cOpen = currentPrice;
-  let cClose = cOpen + ((Math.random() - 0.5) * 15);
-  candles.push({
-    openTime: initTime, o: cOpen,
-    h: Math.max(cOpen, cClose) + (Math.random() * 8),
-    l: Math.min(cOpen, cClose) - (Math.random() * 8),
-    c: cClose
-  });
-  currentPrice = cClose;
-  initTime += CANDLE_PERIOD;
+// Fungsi untuk membangkitkan grafik SETELAH harga didapatkan
+function initChartAndLoop() {
+  let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
+  for(let i=0; i<MAX_CANDLES; i++) {
+    let cOpen = currentPrice;
+    let cClose = cOpen + ((Math.random() - 0.5) * 15);
+    candles.push({
+      openTime: initTime, o: cOpen,
+      h: Math.max(cOpen, cClose) + (Math.random() * 8),
+      l: Math.min(cOpen, cClose) - (Math.random() * 8),
+      c: cClose
+    });
+    currentPrice = cClose;
+    initTime += CANDLE_PERIOD;
+  }
+  currentCandle = candles[candles.length - 1];
+  currentCandle.openTime = performance.now();
+  animFrame = requestAnimationFrame(gameLoop);
 }
-currentCandle = candles[candles.length - 1];
-currentCandle.openTime = performance.now();
-animFrame = requestAnimationFrame(gameLoop);
+
+// MENGAMBIL HARGA REALTIME DARI BINANCE API
+fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT')
+  .then(res => res.json())
+  .then(data => {
+    currentPrice = parseFloat(data.price);
+    initChartAndLoop(); // Jalankan grafik dengan harga asli Binance
+  })
+  .catch(err => {
+    console.error("Gagal mengambil API Binance, menggunakan harga default.", err);
+    initChartAndLoop(); // Fallback jika tidak ada internet / API diblokir
+  });
 
 /**
  * ==============================================================
