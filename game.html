@@ -554,14 +554,17 @@ async function submitDeposit() {
 }
 
 /**
+/**
  * ==============================================================
  * 2. GAME CONFIGURATION (PENGATURAN TERPUSAT)
  * ==============================================================
  */
 const CONFIG = {
   initialBalance: 100000,
-  betSteps: [100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000],
+  // Bet sudah diupdate ke 500k
+  betSteps: [100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000], 
   
+  // Buah-buahan baru sudah dimasukkan beserta perkaliannya
   symbols: [
     { id: 'cherry',     icon: '🍒', multiplier: 1, weight: 60 },
     { id: 'strawberry', icon: '🍓', multiplier: 2, weight: 50 },
@@ -575,7 +578,7 @@ const CONFIG = {
     { id: 'star',       icon: '⭐', multiplier: 25, weight: 3 },
     { id: 'crown',      icon: '👑', multiplier: 50, weight: 1 } 
   ],
-  
+
   mechanics: {
     pityChance: 0.15,            
     zonkTriggerStreak: 4,        
