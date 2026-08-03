@@ -221,7 +221,7 @@ html,body{width:100%;height:100%;overflow:hidden;position:fixed;background:var(-
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-//  OCEAN EMPEROR V8 — PURE CASINO RTP MATH & NUKE OVERHAUL
+//  OCEAN EMPEROR V8 — PURE CASINO RTP MATH & BUGS FIXED
 // ═══════════════════════════════════════════════════════════════════
 
 const GAME_RTP = 0.96; // 96% Return To Player (Global Math Constant)
@@ -235,8 +235,15 @@ if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
     if (db && db.users) {
       const freshUser = db.users.find(u => u.username === currentUser.username);
-      if (freshUser) currentUser.balance = freshUser.balance;
-      updateUI();
+      if (freshUser) {
+          currentUser.balance = freshUser.balance;
+          
+          // [BUG FIX] Sinkronisasi Level & EXP(totalWin) dengan Database
+          if (freshUser.level !== undefined) level = parseInt(freshUser.level);
+          if (freshUser.exp !== undefined) totalWin = parseInt(freshUser.exp);
+          
+          updateUI();
+      }
     }
   }).catch(e => console.error(e));
 }
@@ -245,6 +252,7 @@ async function saveAndExit() {
   document.getElementById('btnExit').textContent = "SAVING...";
   try {
     if (typeof api !== 'undefined' && api.saveProgress) {
+      // Menyimpan totalWin sebagai representasi EXP
       await api.saveProgress(currentUser.username, currentUser.balance, level, totalWin || 0);
     }
   } catch(e) {} finally { window.location.href = 'index.html'; }
@@ -377,7 +385,7 @@ function drawCanvasFloaters() {
   ctx.globalAlpha = 1;
 }
 
-/** 5. FISH DEFS & CLASSES (NO MORE HP, PURE RTP INVESTMENTS) **/
+/** 5. FISH DEFS & CLASSES (PURE RTP INVESTMENTS) **/
 const FISH_TYPES=[
   {id:'small',   val:2,   speed:2.4,size:22,color:'#4fc3f7',prob:0.25, icon:'🐟'},
   {id:'med',     val:10,  speed:1.6,size:30,color:'#81c784',prob:0.25, icon:'🐠'},
@@ -502,10 +510,10 @@ class Fish {
       let expectedReward = this.id === 'jackpot' ? this.countUp : this.val * players[0].bet;
       if(expectedReward > 0) {
           let pct = Math.min(1, this.invested / expectedReward);
-          if (pct > 0.05) { // Hanya muncul jika sudah ditembaki sedikit
+          if (pct > 0.05) { 
               const bw=this.size*1.5, bh=4, bx=this.x-bw/2, by=this.y-this.size-15;
               ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(bx,by,bw,bh);
-              ctx.fillStyle = pct > 0.85 ? '#ff2266' : pct > 0.5 ? '#ffc107' : '#4caf50'; // Merah = Pity dekat!
+              ctx.fillStyle = pct > 0.85 ? '#ff2266' : pct > 0.5 ? '#ffc107' : '#4caf50'; 
               ctx.fillRect(bx,by,bw*pct,bh);
           }
       }
@@ -517,24 +525,22 @@ class Fish {
 function tryKillFish(fish, bulletCostValue, playerBet, ownerId) {
   let reward = fish.val * playerBet;
   if (fish.id === 'jackpot') reward = fish.countUp;
-  if (reward <= 0) reward = 50; // Safety fallback
+  if (reward <= 0) reward = 50; 
   
   let wrMod = ownerId === 0 ? (1 + (upgrades.winrate || 0)*0.05) : 1;
   let dmgMod = ownerId === 0 ? (1 + (upgrades.dmg || 0)*0.2) : 1;
   
-  // RUMUS INTI: Peluang berbanding lurus dengan RTP, Biaya, dan berbanding terbalik dengan Hadiah
   let chance = (bulletCostValue * dmgMod * GAME_RTP * wrMod) / reward;
   
-  // Pity System: Tambahkan investasi modal ke ikan.
   fish.invested += (bulletCostValue * dmgMod);
   if (fish.invested >= reward * 0.85) {
-      chance += 0.5; // Buff peluang brutal jika pemain sudah modal besar ke ikan ini.
+    chance += 0.5; 
   }
   
   if(Math.random() < chance) {
-    return true; // Mati murni karena RNG
+    return true; 
   } else {
-    fish.flash = 8; // Efek visual damage/miss
+    fish.flash = 8; 
     return false;
   }
 }
@@ -546,17 +552,15 @@ function nukeAll(ownerId, nukeCost) {
   addCanvasText('☢ NUKE BOMB! -' + Math.floor(nukeCost).toLocaleString(), W/2, H/2, '#ff2266', 35);
   
   let activeFishes = fishes.filter(f => f.alive && f.x > 0 && f.x < W);
-  if(activeFishes.length === 0) return; // Zonk jika layar kosong
+  if(activeFishes.length === 0) return; 
   
   let totalWeight = 0;
   activeFishes.forEach(f => { totalWeight += (f.id === 'jackpot' ? f.countUp : f.val * players[ownerId].bet); });
   
   let wrMod = 1 + (upgrades.winrate || 0)*0.05;
-  // Dengan RTP 96%, Nuke memiliki baseChance membunuh tiap ikan ~96%
   let baseChance = GAME_RTP * wrMod; 
   
   let totalNukeWin = 0;
-  // Nuke memberikan ekstra 1.2x return karena resiko saldonya besar
   let nukeBonus = 1.2;
 
   activeFishes.forEach(f => {
@@ -566,7 +570,6 @@ function nukeAll(ownerId, nukeCost) {
       let reward = Math.floor((fishWeight / totalWeight) * nukeCost * nukeBonus);
       if (reward < 1) reward = 1;
 
-      // Manual Payout (Bypass standar killFish agar nilai reward custom dari Nuke)
       f.alive = false;
       spawnParticle(f.x, f.y, f.color, 8, 0.6);
       
@@ -585,9 +588,9 @@ function nukeAll(ownerId, nukeCost) {
       } else {
           players[ownerId].bal += reward;
       }
-      f.init(); // Respawn
+      f.init(); 
     } else {
-      f.flash = 20; // Gagal bunuh
+      f.flash = 20; 
     }
   });
 
@@ -607,7 +610,7 @@ class Bullet{
     this.vx=Math.cos(ang)*spd;this.vy=Math.sin(ang)*spd;
     this.wDef=wDef;this.ownerId=ownerId;this.alive=true;
     this.piercing=!!wDef.piercing; this.explosive=!!wDef.explosive;
-    this.costValue = wDef.bulletValue * betValue; // Nilai modal investasi peluru
+    this.costValue = wDef.bulletValue * betValue; 
   }
   update(){
     this.x+=this.vx;this.y+=this.vy;
@@ -641,7 +644,7 @@ class Laser{
   constructor(ox, oy, ang, ownerId, betValue){
     this.ox=ox;this.oy=oy;this.ang=ang;this.ownerId=ownerId;this.life=15;
     const dx=Math.cos(ang),dy=Math.sin(ang);
-    const hitCost = 1.5 * betValue; // Laser cost weight per hit
+    const hitCost = 1.5 * betValue; 
     for(let f of fishes){
       if(!f.alive)continue;
       const fx=f.x-ox,fy=f.y-oy;
@@ -836,23 +839,50 @@ function killFish(f, ownerId){
   f.init(); // Respawn normal
 }
 
+// [BUG FIX] PENGATURAN SENJATA (DIBENAHI AGAR NUKE TIDAK MENGELUARKAN PELURU & BOT TIDAK SALAH TEMBAK)
 function performShoot(player,ang){
   let wDef = WEAPON_DEFS['single'];
+  
   if(player.id === 0){
     wDef = WEAPON_DEFS[equippedSlots[activeSlot]||'single'];
   } else {
-    wDef = WEAPON_DEFS[Object.keys(WEAPON_DEFS)[Math.floor(Math.random()*4)]];
+    // BOT hanya boleh menggunakan senjata reguler (mencegah bug Nuke peluru bocor)
+    const botWeapons = ['single', 'double', 'triple', 'laser'];
+    wDef = WEAPON_DEFS[botWeapons[Math.floor(Math.random() * botWeapons.length)]];
   }
 
   let actualCost = 0;
+  
+  // LOGIKA KHUSUS NUKE (DIPISAHKAN AGAR TIDAK BOCOR MENJADI PELURU)
+  if(wDef.id === 'nuke'){
+    if(player.id !== 0) return; // Bot tidak boleh memakai Nuke
+    if(currentUser.balance < 100) {
+        addCanvasText('SALDO KURANG!', player.x, player.y - 40, '#ff2266', 16);
+        if(autoFire) toggleAuto();
+        return;
+    }
+    
+    let perc = 0.5 + Math.random() * 0.2; // Sedot 50-70% balance
+    actualCost = Math.floor(currentUser.balance * perc);
+    
+    currentUser.balance -= actualCost; updateUI();
+    nukeAll(player.id, actualCost);
+    
+    // [BUG FIX] Auto unequip nuke setelah dipakai agar tidak spam/menyedot habis saldo
+    unequipWeapon('nuke');
+    activeSlot = 0;
+    renderWeaponRow();
+    
+    return; // MENCEGAH PENCIPTAAN PELURU DI BAWAH SINI
+  }
+
+  // LOGIKA SENJATA NORMAL
   if(player.id === 0) {
-    if(wDef.id === 'nuke'){
-        if(currentUser.balance < 100) return; // Butuh saldo minimal
-        let perc = 0.5 + Math.random() * 0.2; // 50-70% balance
-        actualCost = Math.floor(currentUser.balance * perc);
-    } else {
-        actualCost = player.bet * (wDef.costMulti || 1);
-        if(buffs.autoReload && currentUser.balance < 300 && actualCost < 300) actualCost = 0;
+    actualCost = player.bet * (wDef.costMulti || 1);
+    
+    // Fitur Auto Reload Buff
+    if(buffs.autoReload && currentUser.balance < 300 && actualCost < 300) {
+        actualCost = 0;
     }
 
     if(currentUser.balance < actualCost) {
@@ -860,14 +890,7 @@ function performShoot(player,ang){
       if(autoFire) toggleAuto();
       return;
     }
-    
     currentUser.balance -= actualCost; updateUI();
-    
-    // Nuke khusus: langsung panggil fungsi gacha masal
-    if(wDef.id === 'nuke'){
-        nukeAll(player.id, actualCost);
-        return;
-    }
   } else {
     if(player.bal < player.bet) player.bal += 500; 
   }
@@ -880,8 +903,10 @@ function performShoot(player,ang){
       return;
   }
 
+  // Membuat peluru fisik
   const multi = wDef.multi || 1;
   const spread = wDef.id === 'shotgun' ? 0.25 : wDef.id === 'triple' ? 0.2 : wDef.id === 'double' ? 0.1 : 0;
+  
   for(let i=0; i<multi; i++){
     const off = multi>1 ? spread*(i-(multi-1)/2) : 0;
     bullets.push(new Bullet(player.x, player.y, ang+off, wDef, player.id, player.bet));
@@ -1006,8 +1031,10 @@ function loop(){
   if(autoFire && !gameOver){ if(frameCount%12===0) shootMainPlayer(); }
   if(frameCount%120===0 && jackpotPool<9999999){ jackpotPool+=Math.floor(Math.random()*50); updateJackpot(); }
 
-  let targetLevel = Math.floor(totalWin / 1000) + 1;
-  if(targetLevel > level){
+  // [BUG FIX] LEVEL JOMPLANG
+  // Menggunakan kurva RPG eksponensial agar tidak cepat tembus level ribuan
+  let targetLevel = Math.max(level, Math.floor(Math.sqrt(totalWin / 2000)) + 1);
+  if(targetLevel > level && totalWin > 0){
     level = targetLevel;
     addCanvasText(`⭐ LEVEL ${level}!`, W/2, H*0.4, '#00e5ff', 40);
     updateUI(); 
