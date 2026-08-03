@@ -766,7 +766,7 @@ const gameUI = {
           <div class="pt-icon">${s.icon}</div>
           <div class="pt-name">${s.id}</div>
           <div class="pt-mult">${multiplierText}</div>
-          <div class="pt-val" style="${s.isJackpot ? 'color: var(--neon-pink); animation: winPulse 1s infinite alternate;' : ''}">${rewardVal}</div>
+          <div class="pt-val" style="${s.isJackpot ? 'color: var(--neon-pink); animation: flash 0.8s 1s infinite alternate;' : ''}">${rewardVal}</div>
         </div>
       `;
     }).join('');
