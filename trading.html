@@ -3,72 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Binary Options VIP - Multiple Positions</title>
+<title>Binary Options VIP - Pro Trader Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   /* =========================================
      CSS VARIABLES - TEMA KASINO VIP PREMIUM
      ========================================= */
   :root {
-    --bg-base: #030507;
-    --bg-panel: #0a0e14;
-    --bg-glass: rgba(10, 14, 20, 0.85);
-    
-    --gold-light: #fef08a;
-    --gold-main: #eab308;
-    --gold-dark: #a16207;
-    
-    --text-light: #f8fafc;
-    --text-muted: #94a3b8;
-    
-    --danger: #ef4444;
-    --danger-glow: rgba(239, 68, 68, 0.4);
-    --success: #10b981;
-    --success-glow: rgba(16, 185, 129, 0.4);
+    --bg-base: #030507; --bg-panel: #0a0e14; --bg-glass: rgba(10, 14, 20, 0.85);
+    --gold-light: #fef08a; --gold-main: #eab308; --gold-dark: #a16207;
+    --text-light: #f8fafc; --text-muted: #94a3b8;
+    --danger: #ef4444; --danger-glow: rgba(239, 68, 68, 0.4);
+    --success: #10b981; --success-glow: rgba(16, 185, 129, 0.4);
     --info: #3b82f6;
-    
-    --font-title: 'Cinzel', serif;
-    --font-ui: 'Montserrat', sans-serif;
-    --font-digital: 'Orbitron', sans-serif;
+    --font-title: 'Cinzel', serif; --font-ui: 'Montserrat', sans-serif; --font-digital: 'Orbitron', sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
 
   html, body {
     background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
-    color: var(--text-light);
-    font-family: var(--font-ui);
-    height: 100dvh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    color: var(--text-light); font-family: var(--font-ui); height: 100dvh; overflow: hidden; display: flex; justify-content: center; align-items: center;
   }
 
   #app-wrapper {
     width: 100%; max-width: 1200px; height: 100%; max-height: 100dvh;
-    background: var(--bg-base); display: flex; flex-direction: column;
-    position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.9); overflow: hidden;
+    background: var(--bg-base); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.9); overflow: hidden;
   }
-
   ::-webkit-scrollbar { display: none; }
 
-  /* =========================================
-     TOP BAR
-     ========================================= */
+  /* TOP BAR */
   .top-bar {
     background: linear-gradient(180deg, rgba(17,21,30,0.95), rgba(17,21,30,0.6));
     backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-    padding: calc(12px + env(safe-area-inset-top)) 20px 12px; 
-    display: flex; justify-content: space-between; align-items: center;
-    z-index: 100; flex-shrink: 0;
+    padding: calc(12px + env(safe-area-inset-top)) 20px 12px; display: flex; justify-content: space-between; align-items: center; z-index: 100; flex-shrink: 0;
   }
   
   .btn-back { 
-    background: transparent; border: 1px solid var(--danger); color: var(--danger); 
-    padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer; 
-    text-transform: uppercase; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-ui); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); letter-spacing: 1px;
+    background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); letter-spacing: 1px;
   }
   .btn-back:hover, .btn-back:active { background: var(--danger); color: #fff; }
 
@@ -79,190 +51,89 @@
   .stat-amount.bump { animation: bumpNum 0.35s ease; }
   @keyframes bumpNum { 0% { transform: scale(1); } 50% { transform: scale(1.25); color: #fff;} 100% { transform: scale(1); } }
 
-  .icon-btn {
-    background: var(--bg-panel); border: 1px solid rgba(212, 175, 55, 0.3); color: var(--gold-light);
-    width: 40px; height: 40px; border-radius: 10px; font-size: 18px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: 0.2s;
-  }
+  .icon-btn { background: var(--bg-panel); border: 1px solid rgba(212, 175, 55, 0.3); color: var(--gold-light); width: 40px; height: 40px; border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
   .icon-btn:hover, .icon-btn:active { background: var(--gold-dark); color: #fff; }
   .icon-btn.muted { opacity: 0.5; border-color: var(--text-muted); color: var(--text-muted); }
 
-  /* =========================================
-     MAIN LAYOUT
-     ========================================= */
   .main-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
 
-  /* =========================================
-     CHART AREA
-     ========================================= */
-  .chart-section {
-    flex: 1; position: relative; background: radial-gradient(circle at center, #0f1522 0%, var(--bg-base) 100%);
-    display: flex; flex-direction: column; border-bottom: 2px solid var(--gold-dark);
-  }
+  /* CHART AREA & PRO TOOLBAR */
+  .chart-section { flex: 1; position: relative; background: radial-gradient(circle at center, #0f1522 0%, var(--bg-base) 100%); display: flex; flex-direction: column; border-bottom: 2px solid var(--gold-dark); }
+  .chart-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #06090e; border-bottom: 1px solid #1e293b; z-index: 10; flex-wrap: wrap; gap: 10px;}
+  .toolbar-group { display: flex; align-items: center; gap: 8px; }
 
-  .chart-toolbar {
-    display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;
-    background: #06090e; border-bottom: 1px solid #1e293b; z-index: 10;
+  /* CUSTOM DROPDOWN ASSET */
+  .asset-dropdown {
+    background: #11151e; border: 1px solid var(--gold-dark); color: #fff; padding: 8px 12px;
+    border-radius: 8px; font-family: var(--font-ui); font-weight: 800; font-size: 13px; cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(212,175,55,0.2);
   }
+  .asset-dropdown option { background: #0a0e14; color: #fff; }
+  
+  .tf-btn { background: #11151e; border: 1px solid #334155; color: var(--text-muted); padding: 6px 10px; border-radius: 6px; font-family: var(--font-ui); font-weight: 700; font-size: 11px; cursor: pointer; transition: 0.2s; }
+  .tf-btn.active { background: rgba(59, 130, 246, 0.15); border-color: var(--info); color: #fff; }
 
-  .toolbar-group { display: flex; align-items: center; gap: 10px; }
-
-  .asset-selector {
-    background: #11151e; border: 1px solid #334155; color: #fff; padding: 8px 14px;
-    border-radius: 8px; font-family: var(--font-ui); font-weight: 800; font-size: 13px;
-    display: flex; align-items: center; gap: 8px; cursor: pointer;
-  }
-
-  .chart-toggle-btn {
-    background: #11151e; border: 1px solid #334155; color: var(--text-muted); padding: 8px 14px;
-    border-radius: 8px; font-family: var(--font-ui); font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s;
-  }
+  .chart-toggle-btn { background: #11151e; border: 1px solid #334155; color: var(--text-muted); padding: 8px 12px; border-radius: 8px; font-family: var(--font-ui); font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
   .chart-toggle-btn.active { background: rgba(234, 179, 8, 0.15); border-color: var(--gold-main); color: var(--gold-light); }
 
-  .profit-badge {
-    background: rgba(16, 185, 129, 0.15); border: 1px solid var(--success); color: var(--success);
-    padding: 8px 14px; border-radius: 8px; font-family: var(--font-digital); font-size: 13px; font-weight: bold;
-    box-shadow: 0 0 10px var(--success-glow);
-  }
+  .profit-badge { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--success); color: var(--success); padding: 8px 12px; border-radius: 8px; font-family: var(--font-digital); font-size: 12px; font-weight: bold; box-shadow: 0 0 10px var(--success-glow); }
 
   .chart-container { flex: 1; position: relative; overflow: hidden; }
-
-  .grid-overlay {
-    position: absolute; inset: 0; z-index: 1; opacity: 0.05;
-    background-image: 
-      linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px);
-    background-size: 50px 50px; background-position: center center;
-  }
-
+  .grid-overlay { position: absolute; inset: 0; z-index: 1; opacity: 0.05; background-image: linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px); background-size: 50px 50px; background-position: center center; }
   #tradeCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
 
-  .price-tag {
-    position: absolute; right: 0; background: var(--info); color: #fff;
-    padding: 6px 12px; font-family: var(--font-digital); font-size: 13px; font-weight: bold;
-    border-radius: 6px 0 0 6px; z-index: 10; transition: top 0.1s linear; transform: translateY(-50%);
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-  }
+  .price-tag { position: absolute; right: 0; background: var(--info); color: #fff; padding: 6px 12px; font-family: var(--font-digital); font-size: 13px; font-weight: bold; border-radius: 6px 0 0 6px; z-index: 10; transition: top 0.1s linear; transform: translateY(-50%); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+  .price-tag.up { background: var(--success); box-shadow: 0 0 15px var(--success-glow); }
+  .price-tag.down { background: var(--danger); box-shadow: 0 0 15px var(--danger-glow); }
 
-  /* Animasi Hasil Trade */
-  .trade-result-float {
-      position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%);
-      font-family: var(--font-title); font-size: 28px; font-weight: 900; letter-spacing: 2px;
-      z-index: 50; pointer-events: none; animation: floatUp 2s forwards; text-shadow: 0 0 20px rgba(0,0,0,0.8);
-      white-space: nowrap;
-  }
+  .trade-result-float { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); font-family: var(--font-title); font-size: 28px; font-weight: 900; letter-spacing: 2px; z-index: 50; pointer-events: none; animation: floatUp 2s forwards; text-shadow: 0 0 20px rgba(0,0,0,0.8); white-space: nowrap; }
   .trade-result-float.win { color: var(--success); text-shadow: 0 0 20px var(--success-glow); }
   .trade-result-float.loss { color: var(--danger); text-shadow: 0 0 20px var(--danger-glow); }
-  @keyframes floatUp {
-      0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); }
-      15% { opacity: 1; transform: translate(-50%, -20px) scale(1.1); }
-      80% { opacity: 1; transform: translate(-50%, -60px) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -100px) scale(1); }
-  }
+  @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); } 15% { opacity: 1; transform: translate(-50%, -20px) scale(1.1); } 80% { opacity: 1; transform: translate(-50%, -60px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -100px) scale(1); } }
 
-  /* =========================================
-     CONTROL CONSOLE
-     ========================================= */
-  .control-section {
-    background: var(--bg-panel);
-    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
-    display: flex; flex-direction: column; gap: 18px; z-index: 20;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
-  }
-
+  /* CONTROL CONSOLE */
+  .control-section { background: var(--bg-panel); padding: 15px 20px calc(15px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 15px; z-index: 20; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
   .time-selector-wrap { display: flex; flex-direction: column; gap: 8px; }
   .control-label { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
-  
   .time-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-  .time-btn {
-    background: #11151e; border: 1px solid #334155; color: var(--text-muted); padding: 10px 0;
-    border-radius: 8px; font-family: var(--font-digital); font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s;
-  }
+  .time-btn { background: #11151e; border: 1px solid #334155; color: var(--text-muted); padding: 10px 0; border-radius: 8px; font-family: var(--font-digital); font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s; }
   .time-btn.active { background: rgba(59, 130, 246, 0.15); border-color: var(--info); color: #fff; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
 
-  .bet-control-grid { display: flex; flex-direction: column; gap: 12px; }
-  
-  .bet-input-row { display: flex; gap: 10px; height: 54px; }
-  .bet-btn-ctrl {
-    width: 54px; background: #1e293b; border: 1px solid #334155; color: #fff;
-    border-radius: 12px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; 
-    cursor: pointer; transition: 0.15s; flex-shrink: 0;
-  }
+  .bet-control-grid { display: flex; flex-direction: column; gap: 10px; }
+  .bet-input-row { display: flex; gap: 10px; height: 50px; }
+  .bet-btn-ctrl { width: 54px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 12px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.15s; flex-shrink: 0; }
   .bet-btn-ctrl:active { transform: scale(0.92); background: var(--gold-dark); border-color: var(--gold-main); }
-  
-  .bet-display-box {
-    flex: 1; background: #000; border-radius: 12px; border: 1px solid var(--gold-dark);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
-  }
-  .bet-display-label { font-size: 9px; color: var(--gold-main); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 1px;}
+  .bet-display-box { flex: 1; background: #000; border-radius: 12px; border: 1px solid var(--gold-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); }
   .bet-display-val { font-family: var(--font-digital); font-size: 20px; color: #fff; font-weight: bold; letter-spacing: 1px;}
 
   .chip-selector { display: flex; justify-content: space-between; gap: 6px; }
-  .chip-btn {
-    flex: 1; padding: 12px 0; border-radius: 8px; border: 1px solid #334155;
-    background: #06090e; color: var(--text-muted); font-family: var(--font-digital); 
-    font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
-  }
+  .chip-btn { flex: 1; padding: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #06090e; color: var(--text-muted); font-family: var(--font-digital); font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
   .chip-btn:active { transform: scale(0.9); }
   .chip-btn.active { background: rgba(212, 175, 55, 0.15); border-color: var(--gold-main); color: var(--gold-light); }
   
-  .action-buttons { display: flex; gap: 12px; margin-top: 5px;}
-  .btn-trade {
-    flex: 1; border: none; padding: 18px; border-radius: 14px; font-family: var(--font-ui); font-weight: 900; 
-    font-size: 18px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
-    transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff;
-  }
+  .action-buttons { display: flex; gap: 10px; margin-top: 5px;}
+  .btn-trade { flex: 1; border: none; padding: 16px; border-radius: 12px; font-family: var(--font-ui); font-weight: 900; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; }
   .btn-trade:active { transform: translateY(3px); }
-  
   .btn-call { background: linear-gradient(180deg, var(--success), #047857); box-shadow: 0 8px 25px var(--success-glow); border: 1px solid #34d399;}
   .btn-call:hover { box-shadow: 0 10px 30px rgba(16,185,129,0.7); filter: brightness(1.15); }
-  
   .btn-put { background: linear-gradient(180deg, var(--danger), #b91c1c); box-shadow: 0 8px 25px var(--danger-glow); border: 1px solid #f87171;}
   .btn-put:hover { box-shadow: 0 10px 30px rgba(239,68,68,0.7); filter: brightness(1.15); }
 
   canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 9999; }
 
-  /* =========================================
-     MODALS & TOAST
-     ========================================= */
-  .toast {
-    position: absolute; top: 90px; left: 50%; transform: translateX(-50%) translateY(-20px);
-    background: #000; border: 2px solid var(--gold-dark); color: var(--gold-light);
-    padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 700; z-index: 5000;
-    opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; 
-    text-align: center; white-space: nowrap; box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-  }
+  /* MODALS & TOAST */
+  .toast { position: absolute; top: 90px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #000; border: 2px solid var(--gold-dark); color: var(--gold-light); padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 700; z-index: 5000; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; text-align: center; white-space: nowrap; box-shadow: 0 15px 30px rgba(0,0,0,0.8); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  
-  .modal-overlay {
-    position: absolute; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
-    display: flex; justify-content: center; align-items: center; z-index: 3000;
-    opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px;
-  }
+  .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px; }
   .modal-overlay.show { opacity: 1; pointer-events: auto; }
-  
-  .modal-box {
-    background: var(--bg-panel); border: 2px solid var(--gold-main); border-radius: 20px;
-    padding: 30px 24px; width: 100%; max-width: 420px; position: relative;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.5); 
-    transform: translateY(20px); transition: 0.3s;
-  }
+  .modal-box { background: var(--bg-panel); border: 2px solid var(--gold-main); border-radius: 20px; padding: 30px 24px; width: 100%; max-width: 420px; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.5); transform: translateY(20px); transition: 0.3s; }
   .modal-overlay.show .modal-box { transform: translateY(0); }
-  
   .modal-box h2 { font-family: var(--font-title); font-size: 22px; color: var(--gold-light); text-align: center; margin-bottom: 24px; letter-spacing: 1px;}
-  .btn-close-modal {
-    position: absolute; top: 16px; right: 16px; background: transparent; border: none;
-    color: var(--text-muted); width: 36px; height: 36px; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; line-height: 1;
-  }
+  .btn-close-modal { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--text-muted); width: 36px; height: 36px; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; line-height: 1; }
   .btn-close-modal:hover { color: var(--danger); transform: rotate(90deg);}
   .how-to-list { font-size: 13px; color: var(--text-muted); line-height: 1.8; padding-left: 20px; margin-bottom: 24px; }
   .how-to-list li { margin-bottom: 12px; }
   .how-to-list b { color: var(--gold-light); }
-  .btn-modal-action {
-    width: 100%; background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; border: none;
-    padding: 14px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: var(--font-ui);
-  }
+  .btn-modal-action { width: 100%; background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: var(--font-ui); }
 
   @media (min-width: 768px) {
     #app-wrapper { border-radius: 16px; margin: 20px auto; height: calc(100dvh - 40px); border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 20px 60px rgba(0,0,0,1);}
@@ -280,7 +151,7 @@
   <canvas id="confettiCanvas" class="confetti"></canvas>
 
   <header class="top-bar">
-    <button class="btn-back" id="btnExit" onclick="saveAndExit()">◀ KEMBALI</button>
+    <button class="btn-back" id="btnExit" onclick="saveAndExit()">◀ LOBBY</button>
     <div class="stats-group">
       <div class="stat-box">
         <div class="stat-title">SALDO CREDITS</div>
@@ -292,37 +163,50 @@
   </header>
 
   <div class="main-layout">
-    
     <div class="chart-section">
       <div class="chart-toolbar">
         <div class="toolbar-group">
-          <div class="asset-selector">
-            <span style="color: #f7931a;">₿</span> BTC / USDT ▾
+          <!-- SELECTOR PAIR CRYPTO -->
+          <select id="assetSelect" class="asset-dropdown" onchange="loadSymbol(this.value)">
+            <option value="BTCUSDT">₿ BTC / USDT</option>
+            <option value="ETHUSDT">♦ ETH / USDT</option>
+            <option value="BNBUSDT">🔶 BNB / USDT</option>
+            <option value="SOLUSDT">◎ SOL / USDT</option>
+            <option value="XRPUSDT">✕ XRP / USDT</option>
+            <option value="PAXGUSDT">🥇 PAXG / USDT (Gold)</option>
+          </select>
+          
+          <!-- TIMEFRAME SELECTOR -->
+          <div class="toolbar-group" style="margin-left:5px;">
+            <button class="tf-btn active" onclick="changeChartTimeframe(60000, this)">1M</button>
+            <button class="tf-btn" onclick="changeChartTimeframe(300000, this)">5M</button>
+            <button class="tf-btn" onclick="changeChartTimeframe(900000, this)">15M</button>
           </div>
-          <div class="profit-badge">PROFIT 90%</div>
         </div>
+        
         <div class="toolbar-group">
-          <button class="chart-toggle-btn active" id="btnCandle" onclick="setChartType('CANDLE')">🕯️ CANDLE</button>
-          <button class="chart-toggle-btn" id="btnLine" onclick="setChartType('LINE')">📈 LINE</button>
+          <div class="profit-badge">PROFIT 90%</div>
+          <button class="chart-toggle-btn active" id="btnCandle" onclick="setChartType('CANDLE')">🕯️</button>
+          <button class="chart-toggle-btn" id="btnLine" onclick="setChartType('LINE')">📈</button>
         </div>
       </div>
 
       <div class="chart-container" id="chartArea">
         <div class="grid-overlay"></div>
         <canvas id="tradeCanvas"></canvas>
-        <div class="price-tag" id="priceTag">64500.00</div>
+        <div class="price-tag" id="priceTag">MEMUAT...</div>
       </div>
     </div>
 
     <div class="control-section">
       <div class="time-selector-wrap">
-        <span class="control-label">WAKTU KONTRAK</span>
+        <span class="control-label">WAKTU KONTRAK EXPIRED</span>
         <div class="time-grid">
-          <button class="time-btn" onclick="setDuration(3000, this)">3s</button>
-          <button class="time-btn active" onclick="setDuration(5000, this)">5s</button>
-          <button class="time-btn" onclick="setDuration(15000, this)">15s</button>
-          <button class="time-btn" onclick="setDuration(30000, this)">30s</button>
-          <button class="time-btn" onclick="setDuration(60000, this)">1m</button>
+          <button class="time-btn" onclick="setTradeDuration(3000, this)">3s</button>
+          <button class="time-btn active" onclick="setTradeDuration(5000, this)">5s</button>
+          <button class="time-btn" onclick="setTradeDuration(15000, this)">15s</button>
+          <button class="time-btn" onclick="setTradeDuration(30000, this)">30s</button>
+          <button class="time-btn" onclick="setTradeDuration(60000, this)">1m</button>
         </div>
       </div>
 
@@ -363,10 +247,10 @@
       <button class="btn-close-modal" onclick="closeHelpModal()">×</button>
       <h2>CARA BERMAIN TRADING VIP</h2>
       <ol class="how-to-list">
-        <li>Pilih <b>Waktu Kontrak</b> (3 Detik hingga 1 Menit).</li>
-        <li>Tentukan jumlah investasi Anda. Anda dapat <b>Membuka Banyak Posisi</b> sekaligus!</li>
-        <li>Prediksi arah pergerakan harga Bitcoin (BTC). Pilih <b>NAIK (CALL)</b> atau <b>TURUN (PUT)</b>.</li>
-        <li>Jika tebakan Anda benar saat waktu habis, Anda mendapatkan pengembalian investasi ditambah <b>Profit 90%</b>!</li>
+        <li>Pilih <b>Asset / Market</b> (BTC, ETH, SOL, atau Gold).</li>
+        <li>Tentukan <b>Waktu Kontrak</b> (Kapan posisi akan kadaluarsa).</li>
+        <li>Anda dapat <b>Membuka Banyak Posisi</b> sekaligus tanpa jeda!</li>
+        <li>Jika tebakan Anda benar, Anda mendapat pengembalian + <b>Profit 90%</b>!</li>
       </ol>
       <button class="btn-modal-action" onclick="closeHelpModal()">SAYA MENGERTI</button>
     </div>
@@ -374,11 +258,11 @@
 
 </div>
 
-<script src="api.js"></script>
+  <script src="api.js"></script>
 <script>
 /**
  * ==============================================================
- * 1. AUTH & SETUP
+ * 1. AUTH & SETUP (RTP INTEGRATION)
  * ==============================================================
  */
 if (!localStorage.getItem('currentUser')) {
@@ -387,7 +271,7 @@ if (!localStorage.getItem('currentUser')) {
 const userJson = localStorage.getItem('currentUser');
 let currentUser = JSON.parse(userJson);
 
-let playerWinRate = 0.15; // Set RTP (15%)
+let playerWinRate = 0.15; // RTP Default
 const MIN_BET = 100;
 const PROFIT_MULTIPLIER = 1.90; 
 const SOUND_KEY = 'trading_sound';
@@ -395,8 +279,17 @@ const SOUND_KEY = 'trading_sound';
 let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
 let tradeDuration = 5000; 
 
-// Menggunakan harga realistis Crypto BTC/USDT
-let currentPrice = 64500.00;
+// Konfigurasi Chart Realistis
+let CANDLE_PERIOD = 60000; // Default: 1 Menit per Candle (Bisa diganti 5M / 15M)
+const MAX_CANDLES = 25; 
+
+let currentSymbol = 'BTCUSDT';
+let currentPrice = 64500.00; // Harga default awal
+
+const FALLBACK_PRICES = {
+  BTCUSDT: 64500.00, ETHUSDT: 3500.00, BNBUSDT: 600.00,
+  SOLUSDT: 150.00, XRPUSDT: 0.60, PAXGUSDT: 2350.00
+};
 
 if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
@@ -408,154 +301,112 @@ if (typeof api !== 'undefined' && api.getDatabase) {
         updateBalanceUI(false);
       }
     }
-  }).catch(e => console.error(e));
+  });
 }
 
 async function saveToServer() {
   if (typeof api !== 'undefined' && api.saveProgress) {
-    try { await api.saveProgress(currentUser.username, currentUser.balance, currentUser.level || 1, currentUser.exp || 0); } 
-    catch(e) {}
+    try { await api.saveProgress(currentUser.username, currentUser.balance, currentUser.level || 1, currentUser.exp || 0); } catch(e) {}
   }
 }
-
-async function saveAndExit() {
-  document.getElementById('btnExit').innerHTML = "SAVING...";
-  await saveToServer();
-  window.location.href = 'index.html';
-}
+async function saveAndExit() { document.getElementById('btnExit').innerHTML = "SAVING..."; await saveToServer(); window.location.href = 'index.html'; }
 
 function updateBalanceUI(bump) {
   const balEl = document.getElementById('displayBalance');
   balEl.textContent = currentUser.balance.toLocaleString();
-  if (bump) {
-    balEl.classList.remove('bump'); void balEl.offsetWidth; balEl.classList.add('bump');
-  }
+  if (bump) { balEl.classList.remove('bump'); void balEl.offsetWidth; balEl.classList.add('bump'); }
 }
 updateBalanceUI(false);
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 function openHelpModal() { document.getElementById('helpModal').classList.add('show'); }
 function closeHelpModal() { document.getElementById('helpModal').classList.remove('show'); }
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
-});
+document.querySelectorAll('.modal-overlay').forEach(overlay => { overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); }); });
 
-/**
- * ==============================================================
- * SOUND (WebAudio beeps)
- * ==============================================================
- */
+/** SOUND ENGINE **/
 let audioCtx = null;
 function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
 function beep(freq, duration, type, gainVal) {
   if (!soundOn || !audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = type || 'sine';
-  osc.frequency.value = freq;
-  gain.gain.value = gainVal || 0.05;
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.start();
-  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-  osc.stop(audioCtx.currentTime + duration);
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = type || 'sine'; osc.frequency.value = freq; gain.gain.value = gainVal || 0.05;
+  osc.connect(gain); gain.connect(audioCtx.destination); osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration); osc.stop(audioCtx.currentTime + duration);
 }
 function sfxClick() { beep(600, 0.1, 'sine', 0.02); }
 function sfxTradeStart() { beep(400, 0.3, 'square', 0.03); }
 function sfxWin() { beep(600, 0.1, 'triangle', 0.05); setTimeout(() => beep(900, 0.2, 'triangle', 0.05), 100); }
 function sfxLoss() { beep(200, 0.4, 'sawtooth', 0.05); }
 
-function toggleSound() {
-  soundOn = !soundOn;
-  localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off');
-  document.getElementById('btnSound').textContent = soundOn ? '🔊' : '🔇';
-  document.getElementById('btnSound').classList.toggle('muted', !soundOn);
-  if (soundOn) ensureAudio();
-}
+function toggleSound() { soundOn = !soundOn; localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off'); document.getElementById('btnSound').textContent = soundOn ? '🔊' : '🔇'; document.getElementById('btnSound').classList.toggle('muted', !soundOn); if (soundOn) ensureAudio(); }
 document.getElementById('btnSound').textContent = soundOn ? '🔊' : '🔇';
 document.getElementById('btnSound').classList.toggle('muted', !soundOn);
 
-/**
- * ==============================================================
- * UI CONTROLS (Bet & Time)
- * ==============================================================
- */
+/** UI CONTROLS **/
 let currentBet = 100;
-
 function clearChipActive() { document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); }
+function setBetAmount(amount, btnEl) { sfxClick(); const cap = currentUser.balance > 0 ? currentUser.balance : amount; currentBet = Math.max(MIN_BET, Math.min(amount, cap)); document.getElementById('betDisplay').textContent = currentBet.toLocaleString(); clearChipActive(); if (btnEl) btnEl.classList.add('active'); }
+function adjustBet(factor) { sfxClick(); let next = Math.floor(currentBet * factor); if (next < MIN_BET) next = MIN_BET; if (next > currentUser.balance) next = currentUser.balance > 0 ? currentUser.balance : MIN_BET; currentBet = next; document.getElementById('betDisplay').textContent = currentBet.toLocaleString(); clearChipActive(); }
+function setTradeDuration(ms, btnEl) { sfxClick(); tradeDuration = ms; document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active')); btnEl.classList.add('active'); }
 
-function setBetAmount(amount, btnEl) {
+function changeChartTimeframe(ms, btnEl) {
   sfxClick();
-  const cap = currentUser.balance > 0 ? currentUser.balance : amount;
-  currentBet = Math.max(MIN_BET, Math.min(amount, cap));
-  document.getElementById('betDisplay').textContent = currentBet.toLocaleString();
-  clearChipActive();
-  if (btnEl) btnEl.classList.add('active');
-}
-
-function adjustBet(factor) {
-  sfxClick();
-  let next = Math.floor(currentBet * factor);
-  if (next < MIN_BET) next = MIN_BET;
-  if (next > currentUser.balance) next = currentUser.balance > 0 ? currentUser.balance : MIN_BET;
-  currentBet = next;
-  document.getElementById('betDisplay').textContent = currentBet.toLocaleString();
-  clearChipActive();
-}
-
-function setDuration(ms, btnEl) {
-  sfxClick();
-  tradeDuration = ms;
-  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+  CANDLE_PERIOD = ms;
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
   btnEl.classList.add('active');
+  initChartHistory(); // Re-generate chart width
 }
 
 /**
  * ==============================================================
- * CHART ENGINE (Multi Position Support)
+ * CHART ENGINE
  * ==============================================================
  */
 const canvas = document.getElementById('tradeCanvas');
 const ctx = canvas.getContext('2d');
-let animFrame;
-let chartType = 'CANDLE'; 
+let animFrame; let chartType = 'CANDLE'; 
 
-function setChartType(type) {
-  chartType = type;
-  document.getElementById('btnCandle').classList.toggle('active', type === 'CANDLE');
-  document.getElementById('btnLine').classList.toggle('active', type === 'LINE');
-}
-
-// Chart Configurations
-const MAX_CANDLES = 30; 
-const CANDLE_PERIOD = 60000; 
+function setChartType(type) { chartType = type; document.getElementById('btnCandle').classList.toggle('active', type === 'CANDLE'); document.getElementById('btnLine').classList.toggle('active', type === 'LINE'); }
 
 let candles = []; 
 let currentCandle = null;
-
-// ARRAY UNTUK MENYIMPAN BANYAK POSISI SEKALIGUS
 let activeTrades = [];
 let tradeIdCounter = 0;
 
-function resizeCanvas() {
-  canvas.width = canvas.parentElement.clientWidth;
-  canvas.height = canvas.parentElement.clientHeight;
+function resizeCanvas() { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+function initChartHistory() {
+  candles = [];
+  let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
+  let priceScale = currentPrice * 0.0001; // Dinamis berdasarkan harga aset
+  
+  for(let i=0; i<MAX_CANDLES; i++) {
+    let cOpen = currentPrice;
+    let cClose = cOpen + ((Math.random() - 0.5) * priceScale * 15);
+    candles.push({
+      openTime: initTime, o: cOpen,
+      h: Math.max(cOpen, cClose) + (Math.random() * priceScale * 8),
+      l: Math.min(cOpen, cClose) - (Math.random() * priceScale * 8),
+      c: cClose
+    });
+    currentPrice = cClose;
+    initTime += CANDLE_PERIOD;
+  }
+  currentCandle = candles[candles.length - 1];
+  currentCandle.openTime = performance.now();
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
 function updatePriceTick(price, now) {
   if (!currentCandle) return;
   if (now - currentCandle.openTime >= CANDLE_PERIOD) {
     let newCandle = { openTime: currentCandle.openTime + CANDLE_PERIOD, o: currentCandle.c, h: currentCandle.c, l: currentCandle.c, c: price };
-    candles.push(newCandle);
-    if (candles.length > MAX_CANDLES) candles.shift(); 
-    currentCandle = newCandle;
+    candles.push(newCandle); if (candles.length > MAX_CANDLES) candles.shift(); currentCandle = newCandle;
   } else {
     currentCandle.c = price;
     if (price > currentCandle.h) currentCandle.h = price;
@@ -567,62 +418,33 @@ function drawChart(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (candles.length === 0) return;
 
-  const paddingTop = canvas.height * 0.15;
-  const paddingBottom = canvas.height * 0.15;
-  const renderHeight = canvas.height - paddingTop - paddingBottom;
-
-  let minP = Math.min(...candles.map(c => c.l));
-  let maxP = Math.max(...candles.map(c => c.h));
+  const paddingTop = canvas.height * 0.15; const paddingBottom = canvas.height * 0.15; const renderHeight = canvas.height - paddingTop - paddingBottom;
+  let minP = Math.min(...candles.map(c => c.l)); let maxP = Math.max(...candles.map(c => c.h));
   
-  // Memastikan batas visual dinamis mencakup harga saat ini dan target semua posisi
-  activeTrades.forEach(t => {
-      if(t.entryPrice < minP) minP = t.entryPrice;
-      if(t.entryPrice > maxP) maxP = t.entryPrice;
-  });
+  activeTrades.forEach(t => { if(t.entryPrice < minP) minP = t.entryPrice; if(t.entryPrice > maxP) maxP = t.entryPrice; });
 
-  let paddingY = (maxP - minP) * 0.2;
-  if (paddingY < 5) paddingY = 5;
+  let paddingY = (maxP - minP) * 0.15;
+  // Dynamic minimum padding agar grafik coin murah (XRP) tidak terlihat lurus saja
+  let minPadding = currentPrice * 0.0001; 
+  if (paddingY < minPadding) paddingY = minPadding;
   
-  const scaleY = (val) => {
-    let normalized = (val - (minP - paddingY)) / ((maxP + paddingY) - (minP - paddingY));
-    return canvas.height - paddingBottom - (normalized * renderHeight);
-  };
+  const scaleY = (val) => { let normalized = (val - (minP - paddingY)) / ((maxP + paddingY) - (minP - paddingY)); return canvas.height - paddingBottom - (normalized * renderHeight); };
 
-  const candleSpacing = canvas.width / MAX_CANDLES;
-  const candleWidth = candleSpacing * 0.7; 
-  
-  let elapsedInCandle = now - currentCandle.openTime;
-  let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
+  const candleSpacing = canvas.width / MAX_CANDLES; const candleWidth = candleSpacing * 0.7; 
+  let elapsedInCandle = now - currentCandle.openTime; let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
   let baseX = canvas.width - (candleSpacing / 2); 
-
-  let lastX = baseX - shiftX;
-  let lastY = scaleY(currentCandle.c);
+  let lastX = baseX - shiftX; let lastY = scaleY(currentCandle.c);
 
   // MENGGAMBAR GARIS ENTRY UNTUK SEMUA POSISI AKTIF
   activeTrades.forEach(t => {
     const entryY = scaleY(t.entryPrice);
     const color = t.direction === 'CALL' ? '#10b981' : '#ef4444';
     
-    // Fill Area
     ctx.fillStyle = t.direction === 'CALL' ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)';
-    if (t.direction === 'CALL') ctx.fillRect(0, 0, canvas.width, entryY);
-    else ctx.fillRect(0, entryY, canvas.width, canvas.height);
+    if (t.direction === 'CALL') ctx.fillRect(0, 0, canvas.width, entryY); else ctx.fillRect(0, entryY, canvas.width, canvas.height);
 
-    // Dotted Line
-    ctx.beginPath();
-    ctx.moveTo(0, entryY);
-    ctx.lineTo(canvas.width, entryY);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Label Text
-    ctx.fillStyle = color;
-    ctx.font = 'bold 11px Montserrat';
-    ctx.textAlign = 'left';
-    
+    ctx.beginPath(); ctx.moveTo(0, entryY); ctx.lineTo(canvas.width, entryY); ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = color; ctx.font = 'bold 11px Montserrat'; ctx.textAlign = 'left';
     let remaining = Math.max(0, Math.ceil((t.expiryTime - now) / 1000));
     ctx.fillText(`${t.direction} $${t.amount} (${remaining}s)`, 10, entryY - 6);
   });
@@ -630,109 +452,107 @@ function drawChart(now) {
   if (chartType === 'LINE') {
     ctx.beginPath();
     for (let i = 0; i < candles.length; i++) {
-      let offsetIndex = (candles.length - 1 - i);
-      let x = baseX - (offsetIndex * candleSpacing) - shiftX;
-      let y = scaleY(candles[i].c);
+      let offsetIndex = (candles.length - 1 - i); let x = baseX - (offsetIndex * candleSpacing) - shiftX; let y = scaleY(candles[i].c);
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 3;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
-
-    ctx.lineTo(lastX, canvas.height);
-    ctx.lineTo(baseX - ((candles.length - 1) * candleSpacing) - shiftX, canvas.height);
-    ctx.closePath();
-    let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, 'rgba(59,130,246,0.3)');
-    gradient.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = gradient;
-    ctx.fill();
-
+    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
+    ctx.lineTo(lastX, canvas.height); ctx.lineTo(baseX - ((candles.length - 1) * candleSpacing) - shiftX, canvas.height); ctx.closePath();
+    let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height); gradient.addColorStop(0, 'rgba(59,130,246,0.3)'); gradient.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gradient; ctx.fill();
   } else {
-    // SOLID CANDLES
     for (let i = 0; i < candles.length; i++) {
-      let c = candles[i];
-      let isGreen = c.c >= c.o;
-      let color = isGreen ? '#10b981' : '#ef4444'; 
-      let offsetIndex = (candles.length - 1 - i);
-      let x = baseX - (offsetIndex * candleSpacing) - shiftX;
-      
-      let yOpen = scaleY(c.o);
-      let yClose = scaleY(c.c);
-      let yHigh = scaleY(c.h);
-      let yLow = scaleY(c.l);
-
+      let c = candles[i]; let color = c.c >= c.o ? '#10b981' : '#ef4444'; 
+      let offsetIndex = (candles.length - 1 - i); let x = baseX - (offsetIndex * candleSpacing) - shiftX;
+      let yOpen = scaleY(c.o); let yClose = scaleY(c.c); let yHigh = scaleY(c.h); let yLow = scaleY(c.l);
       ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.5;
-
       ctx.beginPath(); ctx.moveTo(x, yHigh); ctx.lineTo(x, yLow); ctx.stroke();
-      const bodyY = Math.min(yOpen, yClose);
-      let bodyH = Math.abs(yOpen - yClose);
-      if (bodyH < 2) bodyH = 2; 
+      const bodyY = Math.min(yOpen, yClose); let bodyH = Math.abs(yOpen - yClose); if (bodyH < 2) bodyH = 2; 
       ctx.fillRect(x - (candleWidth / 2), bodyY, candleWidth, bodyH);
     }
   }
 
-  // Titik Glow Current Price
-  ctx.beginPath(); ctx.arc(lastX, lastY, 5, 0, Math.PI*2);
-  ctx.fillStyle = '#fff'; ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 15;
-  ctx.fill(); ctx.shadowBlur = 0;
+  ctx.beginPath(); ctx.arc(lastX, lastY, 5, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0;
 
-  // Update Harga Berjalan
+  // Format desimal dinamis (XRP = 4 desimal, BTC = 2 desimal)
+  let decimals = currentPrice < 10 ? 4 : 2;
   const tag = document.getElementById('priceTag');
-  tag.textContent = currentPrice.toFixed(2);
+  tag.textContent = currentPrice.toFixed(decimals);
   tag.style.top = `${lastY}px`;
 }
 
 /**
-/**
  * ==============================================================
- * GAME LOOP, BINANCE WEBSOCKET & STEALTH RTP ENGINE
+ * WEBSOCKET & DYNAMIC SCALING ENGINE
  * ==============================================================
  */
 let lastTickTime = performance.now();
-let realMarketPrice = currentPrice; // Variabel penyimpan harga dunia nyata
+let realMarketPrice = currentPrice; 
+let binanceWS = null;
 
-// MENGHUBUNGKAN KE LIVE MARKET BINANCE VIA WEBSOCKET (REAL-TIME)
-const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
-ws.onmessage = (event) => {
-  let data = JSON.parse(event.data);
-  realMarketPrice = parseFloat(data.p);
-};
+function connectWS(symbol) {
+  if (binanceWS) binanceWS.close();
+  let streamName = symbol.toLowerCase() + '@trade';
+  binanceWS = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}`);
+  binanceWS.onmessage = (event) => {
+    let data = JSON.parse(event.data);
+    realMarketPrice = parseFloat(data.p);
+  };
+}
+
+function loadSymbol(symbol) {
+  sfxClick();
+  currentSymbol = symbol;
+  document.getElementById('priceTag').textContent = "MEMUAT...";
+  
+  // Ambil data harga pertama
+  fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`)
+    .then(res => res.json())
+    .then(data => {
+      currentPrice = parseFloat(data.price);
+      realMarketPrice = currentPrice;
+      activeTrades = []; // Wajib bersihkan trade aktif jika pindah pair agar tidak error chart-nya
+      initChartHistory();
+      connectWS(symbol);
+      if(!animFrame) animFrame = requestAnimationFrame(gameLoop);
+    })
+    .catch(() => {
+      currentPrice = FALLBACK_PRICES[symbol] || 100;
+      realMarketPrice = currentPrice;
+      activeTrades = [];
+      initChartHistory();
+      connectWS(symbol);
+      if(!animFrame) animFrame = requestAnimationFrame(gameLoop);
+    });
+}
+
+// Mulai aplikasi
+loadSymbol(currentSymbol);
 
 function gameLoop(now) {
   let dt = now - lastTickTime;
   
   if (dt > 100) {
-    // -------------------------------------------------------------
-    // LOGIKA PERPINDAHAN MARKET ASLI VS MANIPULASI
-    // -------------------------------------------------------------
+    let priceScale = currentPrice * 0.0001; // Dinamis untuk Pair apapun
+    
     if (activeTrades.length === 0) {
-        // MODE 1: MARKET ASLI (TIDAK ADA POSISI)
-        // Grafik menempel ketat ke harga Binance.
-        // Jika baru selesai Trade (harga terlempar jauh), grafik akan meluncur/glide 
-        // dengan sangat mulus kembali ke harga asli agar pemain tidak sadar ada lompatan.
+        // MODE 1: STEALTH (MARKET ASLI BINANCE)
         let diff = realMarketPrice - currentPrice;
-        currentPrice += diff * 0.15; 
+        currentPrice += diff * 0.2; 
     } 
     else {
-        // MODE 2: MANIPULASI RTP BANDAR (ADA POSISI AKTIF)
-        // Koneksi ke pasar asli diabaikan sementara.
-        let volatility = 2.0; 
+        // MODE 2: MANIPULASI RTP BANDAR
+        let volatility = priceScale * 2.0; 
         let bias = 0;
         
         let sortedTrades = [...activeTrades].sort((a,b) => a.expiryTime - b.expiryTime);
         let nearestTrade = sortedTrades[0];
         let remaining = nearestTrade.expiryTime - now;
         
-        // Di 2 detik terakhir, berikan "Tarikan Gravitasi" menuju target Price RTP
         if (remaining > 0 && remaining < 2000) {
             let diff = nearestTrade.targetPrice - currentPrice;
             bias = diff * 0.15; 
-            volatility = 0.5; 
+            volatility = priceScale * 0.5; // Mengurangi guncangan agar presisi
         }
         
-        // Pergerakan acak (noise) agar tetap terlihat seperti market asli
         currentPrice += bias + (Math.random() - 0.5) * volatility;
     }
     
@@ -741,17 +561,17 @@ function gameLoop(now) {
   }
 
   // Resolusi Trade yang Kadaluarsa
+  let safetyGap = currentPrice * 0.00005; // Titik presisi (contoh: 0.05 BTC / 0.0001 XRP)
   for(let i = activeTrades.length - 1; i >= 0; i--) {
       let t = activeTrades[i];
       if (now >= t.expiryTime) {
           
-          // Memastikan mendarat tepat sesuai rumus RTP, menghilangkan margin error
           if (t.isWin) {
-              if(t.direction === 'CALL' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + 0.5;
-              if(t.direction === 'PUT' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - 0.5;
+              if(t.direction === 'CALL' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + safetyGap;
+              if(t.direction === 'PUT' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - safetyGap;
           } else {
-              if(t.direction === 'CALL' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - 0.5;
-              if(t.direction === 'PUT' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + 0.5;
+              if(t.direction === 'CALL' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - safetyGap;
+              if(t.direction === 'PUT' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + safetyGap;
           }
           
           updatePriceTick(currentPrice, now);
@@ -763,73 +583,6 @@ function gameLoop(now) {
   drawChart(now);
   animFrame = requestAnimationFrame(gameLoop);
 }
-
-// Inisialisasi awal Candle (Dilakukan setelah dapat harga Fetch pertama)
-function initChartAndLoop() {
-  let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
-  for(let i=0; i<MAX_CANDLES; i++) {
-    let cOpen = currentPrice;
-    let cClose = cOpen + ((Math.random() - 0.5) * 15);
-    candles.push({
-      openTime: initTime, o: cOpen,
-      h: Math.max(cOpen, cClose) + (Math.random() * 8),
-      l: Math.min(cOpen, cClose) - (Math.random() * 8),
-      c: cClose
-    });
-    currentPrice = cClose;
-    initTime += CANDLE_PERIOD;
-  }
-  currentCandle = candles[candles.length - 1];
-  currentCandle.openTime = performance.now();
-  animFrame = requestAnimationFrame(gameLoop);
-}
-
-// Mengambil harga valid pertama kali web dibuka agar tidak mulai dari $0
-fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT')
-  .then(res => res.json())
-  .then(data => {
-    currentPrice = parseFloat(data.price);
-    realMarketPrice = currentPrice;
-    initChartAndLoop();
-  })
-  .catch(() => {
-    currentPrice = 64500.00; // Fallback jika no internet
-    realMarketPrice = currentPrice;
-    initChartAndLoop();
-  });
-
-// Inisialisasi awal Candle (Dummy Data mundur)
-// Fungsi untuk membangkitkan grafik SETELAH harga didapatkan
-function initChartAndLoop() {
-  let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
-  for(let i=0; i<MAX_CANDLES; i++) {
-    let cOpen = currentPrice;
-    let cClose = cOpen + ((Math.random() - 0.5) * 15);
-    candles.push({
-      openTime: initTime, o: cOpen,
-      h: Math.max(cOpen, cClose) + (Math.random() * 8),
-      l: Math.min(cOpen, cClose) - (Math.random() * 8),
-      c: cClose
-    });
-    currentPrice = cClose;
-    initTime += CANDLE_PERIOD;
-  }
-  currentCandle = candles[candles.length - 1];
-  currentCandle.openTime = performance.now();
-  animFrame = requestAnimationFrame(gameLoop);
-}
-
-// MENGAMBIL HARGA REALTIME DARI BINANCE API
-fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT')
-  .then(res => res.json())
-  .then(data => {
-    currentPrice = parseFloat(data.price);
-    initChartAndLoop(); // Jalankan grafik dengan harga asli Binance
-  })
-  .catch(err => {
-    console.error("Gagal mengambil API Binance, menggunakan harga default.", err);
-    initChartAndLoop(); // Fallback jika tidak ada internet / API diblokir
-  });
 
 /**
  * ==============================================================
@@ -844,11 +597,11 @@ function placeTrade(direction) {
   currentUser.balance -= currentBet;
   updateBalanceUI(true);
   
-  // Hitung RTP secara individual untuk setiap posisi baru
   let isWin = Math.random() < playerWinRate;
   
-  // Tentukan jarak titik akhir (margin) dari harga entry
-  let margin = 2 + Math.random() * 6; // Jarak pergerakan yang meyakinkan
+  // Tentukan jarak titik akhir dinamis sesuai harga Pair (contoh BTC = ~$5, XRP = ~$0.0005)
+  let priceScale = currentPrice * 0.0001;
+  let margin = priceScale * (10 + Math.random() * 20); 
   let targetPrice = currentPrice + (direction === 'CALL' ? (isWin ? margin : -margin) : (isWin ? -margin : margin));
   
   activeTrades.push({
@@ -866,15 +619,11 @@ function placeTrade(direction) {
 function resolveTrade(t) {
   let winAmount = 0;
   if (t.isWin) {
-      sfxWin();
-      winAmount = Math.floor(t.amount * PROFIT_MULTIPLIER);
-      currentUser.balance += winAmount;
-      updateBalanceUI(true);
-      confettiEngine.burst(30);
-      showFloatingResult(true, winAmount);
+      sfxWin(); winAmount = Math.floor(t.amount * PROFIT_MULTIPLIER);
+      currentUser.balance += winAmount; updateBalanceUI(true);
+      confettiEngine.burst(30); showFloatingResult(true, winAmount);
   } else {
-      sfxLoss();
-      showFloatingResult(false, t.amount);
+      sfxLoss(); showFloatingResult(false, t.amount);
   }
   saveToServer();
 }
@@ -884,39 +633,19 @@ function showFloatingResult(isWin, amount) {
   floater.className = 'trade-result-float ' + (isWin ? 'win' : 'loss');
   floater.innerHTML = isWin ? `PROFIT +${amount.toLocaleString()}` : `LOSS -${amount.toLocaleString()}`;
   document.getElementById('chartArea').appendChild(floater);
-  
-  setTimeout(() => {
-      if(floater.parentNode) floater.remove();
-  }, 2000);
+  setTimeout(() => { if(floater.parentNode) floater.remove(); }, 2000);
 }
 
-/**
- * ==============================================================
- * CONFETTI ENGINE
- * ==============================================================
- */
+/** CONFETTI ENGINE **/
 const confettiEngine = {
-  canvas: document.getElementById('confettiCanvas'), ctx: null, parts: [],
-  colors: ['#10b981', '#34d399', '#fef08a', '#ffffff'],
+  canvas: document.getElementById('confettiCanvas'), ctx: null, parts: [], colors: ['#10b981', '#34d399', '#fef08a', '#ffffff'],
   init() { this.ctx = this.canvas.getContext('2d'); this.resize(); window.addEventListener('resize', () => this.resize()); this.run(); },
-  resize() { 
-    const wrapper = document.getElementById('app-wrapper');
-    this.canvas.width = wrapper.clientWidth; 
-    this.canvas.height = wrapper.clientHeight; 
-  },
-  burst(count) {
-    for (let i = 0; i < count; i++) {
-      this.parts.push({
-        x: this.canvas.width / 2, y: this.canvas.height / 2, vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 1) * 30,
-        size: Math.random() * 8 + 4, color: this.colors[Math.floor(Math.random() * this.colors.length)], rot: Math.random() * 360, rotSpd: (Math.random() - 0.5) * 20, life: 1
-      });
-    }
-  },
+  resize() { const wrapper = document.getElementById('app-wrapper'); this.canvas.width = wrapper.clientWidth; this.canvas.height = wrapper.clientHeight; },
+  burst(count) { for (let i = 0; i < count; i++) { this.parts.push({ x: this.canvas.width / 2, y: this.canvas.height / 2, vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 1) * 30, size: Math.random() * 8 + 4, color: this.colors[Math.floor(Math.random() * this.colors.length)], rot: Math.random() * 360, rotSpd: (Math.random() - 0.5) * 20, life: 1 }); } },
   run() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     for (let i = this.parts.length - 1; i >= 0; i--) {
-      let p = this.parts[i];
-      p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
+      let p = this.parts[i]; p.vy += 0.8; p.x += p.vx; p.y += p.vy; p.rot += p.rotSpd; p.life -= 0.015;
       this.ctx.save(); this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rot * Math.PI / 180);
       this.ctx.fillStyle = p.color; this.ctx.globalAlpha = Math.max(p.life, 0);
       this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size); this.ctx.restore();
