@@ -418,17 +418,23 @@
     </div>
   </div>
 
-  <!-- MODAL: MINI GAME 777 -->
+<!-- MODAL: MINI GAME 777 -->
   <div class="overlay" id="miniGameModal">
-    <div class="modal-panel" onclick="event.stopPropagation()">
-      <h2 class="modal-title" style="color: var(--neon-blue);">🎰 BONUS STAGE 🎰</h2>
-      <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; font-family: var(--font-digital); font-size: 3.5rem; color: #fff;">
-        <div id="mgReel1" style="background: #000; padding: 10px 20px; border: 2px solid var(--gold-main); border-radius: 10px; box-shadow: inset 0 0 15px rgba(212,175,55,0.3);">❓</div>
-        <div id="mgReel2" style="background: #000; padding: 10px 20px; border: 2px solid var(--gold-main); border-radius: 10px; box-shadow: inset 0 0 15px rgba(212,175,55,0.3);">❓</div>
-        <div id="mgReel3" style="background: #000; padding: 10px 20px; border: 2px solid var(--gold-main); border-radius: 10px; box-shadow: inset 0 0 15px rgba(212,175,55,0.3);">❓</div>
+    <div class="modal-panel" onclick="event.stopPropagation()" style="background: linear-gradient(180deg, #2a0808 0%, #0a0000 100%); border-color: var(--danger); box-shadow: 0 0 40px rgba(255, 0, 0, 0.3);">
+      <h2 class="modal-title" style="color: var(--gold-light); text-shadow: 0 0 15px var(--danger); font-size: 2rem; margin-bottom: 10px;">🎰 JACKPOT 777 🎰</h2>
+      
+      <!-- Mesin Slot -->
+      <div style="background: #000; border: 4px solid #333; border-radius: 12px; padding: 25px 15px; margin: 20px 0; box-shadow: inset 0 10px 30px rgba(0,0,0,1), 0 5px 15px rgba(0,0,0,0.5);">
+        <div style="display: flex; justify-content: center; gap: 12px; font-family: var(--font-digital); font-size: 4rem; font-weight: bold;">
+          <div id="mgReel1" style="background: linear-gradient(180deg, #f8fafc, #cbd5e1); color: #111; width: 75px; height: 95px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px solid var(--gold-main); box-shadow: inset 0 5px 10px rgba(0,0,0,0.2);">❓</div>
+          <div id="mgReel2" style="background: linear-gradient(180deg, #f8fafc, #cbd5e1); color: #111; width: 75px; height: 95px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px solid var(--gold-main); box-shadow: inset 0 5px 10px rgba(0,0,0,0.2);">❓</div>
+          <div id="mgReel3" style="background: linear-gradient(180deg, #f8fafc, #cbd5e1); color: #111; width: 75px; height: 95px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px solid var(--gold-main); box-shadow: inset 0 5px 10px rgba(0,0,0,0.2);">❓</div>
+        </div>
       </div>
-      <p id="mgStatus" style="text-align: center; color: var(--gold-light); margin-bottom: 20px; font-weight: bold; font-size: 14px;">Dapatkan 7-7-7 untuk x1000 Bet!</p>
-      <button class="btn-action-primary" id="btnStartMG" onclick="gameEngine.startMiniGame()">SPIN JACKPOT</button>
+
+      <p id="mgStatus" style="text-align: center; color: var(--gold-light); margin-bottom: 25px; font-weight: 800; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">Kejar hadiah x1000 Bet!</p>
+      
+      <button class="btn-action-primary" id="btnStartMG" onclick="gameEngine.startMiniGame()" style="background: linear-gradient(180deg, var(--danger), #990000); color: #fff; font-size: 1.2rem; text-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 2px solid #ff4d4d; box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); padding: 15px;">SPIN SEKARANG</button>
     </div>
   </div>
 
@@ -617,7 +623,7 @@ const CONFIG = {
     { id: 'star',       icon: '⭐', multiplier: 25, weight: 3 },
     { id: 'crown',      icon: '👑', multiplier: 50, weight: 1 },
     // --- TAMBAHAN BUAH JACKPOT ---
-    { id: 'golden_apple', icon: '🍏', multiplier: 1000, weight: 0.3, isJackpot: true }
+    { id: 'golden_apple', icon: '🍏', multiplier: 1000, weight: 1000, isJackpot: true }
   ],
 
   mechanics: {
@@ -1109,39 +1115,80 @@ evaluateWin() {
     }
   },
 
-  async startMiniGame() {
+async startMiniGame() {
     document.getElementById('btnStartMG').style.display = 'none';
     const r1 = document.getElementById('mgReel1');
     const r2 = document.getElementById('mgReel2');
     const r3 = document.getElementById('mgReel3');
     const status = document.getElementById('mgStatus');
     
-    status.textContent = 'Memutar...';
+    status.textContent = 'MENGACAK...';
+    status.style.color = 'var(--gold-light)';
 
-    // Efek Animasi Angka Berputar Cepat
-    let spinInterval = setInterval(() => {
-       r1.textContent = Math.floor(Math.random() * 9) + 1;
-       r2.textContent = Math.floor(Math.random() * 9) + 1;
-       r3.textContent = Math.floor(Math.random() * 9) + 1;
-    }, 50);
+    // Reset warna reel ke hitam
+    [r1, r2, r3].forEach(r => r.style.color = '#111');
 
-    await new Promise(res => setTimeout(res, 2000)); // Putar selama 2 detik
-    clearInterval(spinInterval);
-
-    // KALKULASI LOGIKA RTP MINI GAME (1/4 dari RTP Normal)
+    // Tentukan hasil kemenangan di awal
     let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
     let miniGameChance = currentChance * 0.25; 
-    
     let isWinJackpot = Math.random() < miniGameChance;
 
+    let res1, res2, res3;
     if (isWinJackpot) {
-       r1.textContent = '7'; r2.textContent = '7'; r3.textContent = '7';
-       status.textContent = 'JACKPOT! 7-7-7';
+        res1 = 7; res2 = 7; res3 = 7;
+    } else {
+        res1 = Math.floor(Math.random() * 9) + 1;
+        res2 = Math.floor(Math.random() * 9) + 1;
+        res3 = Math.floor(Math.random() * 9) + 1;
+        // Mencegah hasil 7-7-7 jika sistem menentukan kalah
+        if(res1 === 7 && res2 === 7 && res3 === 7) res3 = 1; 
+    }
+
+    // Mulai animasi angka acak berputar kencang
+    let spin1 = setInterval(() => r1.textContent = Math.floor(Math.random() * 9) + 1, 50);
+    let spin2 = setInterval(() => r2.textContent = Math.floor(Math.random() * 9) + 1, 50);
+    let spin3 = setInterval(() => r3.textContent = Math.floor(Math.random() * 9) + 1, 50);
+
+    // STOP REEL 1
+    await new Promise(res => setTimeout(res, 800));
+    clearInterval(spin1);
+    r1.textContent = res1;
+    if (res1 === 7) r1.style.color = 'var(--danger)'; // Beri warna merah jika 7
+
+    // STOP REEL 2
+    await new Promise(res => setTimeout(res, 800));
+    clearInterval(spin2);
+    r2.textContent = res2;
+    if (res2 === 7) r2.style.color = 'var(--danger)';
+
+    // EFEK SUSPENSE: Jika Reel 1 & 2 sama-sama 7, buat Reel 3 berputar lebih lama!
+    if (res1 === 7 && res2 === 7) {
+        status.textContent = 'PELUANG JACKPOT...!!';
+        status.style.color = 'var(--neon-blue)';
+        await new Promise(res => setTimeout(res, 1800)); // Waktu tegang ekstra
+    } else {
+        await new Promise(res => setTimeout(res, 800));
+    }
+
+    // STOP REEL 3
+    clearInterval(spin3);
+    r3.textContent = res3;
+    if (res3 === 7) r3.style.color = 'var(--danger)';
+
+    // Tampilkan Hasil
+    if (isWinJackpot) {
+       status.textContent = 'JACKPOT! 7-7-7 🎊';
        status.style.color = 'var(--neon-pink)';
+       
+       // Efek kedip pada angka 7 saat menang
+       let blink = setInterval(() => {
+           [r1, r2, r3].forEach(r => r.style.color = r.style.color === 'transparent' ? 'var(--danger)' : 'transparent');
+       }, 200);
        
        let jackpotPrize = gameState.currentBet * 1000;
        
-       await new Promise(res => setTimeout(res, 1500));
+       await new Promise(res => setTimeout(res, 2500));
+       clearInterval(blink);
        gameUI.closeMiniGame();
        
        let finalWin = jackpotPrize + (gameState.pendingWin || 0);
@@ -1149,20 +1196,12 @@ evaluateWin() {
        
        this.handleWin(finalWin, allIndices);
     } else {
-       // Ciptakan Zonk di reel (dilarang mengeluarkan 7-7-7)
-       let res1 = Math.floor(Math.random() * 9) + 1;
-       let res2 = Math.floor(Math.random() * 9) + 1;
-       let res3 = Math.floor(Math.random() * 9) + 1;
-       if(res1 === 7 && res2 === 7 && res3 === 7) res3 = 1; 
-       
-       r1.textContent = res1; r2.textContent = res2; r3.textContent = res3;
        status.textContent = 'TIDAK BERUNTUNG!';
        status.style.color = 'var(--text-muted)';
        
        await new Promise(res => setTimeout(res, 1500));
        gameUI.closeMiniGame();
        
-       // Evaluasi sisa hadiah jika ada kombinasi buah lain yang menang bersamaan
        if (gameState.pendingWin > 0) {
           this.handleWin(gameState.pendingWin, gameState.pendingWinIndices);
        } else {
@@ -1170,7 +1209,7 @@ evaluateWin() {
        }
     }
     
-    // Reset temporary state
+    // Reset state sementara
     gameState.pendingWin = 0;
     gameState.pendingWinIndices = new Set();
   },
