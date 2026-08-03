@@ -393,6 +393,20 @@
     </div>
   </div>
 
+  <!-- MODAL: MINI GAME 777 -->
+  <div class="overlay" id="miniGameModal">
+    <div class="modal-panel" onclick="event.stopPropagation()">
+      <h2 class="modal-title" style="color: var(--neon-blue);">🎰 BONUS STAGE 🎰</h2>
+      <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; font-family: var(--font-digital); font-size: 3.5rem; color: #fff;">
+        <div id="mgReel1" style="background: #000; padding: 10px 20px; border: 2px solid var(--gold-main); border-radius: 10px; box-shadow: inset 0 0 15px rgba(212,175,55,0.3);">❓</div>
+        <div id="mgReel2" style="background: #000; padding: 10px 20px; border: 2px solid var(--gold-main); border-radius: 10px; box-shadow: inset 0 0 15px rgba(212,175,55,0.3);">❓</div>
+        <div id="mgReel3" style="background: #000; padding: 10px 20px; border: 2px solid var(--gold-main); border-radius: 10px; box-shadow: inset 0 0 15px rgba(212,175,55,0.3);">❓</div>
+      </div>
+      <p id="mgStatus" style="text-align: center; color: var(--gold-light); margin-bottom: 20px; font-weight: bold; font-size: 14px;">Dapatkan 7-7-7 untuk x1000 Bet!</p>
+      <button class="btn-action-primary" id="btnStartMG" onclick="gameEngine.startMiniGame()">SPIN JACKPOT</button>
+    </div>
+  </div>
+
 <script src="api.js"></script>
 <script>
 /**
@@ -576,7 +590,9 @@ const CONFIG = {
     { id: 'pineapple',  icon: '🍍', multiplier: 10, weight: 8 },
     { id: 'apple',      icon: '🍎', multiplier: 15, weight: 5 },
     { id: 'star',       icon: '⭐', multiplier: 25, weight: 3 },
-    { id: 'crown',      icon: '👑', multiplier: 50, weight: 1 } 
+    { id: 'crown',      icon: '👑', multiplier: 50, weight: 1 },
+    // --- TAMBAHAN BUAH JACKPOT ---
+    { id: 'golden_apple', icon: '🍏', multiplier: 1000, weight: 0.3, isJackpot: true }
   ],
 
   mechanics: {
@@ -707,12 +723,36 @@ const gameUI = {
   },
 
   buildPaytable() {
-    this.elements.paytableGrid.innerHTML = CONFIG.symbols.map(s => `
-      <div class="pt-item">
-        <div class="pt-icon">${s.icon}</div>
-        <div class="pt-val">x${s.multiplier}</div>
-      </div>
-    `).join('');
+    if (!this.elements.paytableGrid) return;
+    
+    this.elements.paytableGrid.innerHTML = CONFIG.symbols.map(s => {
+      // Jika ini buah jackpot, tampilkan teks khusus
+      const rewardVal = s.isJackpot ? "MINI GAME" : "+" + (gameState.currentBet * s.multiplier).toLocaleString();
+      const multiplierText = s.isJackpot ? "MAX x1000" : `Multiplier: x${s.multiplier}`;
+      
+      return `
+        <div class="pt-item">
+          <div class="pt-icon">${s.icon}</div>
+          <div class="pt-name">${s.id}</div>
+          <div class="pt-mult">${multiplierText}</div>
+          <div class="pt-val" style="${s.isJackpot ? 'color: var(--neon-pink); animation: winPulse 1s infinite alternate;' : ''}">${rewardVal}</div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  openMiniGame() {
+    const modal = document.getElementById('miniGameModal');
+    document.getElementById('mgReel1').textContent = '❓';
+    document.getElementById('mgReel2').textContent = '❓';
+    document.getElementById('mgReel3').textContent = '❓';
+    document.getElementById('mgStatus').textContent = 'Dapatkan 7-7-7 untuk x1000 Bet!';
+    document.getElementById('btnStartMG').style.display = 'block';
+    modal.classList.add('show');
+  },
+
+  closeMiniGame() {
+    document.getElementById('miniGameModal').classList.remove('show');
   },
 
   changeBet(dir) {
@@ -987,9 +1027,11 @@ const gameEngine = {
     }
   },
 
-  evaluateWin() {
+evaluateWin() {
     let totalWin = 0;
     let winningIndices = new Set();
+    let hasMiniGame = false;
+    let miniGameIndices = new Set();
 
     PAYLINES.forEach(pl => {
       let maxSeq = 1; let currentSeq = 1; 
@@ -1008,23 +1050,104 @@ const gameEngine = {
       if(currentSeq > maxSeq) { maxSeq = currentSeq; bestSym = currSym; bestIndices = [...currIndices]; }
 
       if (maxSeq >= 3) {
-        let lengthMult = maxSeq === 5 ? 10 : (maxSeq === 4 ? 3 : 1);
-        
-        // FIX UI/UX: Hapus penalti diagonal agar pemain tidak rugi jika dapat combo silang
-        let diagPenalty = 1; 
-        
-        let lineWin = Math.floor(gameState.currentBet * bestSym.multiplier * lengthMult * diagPenalty);
-        
-        totalWin += lineWin;
-        bestIndices.forEach(idx => winningIndices.add(idx));
+        // CEK APAKAH INI BUAH JACKPOT (MINI GAME)
+        if (bestSym.isJackpot) {
+          hasMiniGame = true;
+          bestIndices.forEach(idx => miniGameIndices.add(idx));
+        } else {
+          let lengthMult = maxSeq === 5 ? 10 : (maxSeq === 4 ? 3 : 1);
+          let diagPenalty = 1; 
+          let lineWin = Math.floor(gameState.currentBet * bestSym.multiplier * lengthMult * diagPenalty);
+          
+          totalWin += lineWin;
+          bestIndices.forEach(idx => winningIndices.add(idx));
+        }
       }
     });
 
-    if (totalWin > 0) {
+    // Jika dapat Mini Game, tunda pemberian hadiah normal dan buka modal 777
+    if (hasMiniGame) {
+      gameUI.elements.board.classList.add('has-win');
+      miniGameIndices.forEach(idx => gameUI.cardsDOM[idx].classList.add('win'));
+      
+      // Simpan hadiah buah lain (jika ada) untuk diberikan setelah mini game selesai
+      gameState.pendingWin = totalWin;
+      gameState.pendingWinIndices = winningIndices;
+      
+      setTimeout(() => gameUI.openMiniGame(), 800);
+    } 
+    // Jika tidak ada mini game, jalankan prosedur biasa
+    else if (totalWin > 0) {
       this.handleWin(totalWin, winningIndices);
     } else {
       this.handleLoss();
     }
+  },
+
+  async startMiniGame() {
+    document.getElementById('btnStartMG').style.display = 'none';
+    const r1 = document.getElementById('mgReel1');
+    const r2 = document.getElementById('mgReel2');
+    const r3 = document.getElementById('mgReel3');
+    const status = document.getElementById('mgStatus');
+    
+    status.textContent = 'Memutar...';
+
+    // Efek Animasi Angka Berputar Cepat
+    let spinInterval = setInterval(() => {
+       r1.textContent = Math.floor(Math.random() * 9) + 1;
+       r2.textContent = Math.floor(Math.random() * 9) + 1;
+       r3.textContent = Math.floor(Math.random() * 9) + 1;
+    }, 50);
+
+    await new Promise(res => setTimeout(res, 2000)); // Putar selama 2 detik
+    clearInterval(spinInterval);
+
+    // KALKULASI LOGIKA RTP MINI GAME (1/4 dari RTP Normal)
+    let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
+    let miniGameChance = currentChance * 0.25; 
+    
+    let isWinJackpot = Math.random() < miniGameChance;
+
+    if (isWinJackpot) {
+       r1.textContent = '7'; r2.textContent = '7'; r3.textContent = '7';
+       status.textContent = 'JACKPOT! 7-7-7';
+       status.style.color = 'var(--neon-pink)';
+       
+       let jackpotPrize = gameState.currentBet * 1000;
+       
+       await new Promise(res => setTimeout(res, 1500));
+       gameUI.closeMiniGame();
+       
+       let finalWin = jackpotPrize + (gameState.pendingWin || 0);
+       let allIndices = new Set([...gameState.pendingWinIndices, ...gameUI.cardsDOM.filter(c => c.classList.contains('win')).map(c => parseInt(c.dataset.index))]);
+       
+       this.handleWin(finalWin, allIndices);
+    } else {
+       // Ciptakan Zonk di reel (dilarang mengeluarkan 7-7-7)
+       let res1 = Math.floor(Math.random() * 9) + 1;
+       let res2 = Math.floor(Math.random() * 9) + 1;
+       let res3 = Math.floor(Math.random() * 9) + 1;
+       if(res1 === 7 && res2 === 7 && res3 === 7) res3 = 1; 
+       
+       r1.textContent = res1; r2.textContent = res2; r3.textContent = res3;
+       status.textContent = 'TIDAK BERUNTUNG!';
+       status.style.color = 'var(--text-muted)';
+       
+       await new Promise(res => setTimeout(res, 1500));
+       gameUI.closeMiniGame();
+       
+       // Evaluasi sisa hadiah jika ada kombinasi buah lain yang menang bersamaan
+       if (gameState.pendingWin > 0) {
+          this.handleWin(gameState.pendingWin, gameState.pendingWinIndices);
+       } else {
+          this.handleLoss();
+       }
+    }
+    
+    // Reset temporary state
+    gameState.pendingWin = 0;
+    gameState.pendingWinIndices = new Set();
   },
 
   handleWin(amount, winningIndices) {
