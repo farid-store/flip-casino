@@ -663,33 +663,53 @@ function gameLoop() {
   const now = Date.now();
   let dt = now - lastTickTime;
   
-  // Throttle tick rate ke ~60fps
+  // Throttle tick rate ke ~60fps agar pergerakan grafik selalu hidup (flicker realtime)
   if (dt > 16) { 
+    let priceScale = currentPrice * 0.00002; // Skala pergerakan micro
+
     if (activeTrades.length > 0) {
-        let priceScale = currentPrice * 0.0001; 
-        let volatility = priceScale * 2.0; 
-        let bias = 0;
-        
+        // MODE BANDAR (Dimanipulasi perlahan)
         let sortedTrades = [...activeTrades].sort((a,b) => a.expiryTime - b.expiryTime);
         let nearestTrade = sortedTrades[0];
         let remaining = nearestTrade.expiryTime - now;
         
-        if (remaining > 0 && remaining < 2000) {
-            let diff = nearestTrade.targetPrice - currentPrice;
-            bias = diff * 0.15; 
-            volatility = priceScale * 0.5;
+        let targetDiff = 0;
+        let pullFactor = 0;
+
+        if (remaining < 3000) {
+            // Tarikan halus menuju target bandar di 3 detik terakhir
+            targetDiff = nearestTrade.targetPrice - currentPrice;
+            pullFactor = 0.05; 
+        } else {
+            // Jika masih lama, biarkan ikuti market asli agar terlihat natural
+            targetDiff = realMarketPrice - currentPrice;
+            pullFactor = 0.02; 
         }
         
-        currentPrice += bias + (Math.random() - 0.5) * volatility;
-        updateLocalFakeCandle(currentPrice); 
+        let bias = targetDiff * pullFactor;
+        let noise = (Math.random() - 0.5) * priceScale; 
+        
+        currentPrice += bias + noise;
+    } else {
+        // MODE NORMAL: Mengalir mulus kembali ke harga market asli (Tanpa lompat)
+        let diff = realMarketPrice - currentPrice;
+        let noise = (Math.random() - 0.5) * priceScale * 0.5; // Tambah getaran natural
+        
+        // Lerp (Linear Interpolation) 5% menuju harga asli setiap frame (sangat mulus)
+        currentPrice += (diff * 0.05) + noise; 
     }
-    lastTickTime = now - (dt % 16); // Fix time drift
+    
+    updateLocalFakeCandle(currentPrice);
+    lastTickTime = now - (dt % 16); 
   }
 
-  let safetyGap = currentPrice * 0.00002; 
+  // Jarak koreksi mikroskopis saat expired
+  let safetyGap = currentPrice * 0.000005; 
+
   for(let i = activeTrades.length - 1; i >= 0; i--) {
       let t = activeTrades[i];
       if (now >= t.expiryTime) {
+          // Hanya menggeser sangat tipis JIKA posisinya ternyata belum sesuai target
           if (t.isWin) {
               if(t.direction === 'CALL' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + safetyGap;
               if(t.direction === 'PUT' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - safetyGap;
@@ -702,9 +722,8 @@ function gameLoop() {
           resolveTrade(t);
           activeTrades.splice(i, 1);
           
-          if (activeTrades.length === 0) {
-              currentPrice = realMarketPrice;
-          }
+          // CATATAN: Kode reset kasar (currentPrice = realMarketPrice) SUDAH DIHAPUS. 
+          // Setelah ini harga akan menyesuaikan diri secara halus melalui Mode Normal di atas.
       }
   }
 
@@ -728,8 +747,10 @@ function placeTrade(direction) {
   
   let isWin = Math.random() < playerWinRate;
   
-  let priceScale = currentPrice * 0.0001;
-  let margin = priceScale * (10 + Math.random() * 20); 
+  // Buat gap kemenangan/kekalahan SANGAT TIPIS (1 hingga 3 micro-tick saja)
+  let priceScale = currentPrice * 0.00002; 
+  let margin = priceScale * (1 + Math.random() * 2); 
+  
   let targetPrice = currentPrice + (direction === 'CALL' ? (isWin ? margin : -margin) : (isWin ? -margin : margin));
   
   activeTrades.push({
