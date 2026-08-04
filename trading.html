@@ -23,12 +23,14 @@
 
   html, body {
     background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
-    color: var(--text-light); font-family: var(--font-ui); height: 100dvh; overflow: hidden; display: flex; justify-content: center; align-items: center;
+    color: var(--text-light); font-family: var(--font-ui); height: 100vh; height: 100dvh; 
+    overflow: hidden; display: flex; justify-content: center; align-items: center;
   }
 
   #app-wrapper {
     width: 100%; max-width: 1200px; height: 100%; max-height: 100dvh;
-    background: var(--bg-base); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.9); overflow: hidden;
+    background: var(--bg-base); display: flex; flex-direction: column; position: relative; 
+    box-shadow: 0 0 50px rgba(0,0,0,0.9); overflow: hidden;
   }
   ::-webkit-scrollbar { display: none; }
 
@@ -36,11 +38,16 @@
   .top-bar {
     background: linear-gradient(180deg, rgba(17,21,30,0.95), rgba(17,21,30,0.6));
     backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-    padding: calc(12px + env(safe-area-inset-top)) 20px 12px; display: flex; justify-content: space-between; align-items: center; z-index: 100; flex-shrink: 0;
+    padding: calc(12px + env(safe-area-inset-top)) 20px 12px; display: flex; 
+    justify-content: space-between; align-items: center; z-index: 100; flex-shrink: 0;
   }
   
   .btn-back { 
-    background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); letter-spacing: 1px;
+    background: transparent; border: 1px solid var(--danger); color: var(--danger); 
+    padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 11px; 
+    cursor: pointer; text-transform: uppercase; transition: all 0.2s ease; 
+    display: flex; align-items: center; justify-content: center; 
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); letter-spacing: 1px;
   }
   .btn-back:hover, .btn-back:active { background: var(--danger); color: #fff; }
 
@@ -64,7 +71,8 @@
 
   .asset-dropdown {
     background: #11151e; border: 1px solid var(--gold-dark); color: #fff; padding: 8px 12px;
-    border-radius: 8px; font-family: var(--font-ui); font-weight: 800; font-size: 13px; cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(212,175,55,0.2);
+    border-radius: 8px; font-family: var(--font-ui); font-weight: 800; font-size: 13px; 
+    cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(212,175,55,0.2);
   }
   .asset-dropdown option { background: #0a0e14; color: #fff; }
   
@@ -80,7 +88,8 @@
   .grid-overlay { position: absolute; inset: 0; z-index: 1; opacity: 0.05; background-image: linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px); background-size: 50px 50px; background-position: center center; }
   #tradeCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
 
-  .price-tag { position: absolute; right: 0; background: var(--info); color: #fff; padding: 6px 12px; font-family: var(--font-digital); font-size: 13px; font-weight: bold; border-radius: 6px 0 0 6px; z-index: 10; transition: top 0.1s linear; transform: translateY(-50%); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+  /* Removed CSS transition for 'top' to allow pure 60fps JS manipulation without jitter */
+  .price-tag { position: absolute; right: 0; background: var(--info); color: #fff; padding: 6px 12px; font-family: var(--font-digital); font-size: 13px; font-weight: bold; border-radius: 6px 0 0 6px; z-index: 10; transform: translateY(-50%); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); pointer-events: none;}
   .price-tag.up { background: var(--success); box-shadow: 0 0 15px var(--success-glow); }
   .price-tag.down { background: var(--danger); box-shadow: 0 0 15px var(--danger-glow); }
   .price-tag.loading { background: #334155; box-shadow: none; }
@@ -172,6 +181,7 @@
             <option value="BNBUSDT">🔶 BNB / USDT</option>
             <option value="SOLUSDT">◎ SOL / USDT</option>
             <option value="XRPUSDT">✕ XRP / USDT</option>
+            <option value="PAXGUSDT">🥇 PAXG / USDT (Gold)</option>
           </select>
           
           <div class="toolbar-group" style="margin-left:5px;">
@@ -262,10 +272,17 @@
  * 1. AUTH & SETUP (RTP INTEGRATION)
  * ==============================================================
  */
-if (!localStorage.getItem('currentUser')) {
-    localStorage.setItem('currentUser', JSON.stringify({username: 'Player1', balance: 100000}));
+function getLocalUser() {
+    try {
+        const stored = localStorage.getItem('currentUser');
+        return stored ? JSON.parse(stored) : {username: 'Player1', balance: 100000};
+    } catch (e) {
+        return {username: 'Player1', balance: 100000};
+    }
 }
-let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+let currentUser = getLocalUser();
+localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
 let playerWinRate = 0.15; // RTP Default / Bandar Mode
 const MIN_BET = 100;
@@ -302,12 +319,22 @@ async function saveToServer() {
     try { await api.saveProgress(currentUser.username, currentUser.balance, currentUser.level || 1, currentUser.exp || 0); } catch(e) {}
   }
 }
-async function saveAndExit() { document.getElementById('btnExit').innerHTML = "SAVING..."; await saveToServer(); window.location.href = 'index.html'; }
+
+async function saveAndExit() { 
+  document.getElementById('btnExit').innerHTML = "SAVING..."; 
+  await saveToServer(); 
+  window.location.href = 'index.html'; 
+}
 
 function updateBalanceUI(bump) {
   const balEl = document.getElementById('displayBalance');
   balEl.textContent = currentUser.balance.toLocaleString();
-  if (bump) { balEl.classList.remove('bump'); void balEl.offsetWidth; balEl.classList.add('bump'); }
+  if (bump) { 
+    balEl.classList.remove('bump'); 
+    // Trigger reflow for animation restart
+    void balEl.offsetWidth; 
+    balEl.classList.add('bump'); 
+  }
 }
 updateBalanceUI(false);
 
@@ -319,33 +346,69 @@ function showToast(msg) {
 
 function openHelpModal() { document.getElementById('helpModal').classList.add('show'); }
 function closeHelpModal() { document.getElementById('helpModal').classList.remove('show'); }
-document.querySelectorAll('.modal-overlay').forEach(overlay => { overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); }); });
+document.querySelectorAll('.modal-overlay').forEach(overlay => { 
+  overlay.addEventListener('click', (e) => { 
+    if (e.target === overlay) overlay.classList.remove('show'); 
+  }); 
+});
 
 /** SOUND ENGINE **/
 let audioCtx = null;
-function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
+function ensureAudio() { 
+  if (!audioCtx) { 
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} 
+  } 
+}
 function beep(freq, duration, type, gainVal) {
   if (!soundOn || !audioCtx) return;
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
   osc.type = type || 'sine'; osc.frequency.value = freq; gain.gain.value = gainVal || 0.05;
   osc.connect(gain); gain.connect(audioCtx.destination); osc.start();
-  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration); osc.stop(audioCtx.currentTime + duration);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration); 
+  osc.stop(audioCtx.currentTime + duration);
 }
 function sfxClick() { beep(600, 0.1, 'sine', 0.02); }
 function sfxTradeStart() { beep(400, 0.3, 'square', 0.03); }
 function sfxWin() { beep(600, 0.1, 'triangle', 0.05); setTimeout(() => beep(900, 0.2, 'triangle', 0.05), 100); }
 function sfxLoss() { beep(200, 0.4, 'sawtooth', 0.05); }
 
-function toggleSound() { soundOn = !soundOn; localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off'); document.getElementById('btnSound').textContent = soundOn ? '🔊' : '🔇'; document.getElementById('btnSound').classList.toggle('muted', !soundOn); if (soundOn) ensureAudio(); }
+function toggleSound() { 
+  soundOn = !soundOn; 
+  localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off'); 
+  const btn = document.getElementById('btnSound');
+  btn.textContent = soundOn ? '🔊' : '🔇'; 
+  btn.classList.toggle('muted', !soundOn); 
+  if (soundOn) ensureAudio(); 
+}
 document.getElementById('btnSound').textContent = soundOn ? '🔊' : '🔇';
 document.getElementById('btnSound').classList.toggle('muted', !soundOn);
 
 /** UI CONTROLS **/
 let currentBet = 100;
 function clearChipActive() { document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); }
-function setBetAmount(amount, btnEl) { sfxClick(); const cap = currentUser.balance > 0 ? currentUser.balance : amount; currentBet = Math.max(MIN_BET, Math.min(amount, cap)); document.getElementById('betDisplay').textContent = currentBet.toLocaleString(); clearChipActive(); if (btnEl) btnEl.classList.add('active'); }
-function adjustBet(factor) { sfxClick(); let next = Math.floor(currentBet * factor); if (next < MIN_BET) next = MIN_BET; if (next > currentUser.balance) next = currentUser.balance > 0 ? currentUser.balance : MIN_BET; currentBet = next; document.getElementById('betDisplay').textContent = currentBet.toLocaleString(); clearChipActive(); }
-function setTradeDuration(ms, btnEl) { sfxClick(); tradeDuration = ms; document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active')); btnEl.classList.add('active'); }
+function setBetAmount(amount, btnEl) { 
+  sfxClick(); 
+  const cap = currentUser.balance > 0 ? currentUser.balance : amount; 
+  currentBet = Math.max(MIN_BET, Math.min(amount, cap)); 
+  document.getElementById('betDisplay').textContent = currentBet.toLocaleString(); 
+  clearChipActive(); 
+  if (btnEl) btnEl.classList.add('active'); 
+}
+function adjustBet(factor) { 
+  sfxClick(); 
+  let next = Math.floor(currentBet * factor); 
+  if (next < MIN_BET) next = MIN_BET; 
+  if (next > currentUser.balance) next = currentUser.balance > 0 ? currentUser.balance : MIN_BET; 
+  currentBet = next; 
+  document.getElementById('betDisplay').textContent = currentBet.toLocaleString(); 
+  clearChipActive(); 
+}
+function setTradeDuration(ms, btnEl) { 
+  sfxClick(); 
+  tradeDuration = ms; 
+  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active')); 
+  btnEl.classList.add('active'); 
+}
 
 function changeChartTimeframe(ms, intervalStr, btnEl) {
   sfxClick();
@@ -353,7 +416,7 @@ function changeChartTimeframe(ms, intervalStr, btnEl) {
   BINANCE_INTERVAL = intervalStr;
   document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
   btnEl.classList.add('active');
-  loadSymbol(currentSymbol); // Fetch ulang riwayat sesuai timeframe baru
+  loadSymbol(currentSymbol); 
 }
 
 /**
@@ -363,43 +426,62 @@ function changeChartTimeframe(ms, intervalStr, btnEl) {
  */
 const canvas = document.getElementById('tradeCanvas');
 const ctx = canvas.getContext('2d');
-let animFrame; let chartType = 'CANDLE'; 
+let animFrame; 
+let chartType = 'CANDLE'; 
 
-function setChartType(type) { chartType = type; document.getElementById('btnCandle').classList.toggle('active', type === 'CANDLE'); document.getElementById('btnLine').classList.toggle('active', type === 'LINE'); }
+function setChartType(type) { 
+  chartType = type; 
+  document.getElementById('btnCandle').classList.toggle('active', type === 'CANDLE'); 
+  document.getElementById('btnLine').classList.toggle('active', type === 'LINE'); 
+}
 
 let candles = []; 
 let currentCandle = null;
 let activeTrades = [];
 let tradeIdCounter = 0;
 
-function resizeCanvas() { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight; }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
+function resizeCanvas() { 
+  canvas.width = canvas.parentElement.clientWidth; 
+  canvas.height = canvas.parentElement.clientHeight; 
+}
+window.addEventListener('resize', resizeCanvas); 
+resizeCanvas();
 
 function drawChart() {
   const now = Date.now();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (candles.length === 0 || !currentCandle) return;
 
-  const paddingTop = canvas.height * 0.15; const paddingBottom = canvas.height * 0.15; const renderHeight = canvas.height - paddingTop - paddingBottom;
-  let minP = Math.min(...candles.map(c => c.l)); let maxP = Math.max(...candles.map(c => c.h));
+  const paddingTop = canvas.height * 0.15; 
+  const paddingBottom = canvas.height * 0.15; 
+  const renderHeight = canvas.height - paddingTop - paddingBottom;
+  let minP = Math.min(...candles.map(c => c.l)); 
+  let maxP = Math.max(...candles.map(c => c.h));
   
-  activeTrades.forEach(t => { if(t.entryPrice < minP) minP = t.entryPrice; if(t.entryPrice > maxP) maxP = t.entryPrice; });
+  activeTrades.forEach(t => { 
+    if(t.entryPrice < minP) minP = t.entryPrice; 
+    if(t.entryPrice > maxP) maxP = t.entryPrice; 
+  });
 
   let paddingY = (maxP - minP) * 0.15;
   let minPadding = currentPrice * 0.0001; 
   if (paddingY < minPadding) paddingY = minPadding;
   
-  const scaleY = (val) => { let normalized = (val - (minP - paddingY)) / ((maxP + paddingY) - (minP - paddingY)); return canvas.height - paddingBottom - (normalized * renderHeight); };
+  const scaleY = (val) => { 
+    let normalized = (val - (minP - paddingY)) / ((maxP + paddingY) - (minP - paddingY)); 
+    return canvas.height - paddingBottom - (normalized * renderHeight); 
+  };
 
-  const candleSpacing = canvas.width / MAX_CANDLES; const candleWidth = candleSpacing * 0.7; 
+  const candleSpacing = canvas.width / MAX_CANDLES; 
+  const candleWidth = candleSpacing * 0.7; 
   
-  // Menggeser chart secara akurat berdasarkan detik berjalan pada K-line
   let elapsedInCandle = now - currentCandle.openTime;
   let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
-  if (shiftX > candleSpacing) shiftX = candleSpacing; // Cap maksimal pergerakan per candle
+  if (shiftX > candleSpacing) shiftX = candleSpacing; 
   
   let baseX = canvas.width - (candleSpacing / 2); 
-  let lastX = baseX - shiftX; let lastY = scaleY(currentPrice);
+  let lastX = baseX - shiftX; 
+  let lastY = scaleY(currentPrice);
 
   // MENGGAMBAR GARIS ENTRY UNTUK SEMUA POSISI AKTIF
   activeTrades.forEach(t => {
@@ -407,9 +489,13 @@ function drawChart() {
     const color = t.direction === 'CALL' ? '#10b981' : '#ef4444';
     
     ctx.fillStyle = t.direction === 'CALL' ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)';
-    if (t.direction === 'CALL') ctx.fillRect(0, 0, canvas.width, entryY); else ctx.fillRect(0, entryY, canvas.width, canvas.height);
+    if (t.direction === 'CALL') ctx.fillRect(0, 0, canvas.width, entryY); 
+    else ctx.fillRect(0, entryY, canvas.width, canvas.height);
 
-    ctx.beginPath(); ctx.moveTo(0, entryY); ctx.lineTo(canvas.width, entryY); ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(0, entryY); ctx.lineTo(canvas.width, entryY); 
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); 
+    ctx.stroke(); ctx.setLineDash([]);
+    
     ctx.fillStyle = color; ctx.font = 'bold 11px Montserrat'; ctx.textAlign = 'left';
     let remaining = Math.max(0, Math.ceil((t.expiryTime - now) / 1000));
     ctx.fillText(`${t.direction} $${t.amount} (${remaining}s)`, 10, entryY - 6);
@@ -418,27 +504,46 @@ function drawChart() {
   if (chartType === 'LINE') {
     ctx.beginPath();
     for (let i = 0; i < candles.length; i++) {
-      let offsetIndex = (candles.length - 1 - i); let x = baseX - (offsetIndex * candleSpacing) - shiftX; let y = scaleY(candles[i].c);
+      let offsetIndex = (candles.length - 1 - i); 
+      let x = baseX - (offsetIndex * candleSpacing) - shiftX; 
+      let y = scaleY(candles[i].c);
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
-    ctx.lineTo(lastX, canvas.height); ctx.lineTo(baseX - ((candles.length - 1) * candleSpacing) - shiftX, canvas.height); ctx.closePath();
-    let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height); gradient.addColorStop(0, 'rgba(59,130,246,0.3)'); gradient.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gradient; ctx.fill();
+    ctx.lineTo(lastX, canvas.height); 
+    ctx.lineTo(baseX - ((candles.length - 1) * candleSpacing) - shiftX, canvas.height); 
+    ctx.closePath();
+    
+    let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height); 
+    gradient.addColorStop(0, 'rgba(59,130,246,0.3)'); 
+    gradient.addColorStop(1, 'rgba(0,0,0,0)'); 
+    ctx.fillStyle = gradient; ctx.fill();
   } else {
     for (let i = 0; i < candles.length; i++) {
-      let c = candles[i]; let color = c.c >= c.o ? '#10b981' : '#ef4444'; 
-      let offsetIndex = (candles.length - 1 - i); let x = baseX - (offsetIndex * candleSpacing) - shiftX;
-      let yOpen = scaleY(c.o); let yClose = scaleY(c.c); let yHigh = scaleY(c.h); let yLow = scaleY(c.l);
+      let c = candles[i]; 
+      let color = c.c >= c.o ? '#10b981' : '#ef4444'; 
+      let offsetIndex = (candles.length - 1 - i); 
+      let x = baseX - (offsetIndex * candleSpacing) - shiftX;
+      let yOpen = scaleY(c.o); let yClose = scaleY(c.c); 
+      let yHigh = scaleY(c.h); let yLow = scaleY(c.l);
+      
       ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(x, yHigh); ctx.lineTo(x, yLow); ctx.stroke();
-      const bodyY = Math.min(yOpen, yClose); let bodyH = Math.abs(yOpen - yClose); if (bodyH < 2) bodyH = 2; 
+      
+      const bodyY = Math.min(yOpen, yClose); 
+      let bodyH = Math.abs(yOpen - yClose); 
+      if (bodyH < 2) bodyH = 2; 
       ctx.fillRect(x - (candleWidth / 2), bodyY, candleWidth, bodyH);
     }
   }
 
   // Titik harga berjalan (Blinker)
-  ctx.beginPath(); ctx.arc(lastX, lastY, 5, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0;
+  ctx.beginPath(); 
+  ctx.arc(lastX, lastY, 5, 0, Math.PI*2); 
+  ctx.fillStyle = '#fff'; ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 15; 
+  ctx.fill(); ctx.shadowBlur = 0;
 
+  // DOM Update untuk Indikator Harga (Synced on RequestAnimationFrame)
   let decimals = currentPrice < 10 ? 4 : (currentPrice < 1000 ? 2 : 1);
   const tag = document.getElementById('priceTag');
   tag.textContent = currentPrice.toFixed(decimals);
@@ -451,11 +556,13 @@ function drawChart() {
  * ==============================================================
  */
 let binanceWS = null;
+let reconnectTimer = null;
 
 async function fetchBinanceHistory(symbol) {
   const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${BINANCE_INTERVAL}&limit=${MAX_CANDLES}`;
   try {
     const res = await fetch(url);
+    if (!res.ok) throw new Error("Gagal Load");
     const data = await res.json();
     candles = data.map(d => ({
       openTime: d[0],
@@ -468,11 +575,17 @@ async function fetchBinanceHistory(symbol) {
     document.getElementById('priceTag').classList.remove('loading');
   } catch (error) {
     console.error("Gagal memuat history Binance", error);
+    document.getElementById('priceTag').textContent = "ERROR API";
   }
 }
 
 function connectWS(symbol) {
-  if (binanceWS) binanceWS.close();
+  if (binanceWS) {
+      binanceWS.onclose = null; // Prevent trigger
+      binanceWS.close();
+  }
+  
+  clearTimeout(reconnectTimer);
   let streamName = `${symbol.toLowerCase()}@kline_${BINANCE_INTERVAL}`;
   binanceWS = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}`);
   
@@ -482,7 +595,6 @@ function connectWS(symbol) {
     realMarketPrice = parseFloat(k.c);
     let kOpenTime = k.t;
 
-    // Tambah candle baru jika menit/waktu berganti sesuai Binance
     if (!currentCandle || currentCandle.openTime !== kOpenTime) {
         let newCandle = { openTime: kOpenTime, o: parseFloat(k.o), h: parseFloat(k.h), l: parseFloat(k.l), c: parseFloat(k.c) };
         candles.push(newCandle);
@@ -490,7 +602,6 @@ function connectWS(symbol) {
         currentCandle = newCandle;
     }
 
-    // 100% REAL-TIME UPDATE KECUALI SAAT ADA ORDER
     if (activeTrades.length === 0) {
         currentPrice = realMarketPrice;
         currentCandle.o = parseFloat(k.o);
@@ -498,20 +609,29 @@ function connectWS(symbol) {
         currentCandle.l = parseFloat(k.l);
         currentCandle.c = parseFloat(k.c);
         
-        // Update tag harga UI indikator (Up/Down color)
         const tag = document.getElementById('priceTag');
         tag.classList.remove('up', 'down');
         if (currentCandle.c > currentCandle.o) tag.classList.add('up');
         else if (currentCandle.c < currentCandle.o) tag.classList.add('down');
     }
   };
+
+  // Mekanisme Auto-Reconnect untuk Stabilitas Jangka Panjang
+  binanceWS.onerror = () => { binanceWS.close(); };
+  binanceWS.onclose = () => {
+    console.log("WebSocket Terputus. Mencoba reconnect...");
+    reconnectTimer = setTimeout(() => connectWS(currentSymbol), 3000);
+  };
 }
 
 async function loadSymbol(symbol) {
   sfxClick();
   currentSymbol = symbol;
-  document.getElementById('priceTag').textContent = "MEMUAT...";
-  document.getElementById('priceTag').classList.add('loading');
+  
+  const pTag = document.getElementById('priceTag');
+  pTag.textContent = "MEMUAT...";
+  pTag.classList.add('loading');
+  pTag.classList.remove('up', 'down');
   
   activeTrades = []; 
   await fetchBinanceHistory(symbol);
@@ -535,10 +655,9 @@ function gameLoop() {
   const now = Date.now();
   let dt = now - lastTickTime;
   
-  // Game Tick rate (60fps visual logic for smooth manipulation)
+  // Throttle tick rate ke ~60fps
   if (dt > 16) { 
     if (activeTrades.length > 0) {
-        // HIDE REAL PRICE & INJECT BANDAR MANIPULATION
         let priceScale = currentPrice * 0.0001; 
         let volatility = priceScale * 2.0; 
         let bias = 0;
@@ -547,27 +666,22 @@ function gameLoop() {
         let nearestTrade = sortedTrades[0];
         let remaining = nearestTrade.expiryTime - now;
         
-        // Mulai tarik harga ke target saat tersisa < 2 detik
         if (remaining > 0 && remaining < 2000) {
             let diff = nearestTrade.targetPrice - currentPrice;
             bias = diff * 0.15; 
-            volatility = priceScale * 0.5; // Mengurangi guncangan liar agar presisi
+            volatility = priceScale * 0.5;
         }
         
         currentPrice += bias + (Math.random() - 0.5) * volatility;
-        updateLocalFakeCandle(currentPrice); // Override candle berjalan dengan manipulasi
+        updateLocalFakeCandle(currentPrice); 
     }
-    
-    lastTickTime = now;
+    lastTickTime = now - (dt % 16); // Fix time drift
   }
 
-  // Resolusi Trade yang Kadaluarsa
   let safetyGap = currentPrice * 0.00002; 
   for(let i = activeTrades.length - 1; i >= 0; i--) {
       let t = activeTrades[i];
       if (now >= t.expiryTime) {
-          
-          // Pastikan win/loss persis saat kadaluarsa
           if (t.isWin) {
               if(t.direction === 'CALL' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + safetyGap;
               if(t.direction === 'PUT' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - safetyGap;
@@ -580,7 +694,6 @@ function gameLoop() {
           resolveTrade(t);
           activeTrades.splice(i, 1);
           
-          // INSTANT SNAP BACK to Real Market ketika tidak ada trade aktif
           if (activeTrades.length === 0) {
               currentPrice = realMarketPrice;
           }
