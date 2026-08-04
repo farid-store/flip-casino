@@ -176,14 +176,18 @@
       <div class="chart-toolbar">
         <div class="toolbar-group">
           <!-- DROPDOWN FUTURES PERPETUAL -->
-          <select id="assetSelect" class="asset-dropdown" onchange="loadSymbol(this.value)">
-            <option value="BTCUSDT">₿ BTC / USDT (Perp)</option>
-            <option value="ETHUSDT">♦ ETH / USDT (Perp)</option>
-            <option value="BNBUSDT">🔶 BNB / USDT (Perp)</option>
-            <option value="SOLUSDT">◎ SOL / USDT (Perp)</option>
-            <option value="XRPUSDT">✕ XRP / USDT (Perp)</option>
-            <option value="DOGEUSDT">🐶 DOGE / USDT (Perp)</option>
-          </select>
+<!-- Cari bagian ini di dalam kode HTML sebelumnya -->
+<select id="assetSelect" class="asset-dropdown" onchange="loadSymbol(this.value)">
+  <option value="BTCUSDT">₿ BTC / USDT (Perp)</option>
+  <option value="ETHUSDT">♦ ETH / USDT (Perp)</option>
+  <option value="BNBUSDT">🔶 BNB / USDT (Perp)</option>
+  <option value="SOLUSDT">◎ SOL / USDT (Perp)</option>
+  <option value="XRPUSDT">✕ XRP / USDT (Perp)</option>
+  <option value="DOGEUSDT">🐶 DOGE / USDT (Perp)</option>
+  
+  <!-- Tambahkan PAXG di sini -->
+  <option value="PAXGUSDT">🥇 PAXG / USDT (Perp)</option>
+</select>
           
           <div class="toolbar-group" style="margin-left:5px;">
             <button class="tf-btn active" onclick="changeChartTimeframe(60000, '1m', this)">1M</button>
