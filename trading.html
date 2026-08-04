@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Binary Options VIP - Pro Trader Edition</title>
+<title>Binary Options VIP - Pro Trader Edition (Futures)</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   /* =========================================
@@ -175,13 +175,14 @@
     <div class="chart-section">
       <div class="chart-toolbar">
         <div class="toolbar-group">
+          <!-- DROPDOWN FUTURES PERPETUAL -->
           <select id="assetSelect" class="asset-dropdown" onchange="loadSymbol(this.value)">
-            <option value="BTCUSDT">₿ BTC / USDT</option>
-            <option value="ETHUSDT">♦ ETH / USDT</option>
-            <option value="BNBUSDT">🔶 BNB / USDT</option>
-            <option value="SOLUSDT">◎ SOL / USDT</option>
-            <option value="XRPUSDT">✕ XRP / USDT</option>
-            <option value="PAXGUSDT">🥇 PAXG / USDT (Gold)</option>
+            <option value="BTCUSDT">₿ BTC / USDT (Perp)</option>
+            <option value="ETHUSDT">♦ ETH / USDT (Perp)</option>
+            <option value="BNBUSDT">🔶 BNB / USDT (Perp)</option>
+            <option value="SOLUSDT">◎ SOL / USDT (Perp)</option>
+            <option value="XRPUSDT">✕ XRP / USDT (Perp)</option>
+            <option value="DOGEUSDT">🐶 DOGE / USDT (Perp)</option>
           </select>
           
           <div class="toolbar-group" style="margin-left:5px;">
@@ -552,14 +553,15 @@ function drawChart() {
 
 /**
  * ==============================================================
- * 3. BINANCE DATA FETCHING & WEBSOCKET
+ * 3. BINANCE DATA FETCHING & WEBSOCKET (FUTURES API)
  * ==============================================================
  */
 let binanceWS = null;
 let reconnectTimer = null;
 
 async function fetchBinanceHistory(symbol) {
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${BINANCE_INTERVAL}&limit=${MAX_CANDLES}`;
+  // Menggunakan fapi (Futures API) Binance
+  const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=${BINANCE_INTERVAL}&limit=${MAX_CANDLES}`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error("Gagal Load");
@@ -574,7 +576,7 @@ async function fetchBinanceHistory(symbol) {
     
     document.getElementById('priceTag').classList.remove('loading');
   } catch (error) {
-    console.error("Gagal memuat history Binance", error);
+    console.error("Gagal memuat history Binance Futures", error);
     document.getElementById('priceTag').textContent = "ERROR API";
   }
 }
@@ -587,7 +589,9 @@ function connectWS(symbol) {
   
   clearTimeout(reconnectTimer);
   let streamName = `${symbol.toLowerCase()}@kline_${BINANCE_INTERVAL}`;
-  binanceWS = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}`);
+  
+  // Menggunakan fstream (Futures WebSocket) Binance
+  binanceWS = new WebSocket(`wss://fstream.binance.com/ws/${streamName}`);
   
   binanceWS.onmessage = (event) => {
     let msg = JSON.parse(event.data);
@@ -619,7 +623,7 @@ function connectWS(symbol) {
   // Mekanisme Auto-Reconnect untuk Stabilitas Jangka Panjang
   binanceWS.onerror = () => { binanceWS.close(); };
   binanceWS.onclose = () => {
-    console.log("WebSocket Terputus. Mencoba reconnect...");
+    console.log("WebSocket Futures Terputus. Mencoba reconnect...");
     reconnectTimer = setTimeout(() => connectWS(currentSymbol), 3000);
   };
 }
