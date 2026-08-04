@@ -459,6 +459,11 @@ function drawChart() {
 
   const paddingTop = canvas.height * 0.15; 
   const paddingBottom = canvas.height * 0.15; 
+  
+  // PENAMBAHAN RUANG KOSONG (PADDING) DI KANAN
+  const paddingRight = 95; // Jarak 95px untuk label harga agar tidak menimpa candle
+  const renderWidth = canvas.width - paddingRight; // Lebar efektif untuk menggambar chart
+  
   const renderHeight = canvas.height - paddingTop - paddingBottom;
   let minP = Math.min(...candles.map(c => c.l)); 
   let maxP = Math.max(...candles.map(c => c.h));
@@ -477,14 +482,16 @@ function drawChart() {
     return canvas.height - paddingBottom - (normalized * renderHeight); 
   };
 
-  const candleSpacing = canvas.width / MAX_CANDLES; 
+  // Hitung spasi berdasarkan renderWidth, bukan canvas.width full
+  const candleSpacing = renderWidth / MAX_CANDLES; 
   const candleWidth = candleSpacing * 0.7; 
   
   let elapsedInCandle = now - currentCandle.openTime;
   let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
   if (shiftX > candleSpacing) shiftX = candleSpacing; 
   
-  let baseX = canvas.width - (candleSpacing / 2); 
+  // Titik X paling kanan sekarang dibatasi oleh paddingRight
+  let baseX = renderWidth - (candleSpacing / 2); 
   let lastX = baseX - shiftX; 
   let lastY = scaleY(currentPrice);
 
@@ -542,13 +549,23 @@ function drawChart() {
     }
   }
 
+  // TAMBAHAN: Garis panduan penghubung dari harga ke label kanan (Lebih Estetik)
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(canvas.width, lastY);
+  ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
   // Titik harga berjalan (Blinker)
   ctx.beginPath(); 
   ctx.arc(lastX, lastY, 5, 0, Math.PI*2); 
   ctx.fillStyle = '#fff'; ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 15; 
   ctx.fill(); ctx.shadowBlur = 0;
 
-  // DOM Update untuk Indikator Harga (Synced on RequestAnimationFrame)
+  // DOM Update untuk Indikator Harga
   let decimals = currentPrice < 10 ? 4 : (currentPrice < 1000 ? 2 : 1);
   const tag = document.getElementById('priceTag');
   tag.textContent = currentPrice.toFixed(decimals);
