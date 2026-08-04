@@ -62,7 +62,6 @@
   .chart-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #06090e; border-bottom: 1px solid #1e293b; z-index: 10; flex-wrap: wrap; gap: 10px;}
   .toolbar-group { display: flex; align-items: center; gap: 8px; }
 
-  /* CUSTOM DROPDOWN ASSET */
   .asset-dropdown {
     background: #11151e; border: 1px solid var(--gold-dark); color: #fff; padding: 8px 12px;
     border-radius: 8px; font-family: var(--font-ui); font-weight: 800; font-size: 13px; cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(212,175,55,0.2);
@@ -84,6 +83,7 @@
   .price-tag { position: absolute; right: 0; background: var(--info); color: #fff; padding: 6px 12px; font-family: var(--font-digital); font-size: 13px; font-weight: bold; border-radius: 6px 0 0 6px; z-index: 10; transition: top 0.1s linear; transform: translateY(-50%); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
   .price-tag.up { background: var(--success); box-shadow: 0 0 15px var(--success-glow); }
   .price-tag.down { background: var(--danger); box-shadow: 0 0 15px var(--danger-glow); }
+  .price-tag.loading { background: #334155; box-shadow: none; }
 
   .trade-result-float { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); font-family: var(--font-title); font-size: 28px; font-weight: 900; letter-spacing: 2px; z-index: 50; pointer-events: none; animation: floatUp 2s forwards; text-shadow: 0 0 20px rgba(0,0,0,0.8); white-space: nowrap; }
   .trade-result-float.win { color: var(--success); text-shadow: 0 0 20px var(--success-glow); }
@@ -166,21 +166,18 @@
     <div class="chart-section">
       <div class="chart-toolbar">
         <div class="toolbar-group">
-          <!-- SELECTOR PAIR CRYPTO -->
           <select id="assetSelect" class="asset-dropdown" onchange="loadSymbol(this.value)">
             <option value="BTCUSDT">₿ BTC / USDT</option>
             <option value="ETHUSDT">♦ ETH / USDT</option>
             <option value="BNBUSDT">🔶 BNB / USDT</option>
             <option value="SOLUSDT">◎ SOL / USDT</option>
             <option value="XRPUSDT">✕ XRP / USDT</option>
-            <option value="PAXGUSDT">🥇 PAXG / USDT (Gold)</option>
           </select>
           
-          <!-- TIMEFRAME SELECTOR -->
           <div class="toolbar-group" style="margin-left:5px;">
-            <button class="tf-btn active" onclick="changeChartTimeframe(60000, this)">1M</button>
-            <button class="tf-btn" onclick="changeChartTimeframe(300000, this)">5M</button>
-            <button class="tf-btn" onclick="changeChartTimeframe(900000, this)">15M</button>
+            <button class="tf-btn active" onclick="changeChartTimeframe(60000, '1m', this)">1M</button>
+            <button class="tf-btn" onclick="changeChartTimeframe(300000, '5m', this)">5M</button>
+            <button class="tf-btn" onclick="changeChartTimeframe(900000, '15m', this)">15M</button>
           </div>
         </div>
         
@@ -194,7 +191,7 @@
       <div class="chart-container" id="chartArea">
         <div class="grid-overlay"></div>
         <canvas id="tradeCanvas"></canvas>
-        <div class="price-tag" id="priceTag">MEMUAT...</div>
+        <div class="price-tag loading" id="priceTag">CONNECTING...</div>
       </div>
     </div>
 
@@ -247,7 +244,7 @@
       <button class="btn-close-modal" onclick="closeHelpModal()">×</button>
       <h2>CARA BERMAIN TRADING VIP</h2>
       <ol class="how-to-list">
-        <li>Pilih <b>Asset / Market</b> (BTC, ETH, SOL, atau Gold).</li>
+        <li>Pilih <b>Asset / Market</b> (BTC, ETH, SOL, dsb).</li>
         <li>Tentukan <b>Waktu Kontrak</b> (Kapan posisi akan kadaluarsa).</li>
         <li>Anda dapat <b>Membuka Banyak Posisi</b> sekaligus tanpa jeda!</li>
         <li>Jika tebakan Anda benar, Anda mendapat pengembalian + <b>Profit 90%</b>!</li>
@@ -258,7 +255,7 @@
 
 </div>
 
-  <script src="api.js"></script>
+<script src="api.js"></script>
 <script>
 /**
  * ==============================================================
@@ -268,10 +265,9 @@
 if (!localStorage.getItem('currentUser')) {
     localStorage.setItem('currentUser', JSON.stringify({username: 'Player1', balance: 100000}));
 }
-const userJson = localStorage.getItem('currentUser');
-let currentUser = JSON.parse(userJson);
+let currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-let playerWinRate = 0.15; // RTP Default
+let playerWinRate = 0.15; // RTP Default / Bandar Mode
 const MIN_BET = 100;
 const PROFIT_MULTIPLIER = 1.90; 
 const SOUND_KEY = 'trading_sound';
@@ -280,16 +276,13 @@ let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
 let tradeDuration = 5000; 
 
 // Konfigurasi Chart Realistis
-let CANDLE_PERIOD = 60000; // Default: 1 Menit per Candle (Bisa diganti 5M / 15M)
-const MAX_CANDLES = 25; 
+let CANDLE_PERIOD = 60000; // Milliseconds (1M)
+let BINANCE_INTERVAL = '1m';
+const MAX_CANDLES = 30; 
 
 let currentSymbol = 'BTCUSDT';
-let currentPrice = 64500.00; // Harga default awal
-
-const FALLBACK_PRICES = {
-  BTCUSDT: 64500.00, ETHUSDT: 3500.00, BNBUSDT: 600.00,
-  SOLUSDT: 150.00, XRPUSDT: 0.60, PAXGUSDT: 2350.00
-};
+let currentPrice = 0; 
+let realMarketPrice = 0;
 
 if (typeof api !== 'undefined' && api.getDatabase) {
   api.getDatabase().then(db => {
@@ -354,17 +347,18 @@ function setBetAmount(amount, btnEl) { sfxClick(); const cap = currentUser.balan
 function adjustBet(factor) { sfxClick(); let next = Math.floor(currentBet * factor); if (next < MIN_BET) next = MIN_BET; if (next > currentUser.balance) next = currentUser.balance > 0 ? currentUser.balance : MIN_BET; currentBet = next; document.getElementById('betDisplay').textContent = currentBet.toLocaleString(); clearChipActive(); }
 function setTradeDuration(ms, btnEl) { sfxClick(); tradeDuration = ms; document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active')); btnEl.classList.add('active'); }
 
-function changeChartTimeframe(ms, btnEl) {
+function changeChartTimeframe(ms, intervalStr, btnEl) {
   sfxClick();
   CANDLE_PERIOD = ms;
+  BINANCE_INTERVAL = intervalStr;
   document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
   btnEl.classList.add('active');
-  initChartHistory(); // Re-generate chart width
+  loadSymbol(currentSymbol); // Fetch ulang riwayat sesuai timeframe baru
 }
 
 /**
  * ==============================================================
- * CHART ENGINE
+ * 2. CHART ENGINE (100% REAL-TIME BINANCE API)
  * ==============================================================
  */
 const canvas = document.getElementById('tradeCanvas');
@@ -381,42 +375,10 @@ let tradeIdCounter = 0;
 function resizeCanvas() { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight; }
 window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-function initChartHistory() {
-  candles = [];
-  let initTime = performance.now() - (MAX_CANDLES * CANDLE_PERIOD);
-  let priceScale = currentPrice * 0.0001; // Dinamis berdasarkan harga aset
-  
-  for(let i=0; i<MAX_CANDLES; i++) {
-    let cOpen = currentPrice;
-    let cClose = cOpen + ((Math.random() - 0.5) * priceScale * 15);
-    candles.push({
-      openTime: initTime, o: cOpen,
-      h: Math.max(cOpen, cClose) + (Math.random() * priceScale * 8),
-      l: Math.min(cOpen, cClose) - (Math.random() * priceScale * 8),
-      c: cClose
-    });
-    currentPrice = cClose;
-    initTime += CANDLE_PERIOD;
-  }
-  currentCandle = candles[candles.length - 1];
-  currentCandle.openTime = performance.now();
-}
-
-function updatePriceTick(price, now) {
-  if (!currentCandle) return;
-  if (now - currentCandle.openTime >= CANDLE_PERIOD) {
-    let newCandle = { openTime: currentCandle.openTime + CANDLE_PERIOD, o: currentCandle.c, h: currentCandle.c, l: currentCandle.c, c: price };
-    candles.push(newCandle); if (candles.length > MAX_CANDLES) candles.shift(); currentCandle = newCandle;
-  } else {
-    currentCandle.c = price;
-    if (price > currentCandle.h) currentCandle.h = price;
-    if (price < currentCandle.l) currentCandle.l = price;
-  }
-}
-
-function drawChart(now) {
+function drawChart() {
+  const now = Date.now();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (candles.length === 0) return;
+  if (candles.length === 0 || !currentCandle) return;
 
   const paddingTop = canvas.height * 0.15; const paddingBottom = canvas.height * 0.15; const renderHeight = canvas.height - paddingTop - paddingBottom;
   let minP = Math.min(...candles.map(c => c.l)); let maxP = Math.max(...candles.map(c => c.h));
@@ -424,16 +386,20 @@ function drawChart(now) {
   activeTrades.forEach(t => { if(t.entryPrice < minP) minP = t.entryPrice; if(t.entryPrice > maxP) maxP = t.entryPrice; });
 
   let paddingY = (maxP - minP) * 0.15;
-  // Dynamic minimum padding agar grafik coin murah (XRP) tidak terlihat lurus saja
   let minPadding = currentPrice * 0.0001; 
   if (paddingY < minPadding) paddingY = minPadding;
   
   const scaleY = (val) => { let normalized = (val - (minP - paddingY)) / ((maxP + paddingY) - (minP - paddingY)); return canvas.height - paddingBottom - (normalized * renderHeight); };
 
   const candleSpacing = canvas.width / MAX_CANDLES; const candleWidth = candleSpacing * 0.7; 
-  let elapsedInCandle = now - currentCandle.openTime; let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
+  
+  // Menggeser chart secara akurat berdasarkan detik berjalan pada K-line
+  let elapsedInCandle = now - currentCandle.openTime;
+  let shiftX = (elapsedInCandle / CANDLE_PERIOD) * candleSpacing;
+  if (shiftX > candleSpacing) shiftX = candleSpacing; // Cap maksimal pergerakan per candle
+  
   let baseX = canvas.width - (candleSpacing / 2); 
-  let lastX = baseX - shiftX; let lastY = scaleY(currentCandle.c);
+  let lastX = baseX - shiftX; let lastY = scaleY(currentPrice);
 
   // MENGGAMBAR GARIS ENTRY UNTUK SEMUA POSISI AKTIF
   activeTrades.forEach(t => {
@@ -470,10 +436,10 @@ function drawChart(now) {
     }
   }
 
+  // Titik harga berjalan (Blinker)
   ctx.beginPath(); ctx.arc(lastX, lastY, 5, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0;
 
-  // Format desimal dinamis (XRP = 4 desimal, BTC = 2 desimal)
-  let decimals = currentPrice < 10 ? 4 : 2;
+  let decimals = currentPrice < 10 ? 4 : (currentPrice < 1000 ? 2 : 1);
   const tag = document.getElementById('priceTag');
   tag.textContent = currentPrice.toFixed(decimals);
   tag.style.top = `${lastY}px`;
@@ -481,65 +447,99 @@ function drawChart(now) {
 
 /**
  * ==============================================================
- * WEBSOCKET & DYNAMIC SCALING ENGINE
+ * 3. BINANCE DATA FETCHING & WEBSOCKET
  * ==============================================================
  */
-let lastTickTime = performance.now();
-let realMarketPrice = currentPrice; 
 let binanceWS = null;
+
+async function fetchBinanceHistory(symbol) {
+  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${BINANCE_INTERVAL}&limit=${MAX_CANDLES}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    candles = data.map(d => ({
+      openTime: d[0],
+      o: parseFloat(d[1]), h: parseFloat(d[2]), l: parseFloat(d[3]), c: parseFloat(d[4])
+    }));
+    currentCandle = candles[candles.length - 1];
+    currentPrice = currentCandle.c;
+    realMarketPrice = currentPrice;
+    
+    document.getElementById('priceTag').classList.remove('loading');
+  } catch (error) {
+    console.error("Gagal memuat history Binance", error);
+  }
+}
 
 function connectWS(symbol) {
   if (binanceWS) binanceWS.close();
-  let streamName = symbol.toLowerCase() + '@trade';
+  let streamName = `${symbol.toLowerCase()}@kline_${BINANCE_INTERVAL}`;
   binanceWS = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}`);
+  
   binanceWS.onmessage = (event) => {
-    let data = JSON.parse(event.data);
-    realMarketPrice = parseFloat(data.p);
+    let msg = JSON.parse(event.data);
+    let k = msg.k;
+    realMarketPrice = parseFloat(k.c);
+    let kOpenTime = k.t;
+
+    // Tambah candle baru jika menit/waktu berganti sesuai Binance
+    if (!currentCandle || currentCandle.openTime !== kOpenTime) {
+        let newCandle = { openTime: kOpenTime, o: parseFloat(k.o), h: parseFloat(k.h), l: parseFloat(k.l), c: parseFloat(k.c) };
+        candles.push(newCandle);
+        if (candles.length > MAX_CANDLES) candles.shift();
+        currentCandle = newCandle;
+    }
+
+    // 100% REAL-TIME UPDATE KECUALI SAAT ADA ORDER
+    if (activeTrades.length === 0) {
+        currentPrice = realMarketPrice;
+        currentCandle.o = parseFloat(k.o);
+        currentCandle.h = parseFloat(k.h);
+        currentCandle.l = parseFloat(k.l);
+        currentCandle.c = parseFloat(k.c);
+        
+        // Update tag harga UI indikator (Up/Down color)
+        const tag = document.getElementById('priceTag');
+        tag.classList.remove('up', 'down');
+        if (currentCandle.c > currentCandle.o) tag.classList.add('up');
+        else if (currentCandle.c < currentCandle.o) tag.classList.add('down');
+    }
   };
 }
 
-function loadSymbol(symbol) {
+async function loadSymbol(symbol) {
   sfxClick();
   currentSymbol = symbol;
   document.getElementById('priceTag').textContent = "MEMUAT...";
+  document.getElementById('priceTag').classList.add('loading');
   
-  // Ambil data harga pertama
-  fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`)
-    .then(res => res.json())
-    .then(data => {
-      currentPrice = parseFloat(data.price);
-      realMarketPrice = currentPrice;
-      activeTrades = []; // Wajib bersihkan trade aktif jika pindah pair agar tidak error chart-nya
-      initChartHistory();
-      connectWS(symbol);
-      if(!animFrame) animFrame = requestAnimationFrame(gameLoop);
-    })
-    .catch(() => {
-      currentPrice = FALLBACK_PRICES[symbol] || 100;
-      realMarketPrice = currentPrice;
-      activeTrades = [];
-      initChartHistory();
-      connectWS(symbol);
-      if(!animFrame) animFrame = requestAnimationFrame(gameLoop);
-    });
+  activeTrades = []; 
+  await fetchBinanceHistory(symbol);
+  connectWS(symbol);
+  
+  if(!animFrame) animFrame = requestAnimationFrame(gameLoop);
 }
 
-// Mulai aplikasi
 loadSymbol(currentSymbol);
 
-function gameLoop(now) {
+let lastTickTime = Date.now();
+
+function updateLocalFakeCandle(price) {
+  if (!currentCandle) return;
+  currentCandle.c = price;
+  if (price > currentCandle.h) currentCandle.h = price;
+  if (price < currentCandle.l) currentCandle.l = price;
+}
+
+function gameLoop() {
+  const now = Date.now();
   let dt = now - lastTickTime;
   
-  if (dt > 100) {
-    let priceScale = currentPrice * 0.0001; // Dinamis untuk Pair apapun
-    
-    if (activeTrades.length === 0) {
-        // MODE 1: STEALTH (MARKET ASLI BINANCE)
-        let diff = realMarketPrice - currentPrice;
-        currentPrice += diff * 0.2; 
-    } 
-    else {
-        // MODE 2: MANIPULASI RTP BANDAR
+  // Game Tick rate (60fps visual logic for smooth manipulation)
+  if (dt > 16) { 
+    if (activeTrades.length > 0) {
+        // HIDE REAL PRICE & INJECT BANDAR MANIPULATION
+        let priceScale = currentPrice * 0.0001; 
         let volatility = priceScale * 2.0; 
         let bias = 0;
         
@@ -547,25 +547,27 @@ function gameLoop(now) {
         let nearestTrade = sortedTrades[0];
         let remaining = nearestTrade.expiryTime - now;
         
+        // Mulai tarik harga ke target saat tersisa < 2 detik
         if (remaining > 0 && remaining < 2000) {
             let diff = nearestTrade.targetPrice - currentPrice;
             bias = diff * 0.15; 
-            volatility = priceScale * 0.5; // Mengurangi guncangan agar presisi
+            volatility = priceScale * 0.5; // Mengurangi guncangan liar agar presisi
         }
         
         currentPrice += bias + (Math.random() - 0.5) * volatility;
+        updateLocalFakeCandle(currentPrice); // Override candle berjalan dengan manipulasi
     }
     
-    updatePriceTick(currentPrice, now);
     lastTickTime = now;
   }
 
   // Resolusi Trade yang Kadaluarsa
-  let safetyGap = currentPrice * 0.00005; // Titik presisi (contoh: 0.05 BTC / 0.0001 XRP)
+  let safetyGap = currentPrice * 0.00002; 
   for(let i = activeTrades.length - 1; i >= 0; i--) {
       let t = activeTrades[i];
       if (now >= t.expiryTime) {
           
+          // Pastikan win/loss persis saat kadaluarsa
           if (t.isWin) {
               if(t.direction === 'CALL' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + safetyGap;
               if(t.direction === 'PUT' && currentPrice >= t.entryPrice) currentPrice = t.entryPrice - safetyGap;
@@ -574,24 +576,30 @@ function gameLoop(now) {
               if(t.direction === 'PUT' && currentPrice <= t.entryPrice) currentPrice = t.entryPrice + safetyGap;
           }
           
-          updatePriceTick(currentPrice, now);
+          updateLocalFakeCandle(currentPrice);
           resolveTrade(t);
           activeTrades.splice(i, 1);
+          
+          // INSTANT SNAP BACK to Real Market ketika tidak ada trade aktif
+          if (activeTrades.length === 0) {
+              currentPrice = realMarketPrice;
+          }
       }
   }
 
-  drawChart(now);
+  drawChart();
   animFrame = requestAnimationFrame(gameLoop);
 }
 
 /**
  * ==============================================================
- * TRADING LOGIC
+ * 4. TRADING LOGIC
  * ==============================================================
  */
 function placeTrade(direction) {
   ensureAudio();
   if (currentUser.balance < currentBet) return showToast('Saldo tidak cukup!');
+  if (!currentCandle) return showToast('Koneksi pasar tertunda, coba lagi.');
   
   sfxTradeStart();
   currentUser.balance -= currentBet;
@@ -599,7 +607,6 @@ function placeTrade(direction) {
   
   let isWin = Math.random() < playerWinRate;
   
-  // Tentukan jarak titik akhir dinamis sesuai harga Pair (contoh BTC = ~$5, XRP = ~$0.0005)
   let priceScale = currentPrice * 0.0001;
   let margin = priceScale * (10 + Math.random() * 20); 
   let targetPrice = currentPrice + (direction === 'CALL' ? (isWin ? margin : -margin) : (isWin ? -margin : margin));
@@ -610,8 +617,8 @@ function placeTrade(direction) {
       amount: currentBet,
       entryPrice: currentPrice,
       targetPrice: targetPrice,
-      startTime: performance.now(),
-      expiryTime: performance.now() + tradeDuration,
+      startTime: Date.now(),
+      expiryTime: Date.now() + tradeDuration,
       isWin: isWin
   });
 }
