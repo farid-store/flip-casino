@@ -230,25 +230,26 @@
     </div>
   </div>
 
-  <script src="api.js"></script>
-  <script>
+<!-- MENGGUNAKAN TYPE MODULE -->
+<script type="module">
+    import { api } from './api.js';
+
     // 1. CEK OTORISASI
     const userJson = localStorage.getItem('currentUser');
     if (!userJson) {
       window.location.href = 'auth.html';
     } else {
       const user = JSON.parse(userJson);
-      // Validasi ketat khusus admin
       if (user.username !== 'admin_casino' && user.username !== 'admin') {
         alert('Akses Ditolak! Anda bukan admin.');
         window.location.href = 'index.html';
       }
     }
 
-    let globalDatabase = null;
+    let globalUsers = [];
 
-    // 2. FUNGSI MEMUAT SEMUA DATA
-    async function loadData() {
+    // 2. FUNGSI MEMUAT SEMUA DATA (Diekspor ke window agar bisa dipanggil dari HTML)
+    window.loadData = async function() {
       const tbodyUsers = document.getElementById('tableBody');
       const tbodyDeposits = document.getElementById('depositTableBody');
       const tbodyWithdrawals = document.getElementById('withdrawalTableBody');
@@ -257,28 +258,21 @@
       btnRefresh.textContent = "Memuat...";
       btnRefresh.disabled = true;
       
-      const db = await api.getDatabase();
+      const data = await api.getAdminData();
       
-      if (db) {
-        globalDatabase = db;
+      if (data) {
+        globalUsers = data.users; // Simpan data user untuk reference
         
         // --- RENDER TABEL USER ---
-        if (db.users) {
+        if (data.users.length > 0) {
           tbodyUsers.innerHTML = '';
-          db.users.forEach((u, index) => {
-            
-            // Format tampilan RTP
+          data.users.forEach((u) => {
             const rtpValue = u.winRate !== undefined ? parseFloat(u.winRate) : 15;
             let rtpColor = "var(--gold-light)";
             let borderRtp = "var(--gold-dark)";
             
-            if (rtpValue === 100) {
-              rtpColor = "#22c55e"; // Hijau jika Pasti Menang
-              borderRtp = "#22c55e";
-            } else if (rtpValue === 0) {
-              rtpColor = "#ef4444"; // Merah jika Pasti Kalah
-              borderRtp = "#ef4444";
-            }
+            if (rtpValue === 100) { rtpColor = "#22c55e"; borderRtp = "#22c55e"; } 
+            else if (rtpValue === 0) { rtpColor = "#ef4444"; borderRtp = "#ef4444"; }
 
             const rtpDisplay = u.winRate !== undefined ? `${rtpValue}%` : '15% (Def)';
             
@@ -295,8 +289,9 @@
               </td>
               <td class="balance-col">${(u.balance || 0).toLocaleString()}</td>
               <td style="display:flex; flex-direction:column; gap:6px;">
-                <button class="btn-edit" onclick="editBalance(${index}, '${u.username}')">Ubah Saldo</button>
-                <button class="btn-edit-rtp" onclick="editWinRate(${index}, '${u.username}')">Set RTP</button>
+                <!-- MENGIRIM DOC ID (u.id) ALIH-ALIH INDEX -->
+                <button class="btn-edit" onclick="window.editBalance('${u.id}', '${u.username}', ${u.balance || 0})">Ubah Saldo</button>
+                <button class="btn-edit-rtp" onclick="window.editWinRate('${u.id}', '${u.username}', ${rtpValue})">Set RTP</button>
               </td>
             `;
             tbodyUsers.appendChild(tr);
@@ -304,18 +299,17 @@
         }
 
         // --- RENDER TABEL DEPOSIT ---
-        if (db.deposits && db.deposits.length > 0) {
+        if (data.deposits.length > 0) {
           tbodyDeposits.innerHTML = '';
-          [...db.deposits].reverse().forEach((dep, reverseIndex) => {
-            const originalIndex = db.deposits.length - 1 - reverseIndex;
+          data.deposits.forEach((dep) => {
             let statusBadge = '';
             let actionButtons = '-';
 
             if (dep.status === 'pending') {
               statusBadge = '<span class="badge-status badge-pending">PENDING</span>';
               actionButtons = `
-                <button class="btn-approve" onclick="processDeposit(${originalIndex}, 'approved')">Terima</button>
-                <button class="btn-reject" onclick="processDeposit(${originalIndex}, 'rejected')">Tolak</button>
+                <button class="btn-approve" onclick="window.processDeposit('${dep.id}', '${dep.username}', ${dep.amount}, 'approved')">Terima</button>
+                <button class="btn-reject" onclick="window.processDeposit('${dep.id}', '${dep.username}', ${dep.amount}, 'rejected')">Tolak</button>
               `;
             } else if (dep.status === 'approved') {
               statusBadge = '<span class="badge-status badge-approved">BERHASIL</span>';
@@ -339,18 +333,17 @@
         }
 
         // --- RENDER TABEL WITHDRAWAL ---
-        if (db.withdrawals && db.withdrawals.length > 0) {
+        if (data.withdrawals.length > 0) {
           tbodyWithdrawals.innerHTML = '';
-          [...db.withdrawals].reverse().forEach((wd, reverseIndex) => {
-            const originalIndex = db.withdrawals.length - 1 - reverseIndex;
+          data.withdrawals.forEach((wd) => {
             let statusBadge = '';
             let actionButtons = '-';
 
             if (wd.status === 'pending') {
               statusBadge = '<span class="badge-status badge-pending">PENDING</span>';
               actionButtons = `
-                <button class="btn-approve" onclick="processWithdrawal(${originalIndex}, 'approved')">Kirim</button>
-                <button class="btn-reject" onclick="processWithdrawal(${originalIndex}, 'rejected')">Tolak</button>
+                <button class="btn-approve" onclick="window.processWithdrawal('${wd.id}', '${wd.username}', ${wd.amount}, 'approved')">Kirim</button>
+                <button class="btn-reject" onclick="window.processWithdrawal('${wd.id}', '${wd.username}', ${wd.amount}, 'rejected')">Tolak</button>
               `;
             } else if (wd.status === 'approved') {
               statusBadge = '<span class="badge-status badge-approved">TERKIRIM</span>';
@@ -379,87 +372,77 @@
 
       btnRefresh.textContent = "🔄 Refresh Data";
       btnRefresh.disabled = false;
-    }
+    };
 
     // 3. FUNGSI PROSES DEPOSIT
-    async function processDeposit(depIndex, action) {
-      if (!globalDatabase) return;
-      const deposit = globalDatabase.deposits[depIndex];
-      
+    window.processDeposit = async function(docId, username, amount, action) {
       const confirmMsg = action === 'approved' 
-        ? `Setujui deposit ${deposit.amount.toLocaleString()} untuk ${deposit.username}? Saldo akan bertambah otomatis.` 
-        : `Tolak permintaan deposit dari ${deposit.username}?`;
+        ? `Setujui deposit ${amount.toLocaleString()} untuk ${username}? Saldo akan bertambah otomatis.` 
+        : `Tolak permintaan deposit dari ${username}?`;
 
       if (confirm(confirmMsg)) {
+        document.getElementById('btnRefresh').textContent = "Menyimpan...";
+        
+        // Jika disetujui, update saldo user dulu
         if (action === 'approved') {
-          const userIndex = globalDatabase.users.findIndex(u => u.username === deposit.username);
-          if (userIndex !== -1) {
-            let currentBalance = parseInt(globalDatabase.users[userIndex].balance) || 0;
-            globalDatabase.users[userIndex].balance = currentBalance + parseInt(deposit.amount);
+          const user = globalUsers.find(u => u.username === username);
+          if (user) {
+            const newBalance = parseInt(user.balance || 0) + parseInt(amount);
+            await api.updateAdminUser(user.id, { balance: newBalance });
           } else {
-            alert('Error: Username tidak ditemukan di database pemain!');
-            return;
+            alert("Username tidak ditemukan di database pemain!");
+            return window.loadData();
           }
         }
 
-        deposit.status = action;
-        document.getElementById('btnRefresh').textContent = "Menyimpan...";
-        const result = await api.updateDatabase(globalDatabase);
-        
+        // Update status di tabel deposits
+        const result = await api.updateTransactionStatus('deposits', docId, action);
         if (result) {
           alert(`Deposit berhasil di-${action === 'approved' ? 'Setujui' : 'Tolak'}!`);
-          loadData();
         } else {
-          alert('Gagal menyimpan ke server!');
+          alert('Gagal mengubah status di server!');
         }
+        window.loadData();
       }
-    }
+    };
 
     // 4. FUNGSI PROSES WITHDRAWAL
-    async function processWithdrawal(wdIndex, action) {
-      if (!globalDatabase) return;
-      const wd = globalDatabase.withdrawals[wdIndex];
-      
+    window.processWithdrawal = async function(docId, username, amount, action) {
       const confirmMsg = action === 'approved' 
-        ? `Setujui penarikan ${wd.amount.toLocaleString()} untuk ${wd.username}? Pastikan Anda sudah mentransfer uangnya. Saldo pemain akan otomatis dipotong.` 
-        : `Tolak permintaan penarikan dari ${wd.username}?`;
+        ? `Setujui penarikan ${amount.toLocaleString()} untuk ${username}? Saldo pemain akan otomatis dipotong.` 
+        : `Tolak permintaan penarikan dari ${username}?`;
 
       if (confirm(confirmMsg)) {
+        document.getElementById('btnRefresh').textContent = "Menyimpan...";
+        
         if (action === 'approved') {
-          const userIndex = globalDatabase.users.findIndex(u => u.username === wd.username);
-          if (userIndex !== -1) {
-            let currentBalance = parseInt(globalDatabase.users[userIndex].balance) || 0;
-            let wdAmount = parseInt(wd.amount);
-            
-            if (currentBalance >= wdAmount) {
-              globalDatabase.users[userIndex].balance = currentBalance - wdAmount;
+          const user = globalUsers.find(u => u.username === username);
+          if (user) {
+            const currentBalance = parseInt(user.balance || 0);
+            if (currentBalance >= amount) {
+              await api.updateAdminUser(user.id, { balance: currentBalance - amount });
             } else {
-              alert(`Error: Saldo pemain tidak mencukupi!\nSaldo saat ini: ${currentBalance.toLocaleString()}\nPermintaan WD: ${wdAmount.toLocaleString()}`);
-              return;
+              alert(`Error: Saldo tidak cukup!\nSaldo: ${currentBalance.toLocaleString()}\nPermintaan WD: ${amount.toLocaleString()}`);
+              return window.loadData();
             }
           } else {
-            alert('Error: Username tidak ditemukan di database pemain!');
-            return;
+            alert("Username tidak ditemukan di database!");
+            return window.loadData();
           }
         }
 
-        wd.status = action;
-        document.getElementById('btnRefresh').textContent = "Menyimpan...";
-        const result = await api.updateDatabase(globalDatabase);
-        
+        const result = await api.updateTransactionStatus('withdrawals', docId, action);
         if (result) {
           alert(`Penarikan berhasil di-${action === 'approved' ? 'Setujui' : 'Tolak'}!`);
-          loadData();
         } else {
-          alert('Gagal menyimpan ke server!');
+          alert('Gagal mengubah status di server!');
         }
+        window.loadData();
       }
-    }
+    };
 
     // 5. FUNGSI UBAH SALDO MANUAL
-    async function editBalance(userIndex, username) {
-      if (!globalDatabase) return;
-      const currentBalance = globalDatabase.users[userIndex].balance || 0;
+    window.editBalance = async function(userId, username, currentBalance) {
       const newBalanceStr = prompt(`Masukkan saldo baru untuk pemain ${username}:`, currentBalance);
       
       if (newBalanceStr !== null && newBalanceStr !== "") {
@@ -467,26 +450,22 @@
         if (isNaN(newBalance)) return alert('Error: Masukkan angka yang valid!');
 
         if (confirm(`Yakin mengubah saldo ${username} dari ${currentBalance} menjadi ${newBalance}?`)) {
-          globalDatabase.users[userIndex].balance = newBalance;
           document.getElementById('btnRefresh').textContent = "Menyimpan...";
-          const result = await api.updateDatabase(globalDatabase);
+          const result = await api.updateAdminUser(userId, { balance: newBalance });
+          
           if (result) {
             alert('Saldo berhasil diubah!');
-            loadData();
+            window.loadData();
           } else {
             alert('Gagal menyimpan ke server!');
           }
         }
       }
-    }
+    };
 
     // 6. FUNGSI UBAH TINGKAT KEMENANGAN (RTP)
-    async function editWinRate(userIndex, username) {
-      if (!globalDatabase) return;
-      
-      const currentRtp = globalDatabase.users[userIndex].winRate !== undefined ? globalDatabase.users[userIndex].winRate : 15;
-      
-      const newRtpStr = prompt(`⚙️ ATUR TINGKAT KEMENANGAN (RTP) UNTUK: ${username}\n\nPANDUAN ANGKA:\n100 = Selalu Menang\n0 = Selalu Kalah (Zonk)\n15 = Normal / Bawaan Kasino\n\nMasukkan Angka Persentase (0 - 100):`, currentRtp);
+    window.editWinRate = async function(userId, username, currentRtp) {
+      const newRtpStr = prompt(`⚙️ ATUR TINGKAT KEMENANGAN (RTP) UNTUK: ${username}\n\nMasukkan Angka Persentase (0 - 100):`, currentRtp);
       
       if (newRtpStr !== null && newRtpStr !== "") {
         const newRtp = parseFloat(newRtpStr);
@@ -497,22 +476,21 @@
         }
 
         if (confirm(`Yakin mengatur Kemenangan (RTP) ${username} menjadi ${newRtp}%?`)) {
-          globalDatabase.users[userIndex].winRate = newRtp;
           document.getElementById('btnRefresh').textContent = "Menyimpan RTP...";
-          const result = await api.updateDatabase(globalDatabase);
+          const result = await api.updateAdminUser(userId, { winRate: newRtp });
           
           if (result) {
             alert('Berhasil! Pengaturan RTP masuk ke Database.');
-            loadData();
+            window.loadData();
           } else {
             alert('Gagal menyimpan ke server!');
           }
         }
       }
-    }
+    };
 
     // Load data otomatis saat halaman dibuka
-    window.onload = loadData;
-  </script>
+    window.onload = window.loadData;
+</script>
 </body>
 </html>
