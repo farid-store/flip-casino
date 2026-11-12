@@ -1,107 +1,147 @@
 /**
  * ==============================================================
- * API CONTROLLER - KONEKSI KE JSONBIN.IO
+ * API CONTROLLER - KONEKSI KE FIREBASE FIRESTORE
  * ==============================================================
  */
 
-// GANTI DENGAN KUNCI DAN ID MILIKMU
-const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
-const BIN_ID = '6a6e2401da38895dfead2b5f'; 
-const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+// 1. Import Firebase SDK versi terbaru (V10 Modular)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  getDocs, 
+  query, 
+  where, 
+  addDoc, 
+  updateDoc, 
+  doc 
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-const headers = {
-  'Content-Type': 'application/json',
-  'X-Master-Key': API_KEY
+// 2. GANTI DENGAN FIREBASE CONFIG MILIKMU! 
+// (Dapatkan ini dari Firebase Console -> Project Settings)
+const firebaseConfig = {
+  apiKey: "API_KEY_ANDA",
+  authDomain: "PROJECT_ID_ANDA.firebaseapp.com",
+  projectId: "PROJECT_ID_ANDA",
+  storageBucket: "PROJECT_ID_ANDA.appspot.com",
+  messagingSenderId: "SENDER_ID_ANDA",
+  appId: "APP_ID_ANDA"
 };
 
-const api = {
-  // 1. Mengambil seluruh data dari database
-  async getDatabase() {
-    try {
-      const response = await fetch(`${BASE_URL}/latest`, { method: 'GET', headers });
-      const data = await response.json();
-      return data.record; // JSONBin menyimpan data kita di dalam properti 'record'
-    } catch (error) {
-      console.error("Gagal mengambil data:", error);
-      return null;
-    }
-  },
+// Inisialisasi Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  // 2. Menyimpan/menimpa data baru ke database
-  async updateDatabase(newData) {
-    try {
-      const response = await fetch(BASE_URL, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(newData)
-      });
-      return await response.json();
-    } catch (error) {
-      console.error("Gagal menyimpan data:", error);
-      return null;
-    }
-  },
+// Referensi ke koleksi "users" di Firestore
+const usersCollection = collection(db, "users");
 
-  // 3. Fungsi Pendaftaran (Register)
+export const api = {
+  
+  // 1. Fungsi Pendaftaran (Register)
   async register(userObj) {
-    const db = await this.getDatabase();
-    if (!db || !db.users) return { success: false, message: "Database error" };
+    try {
+      // Cek apakah username sudah dipakai
+      const q = query(usersCollection, where("username", "==", userObj.username));
+      const querySnapshot = await getDocs(q);
 
-    // Cek apakah username sudah dipakai
-    const exists = db.users.find(u => u.username === userObj.username);
-    if (exists) return { success: false, message: "Username sudah terdaftar!" };
+      if (!querySnapshot.empty) {
+        return { success: false, message: "Username sudah terdaftar!" };
+      }
 
-    // Format data user baru
-    const newUser = {
-      ...userObj, // Memasukkan (username, password, email, hp, rekening)
-      balance: 100000, // Saldo awal standar
-      level: 1,
-      exp: 0,
-      joinedAt: new Date().toISOString()
-    };
+      // Format data user baru (sama seperti sebelumnya)
+      const newUser = {
+        ...userObj, 
+        balance: 100000, // Saldo awal standar
+        level: 1,
+        exp: 0,
+        joinedAt: new Date().toISOString()
+      };
 
-    db.users.push(newUser);
-    const result = await this.updateDatabase(db);
-    
-    if (result) return { success: true, user: newUser };
-    return { success: false, message: "Gagal menyimpan ke server" };
+      // Simpan user baru sebagai dokumen baru di Firestore
+      await addDoc(usersCollection, newUser);
+      
+      return { success: true, user: newUser };
+    } catch (error) {
+      console.error("Gagal mendaftar:", error);
+      return { success: false, message: "Gagal menyimpan ke server Firestore" };
+    }
   },
 
-  // 4. Fungsi Masuk (Login)
+  // 2. Fungsi Masuk (Login)
   async login(username, password) {
-    const db = await this.getDatabase();
-    if (!db || !db.users) return { success: false, message: "Database error" };
+    try {
+      // Cari data berdasarkan username
+      const q = query(usersCollection, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
 
-    // Cari kecocokan username dan password
-    const user = db.users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-      // Simpan sesi login ke LocalStorage (browser)
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      return { success: true, user };
+      if (querySnapshot.empty) {
+        return { success: false, message: "Username tidak ditemukan!" };
+      }
+
+      let userData = null;
+      let docId = null;
+
+      // Ambil data user dari hasil pencarian (karena username unik, hasilnya pasti 1)
+      querySnapshot.forEach((document) => {
+        userData = document.data();
+        docId = document.id; // ID unik dokumen di Firestore
+      });
+
+      // Validasi password
+      if (userData && userData.password === password) {
+        // Simpan sesi login ke LocalStorage (tambahkan docId untuk mempermudah update nantinya)
+        const currentUserData = { ...userData, id: docId };
+        localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+        
+        return { success: true, user: currentUserData };
+      }
+
+      return { success: false, message: "Password salah!" };
+    } catch (error) {
+      console.error("Gagal login:", error);
+      return { success: false, message: "Terjadi kesalahan server" };
     }
-    return { success: false, message: "Username atau password salah!" };
   },
 
-  // 5. Fungsi Update Progres Pemain (Saldo & Level)
+  // 3. Fungsi Update Progres Pemain (Saldo & Level)
   async saveProgress(username, balance, level, exp) {
-    const db = await this.getDatabase();
-    if (!db || !db.users) return false;
+    try {
+      // 1. Cari dokumen user berdasarkan username
+      const q = query(usersCollection, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
 
-    const userIndex = db.users.findIndex(u => u.username === username);
-    if (userIndex !== -1) {
-      db.users[userIndex].balance = balance;
-      db.users[userIndex].level = level;
-      db.users[userIndex].exp = exp;
-      
-      await this.updateDatabase(db);
-      
-      // Update juga di LocalStorage agar UI sinkron
-      const updatedUser = db.users[userIndex];
+      if (querySnapshot.empty) return false;
+
+      let docId = null;
+      let userData = null;
+
+      querySnapshot.forEach((document) => {
+        docId = document.id;
+        userData = document.data();
+      });
+
+      // 2. Update HANYA data progres pada dokumen spesifik tersebut
+      const userRef = doc(db, "users", docId);
+      await updateDoc(userRef, {
+        balance: balance,
+        level: level,
+        exp: exp
+      });
+
+      // 3. Update juga di LocalStorage agar UI web tetap sinkron
+      const updatedUser = {
+        ...userData,
+        id: docId,
+        balance: balance,
+        level: level,
+        exp: exp
+      };
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      
+
       return true;
+    } catch (error) {
+      console.error("Gagal menyimpan progres:", error);
+      return false;
     }
-    return false;
   }
 };
