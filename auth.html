@@ -240,16 +240,19 @@
   </div>
 </div>
 
-<!-- Import file api.js dari Tahap 1 -->
-<script src="api.js"></script>
-<script>
+<!-- Hapus pemanggilan script lama: <script src="api.js"></script> -->
+<script type="module">
+  // Import fungsi api dari api.js yang baru
+  import { api } from './api.js';
+
   // Cek jika user sudah login, langsung arahkan ke Lobby (index.html)
   if(localStorage.getItem('currentUser')) {
-    window.location.href = 'index.html'; // Akan kita buat di Tahap 3
+    window.location.href = 'index.html'; 
   }
 
-  // Fungsi untuk mengganti tampilan Login / Register
-  function switchTab(tab) {
+  // Karena kita menggunakan type="module", fungsi harus didaftarkan ke objek window
+  // agar bisa dipanggil dari atribut onclick="..." di elemen HTML
+  window.switchTab = function(tab) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
     
@@ -260,7 +263,7 @@
       document.querySelectorAll('.tab-btn')[1].classList.add('active');
       document.getElementById('registerForm').classList.add('active');
     }
-  }
+  };
 
   // Fungsi utilitas untuk menampilkan pesan peringatan
   function showAlert(elementId, message, type) {
@@ -324,7 +327,7 @@
       document.getElementById('registerForm').reset();
       // Pindah ke tab login
       setTimeout(() => {
-        switchTab('login');
+        window.switchTab('login');
         document.getElementById('loginUsername').value = newUserObj.username;
       }, 1500);
     } else {
