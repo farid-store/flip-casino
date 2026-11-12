@@ -20,12 +20,13 @@ import {
 // 2. GANTI DENGAN FIREBASE CONFIG MILIKMU! 
 // (Dapatkan ini dari Firebase Console -> Project Settings)
 const firebaseConfig = {
-  apiKey: "API_KEY_ANDA",
-  authDomain: "PROJECT_ID_ANDA.firebaseapp.com",
-  projectId: "PROJECT_ID_ANDA",
-  storageBucket: "PROJECT_ID_ANDA.appspot.com",
-  messagingSenderId: "SENDER_ID_ANDA",
-  appId: "APP_ID_ANDA"
+apiKey: "AIzaSyB2z0ueVPmvImlpXoHyeQ6ubS3P3P4BF1s",
+  authDomain: "arcade-game-ec813.firebaseapp.com",
+  projectId: "arcade-game-ec813",
+  storageBucket: "arcade-game-ec813.firebasestorage.app",
+  messagingSenderId: "1005759724056",
+  appId: "1:1005759724056:web:0de1e12221206d5216e16d",
+  measurementId: "G-J0QVRF3C4Q"
 };
 
 // Inisialisasi Firebase
