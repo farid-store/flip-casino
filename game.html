@@ -2,10 +2,11 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<!-- FIX: Tambahan viewport-fit=cover untuk iOS/Safari safe area -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Royal Casino: Fruit Flip 🎰</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-<!-- Library QRCode -->
+<!-- Tambahkan library QRCode -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   /* =========================================
@@ -35,6 +36,7 @@
     background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-base) 100%);
     color: var(--text-light); font-family: var(--font-ui);
     display: flex; flex-direction: column; align-items: center;
+    /* FIX UI: Support browser modern dengan 100dvh agar tidak tertutup search bar */
     min-height: 100vh;
     min-height: 100dvh;
     height: 100dvh;
@@ -46,6 +48,7 @@
      ========================================= */
   .top-bar {
     width: 100%; max-width: 600px; padding: 15px 20px;
+    /* FIX UI: Jarak atas aman untuk notch/status bar */
     padding-top: calc(15px + env(safe-area-inset-top));
     display: flex; justify-content: space-between; align-items: center;
     background: linear-gradient(180deg, rgba(17,21,30,0.95), transparent);
@@ -131,11 +134,15 @@
   .control-console {
     width: 100%; max-width: 600px; background: var(--bg-panel);
     border-top: 2px solid var(--gold-dark); 
+    
+    /* FIX UI: Tambahan env() agar aman dari tombol home indicator iOS & search bar bawah */
     padding: 15px 15px calc(15px + env(safe-area-inset-bottom));
+    
     border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
     display: flex; flex-direction: column; gap: 12px;
   }
 
+  /* Digital Info Banner */
   .info-banner {
     background: #000; border: 2px solid #222; border-radius: 8px;
     padding: 8px; text-align: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
@@ -144,6 +151,7 @@
   .info-text.win-alert { color: var(--gold-light); font-size: 16px; font-weight: bold; animation: flash 0.5s infinite alternate; }
   @keyframes flash { from { text-shadow: 0 0 5px var(--gold-main); } to { text-shadow: 0 0 20px var(--gold-light); } }
 
+  /* Bet Adjuster */
   .bet-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .bet-btn-ctrl {
     background: #1e293b; border: 1px solid #334155; color: #fff;
@@ -159,6 +167,7 @@
   .bet-display-val { font-family: var(--font-digital); font-size: 16px; color: #fff; }
   .btn-max { background: linear-gradient(180deg, var(--gold-main), var(--gold-dark)); border: none; color: #000; font-weight: 800; font-size: 12px; }
 
+  /* Action Buttons */
   .actions-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .action-btn {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
@@ -192,22 +201,30 @@
   .modal-panel { background: var(--bg-panel); border: 2px solid var(--gold-main); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; position: relative; }
   .modal-title { font-family: var(--font-title); color: var(--gold-light); text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
   
+  /* Paytable (Diperbarui dengan Scroll & Gaya Baru) */
   .paytable-grid { 
     display: grid; 
     grid-template-columns: repeat(2, 1fr); 
     gap: 10px; 
     margin-bottom: 15px; 
-    max-height: 50vh; 
-    overflow-y: auto; 
+    max-height: 50vh;        /* Membatasi tinggi menu agar tidak tembus ke luar layar HP */
+    overflow-y: auto;        /* Memunculkan fitur scroll (gulung) otomatis */
     padding-right: 5px;
   }
+  
+  /* Desain Scrollbar */
   .paytable-grid::-webkit-scrollbar { width: 5px; }
   .paytable-grid::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
 
   .pt-item { 
-    background: #000; padding: 10px 8px; border-radius: 8px; 
-    text-align: center; border: 1px solid #333; display: flex;
-    flex-direction: column; align-items: center;
+    background: #000; 
+    padding: 10px 8px; 
+    border-radius: 8px; 
+    text-align: center; 
+    border: 1px solid #333; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .pt-icon { font-size: 28px; line-height: 1; margin-bottom: 2px; }
   .pt-name { font-size: 9px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin-top: 2px; }
@@ -217,6 +234,7 @@
   .pt-info { font-size: 11px; color: var(--text-muted); line-height: 1.5; text-align: center; margin-top: 10px; }
   .btn-close-modal { width: 100%; padding: 12px; background: var(--gold-main); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; }
   
+  /* Jackpot UI */
   .jackpot-wrapper { text-align: center; transform: scale(0.5); opacity: 0; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   .overlay.show .jackpot-wrapper { transform: scale(1); opacity: 1; }
   .jp-tier { font-family: var(--font-title); font-size: clamp(3rem, 12vw, 5rem); font-weight: 800; text-transform: uppercase; line-height: 1; margin-bottom: 10px; }
@@ -227,11 +245,13 @@
   
   @keyframes jpPulse { 100% { transform: scale(1.05); } }
 
+  /* Zonk UI */
   .zonk-icon { font-size: 5rem; animation: bombShake 0.4s infinite; }
   .zonk-title { color: var(--danger); font-family: var(--font-title); font-size: 2.5rem; text-shadow: 0 0 20px red; margin: 10px 0; }
   .zonk-loss { font-family: var(--font-digital); font-size: 2rem; color: #fff; }
   @keyframes bombShake { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 75%{transform:rotate(10deg);} }
 
+  /* Deposit Modal Tambahan */
   .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
   .btn-preset {
     background: #1e293b; border: 1px solid #334155; color: var(--gold-light);
@@ -269,6 +289,7 @@
 
   <canvas id="confettiCanvas"></canvas>
 
+  <!-- TOP BAR: PROFILE, BALANCE & EXIT -->
   <header class="top-bar">
     <button onclick="saveAndExit()" id="btnExit" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 10px;">⬅ KEMBALI</button>
     
@@ -287,17 +308,21 @@
     </div>
   </header>
 
+  <!-- MAIN GAME BOARD -->
   <main class="machine-container">
     <div class="slot-frame">
       <div class="grid-5x5" id="board"></div>
     </div>
   </main>
 
+  <!-- BOTTOM CONTROL CONSOLE -->
   <footer class="control-console">
+    <!-- Digital Information Board -->
     <div class="info-banner">
       <div class="info-text" id="infoText">WELCOME TO ROYAL CASINO</div>
     </div>
 
+    <!-- Bet Controls -->
     <div class="bet-row">
       <button class="bet-btn-ctrl" onclick="gameUI.changeBet(-1)">-</button>
       <div class="bet-display-box">
@@ -308,6 +333,7 @@
       <button class="bet-btn-ctrl btn-max" onclick="gameUI.maxBet()">MAX</button>
     </div>
 
+    <!-- Action Buttons -->
     <div class="actions-row">
       <button class="action-btn btn-info" onclick="gameUI.showPaytable()">
         <i>ℹ️</i><span>INFO</span>
@@ -324,10 +350,13 @@
     </div>
   </footer>
 
+  <!-- MODAL: PAYTABLE -->
   <div class="overlay" id="paytableModal" onclick="this.classList.remove('show')">
     <div class="modal-panel" onclick="event.stopPropagation()">
       <h2 class="modal-title">PAYTABLE</h2>
-      <div class="paytable-grid" id="paytableGrid"></div>
+      <div class="paytable-grid" id="paytableGrid">
+        <!-- Diisi via JS sesuai CONFIG -->
+      </div>
       <div class="pt-info">
         <b>Match 3+ on any line (Horz, Vert, Diag)</b><br>
         Lose 4x in a row? Watch out for the Zonk Bomb! 💣
@@ -336,10 +365,12 @@
     </div>
   </div>
 
+  <!-- MODAL: DEPOSIT QRIS -->
   <div class="overlay" id="depositModal" onclick="closeDepositModal()">
     <div class="modal-panel" onclick="event.stopPropagation()">
       <h2 class="modal-title" style="margin-bottom: 15px;">TOP UP CREDITS</h2>
       
+      <!-- Langkah 1: Pilih Nominal -->
       <div id="depositStep1">
         <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Pilih Nominal Deposit</p>
         <div class="preset-grid">
@@ -353,13 +384,14 @@
         <button class="btn-action-cancel" onclick="closeDepositModal()">TUTUP</button>
       </div>
 
+      <!-- Langkah 2: Scan QRIS -->
       <div id="depositStep2" style="display: none; text-align: center;">
         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">Total Pembayaran:</p>
         <p style="font-size: 20px; color: var(--gold-light); margin-bottom: 10px; font-weight: bold; font-family: var(--font-digital);" id="qrisTotalDisplay">Rp0</p>
         
         <div id="qrcode"></div>
         
-        <p style="font-size: 10px; color: var(--danger); margin-bottom: 15px;">*Wajib transfer sesuai nominal agar diproses otomatis.</p>
+        <p style="font-size: 10px; color: var(--danger); margin-bottom: 15px;">*Wajib transfer sesuai nominal agar diproses otomatis oleh Admin.</p>
         
         <button class="btn-action-success" id="btnConfirmDeposit" onclick="submitDeposit()">SAYA SUDAH TRANSFER</button>
         <button class="btn-action-cancel" onclick="resetDepositModal()">Batal / Ubah Nominal</button>
@@ -367,6 +399,7 @@
     </div>
   </div>
 
+  <!-- MODAL: JACKPOT -->
   <div class="overlay" id="jackpotModal" onclick="gameUI.closeJackpot()">
     <div class="jackpot-wrapper">
       <div class="jp-tier" id="jpTitle">SUPER</div>
@@ -375,6 +408,7 @@
     </div>
   </div>
 
+  <!-- MODAL: ZONK BOMB -->
   <div class="overlay" id="zonkModal" onclick="gameUI.closeZonk()">
     <div class="jackpot-wrapper">
       <div class="zonk-icon">💣</div>
@@ -384,10 +418,12 @@
     </div>
   </div>
 
+<!-- MODAL: MINI GAME 777 -->
   <div class="overlay" id="miniGameModal">
     <div class="modal-panel" onclick="event.stopPropagation()" style="background: linear-gradient(180deg, #2a0808 0%, #0a0000 100%); border-color: var(--danger); box-shadow: 0 0 40px rgba(255, 0, 0, 0.3);">
       <h2 class="modal-title" style="color: var(--gold-light); text-shadow: 0 0 15px var(--danger); font-size: 2rem; margin-bottom: 10px;">🎰 JACKPOT 777 🎰</h2>
       
+      <!-- Mesin Slot -->
       <div style="background: #000; border: 4px solid #333; border-radius: 12px; padding: 25px 15px; margin: 20px 0; box-shadow: inset 0 10px 30px rgba(0,0,0,1), 0 5px 15px rgba(0,0,0,0.5);">
         <div style="display: flex; justify-content: center; gap: 12px; font-family: var(--font-digital); font-size: 4rem; font-weight: bold;">
           <div id="mgReel1" style="background: linear-gradient(180deg, #f8fafc, #cbd5e1); color: #111; width: 75px; height: 95px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px solid var(--gold-main); box-shadow: inset 0 5px 10px rgba(0,0,0,0.2);">❓</div>
@@ -402,27 +438,177 @@
     </div>
   </div>
 
-<!-- ==========================================
-     FULL SCRIPT MODULE
-     ========================================== -->
-<script type="module">
-import { api } from './api.js';
-
-// 1. Cek User & Setup Variabel Awal
+<script src="api.js"></script>
+<script>
+/**
+ * ==============================================================
+ * 0. AUTHENTICATION & DATA BINDING
+ * ==============================================================
+ */
 const userJson = localStorage.getItem('currentUser');
 if (!userJson) {
   window.location.href = 'auth.html';
 }
 const currentUser = JSON.parse(userJson);
 
+// Variabel untuk menyimpan RTP spesifik pemain
 let playerWinRate = null;
+
+// Tarik data RTP terbaru dari server saat game dimuat
+if (typeof api !== 'undefined' && api.getDatabase) {
+  api.getDatabase().then(db => {
+    if (db && db.users) {
+      const freshUser = db.users.find(u => u.username === currentUser.username);
+      if (freshUser && freshUser.winRate !== undefined) {
+        playerWinRate = parseFloat(freshUser.winRate) / 100;
+        console.log("RTP berhasil diload:", freshUser.winRate, "%");
+      }
+    }
+  }).catch(e => console.error("Gagal load RTP", e));
+}
+
+async function saveAndExit() {
+  const btn = document.getElementById('btnExit');
+  btn.disabled = true;
+  btn.textContent = "SAVING...";
+  
+  try {
+    if (typeof api !== 'undefined' && api.saveProgress) {
+      await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp);
+    }
+  } catch(error) {
+    console.error("Gagal menyimpan progress:", error);
+  } finally {
+    window.location.href = 'index.html'; // Pindah halaman secara paksa walau error
+  }
+}
+
+/**
+ * ==============================================================
+ * 1. DEPOSIT SYSTEM LOGIC
+ * ==============================================================
+ */
 let selectedAmount = 0;
 let qrEngine = null;
 
-// 2. Data Konfigurasi Game (Di-load pertama agar bebas error)
+function openDepositModal() {
+  document.getElementById('depositModal').classList.add('show');
+}
+
+function closeDepositModal() {
+  document.getElementById('depositModal').classList.remove('show');
+  setTimeout(resetDepositModal, 300);
+}
+
+function resetDepositModal() {
+  document.getElementById('depositStep1').style.display = 'block';
+  document.getElementById('depositStep2').style.display = 'none';
+  document.getElementById('customAmount').value = '';
+  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+  selectedAmount = 0;
+}
+
+function setNominal(amount) {
+  selectedAmount = amount;
+  document.getElementById('customAmount').value = amount;
+  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function crc16(str) {
+  let c = 0xFFFF;
+  for(let i = 0; i < str.length; i++) { 
+    c ^= str.charCodeAt(i) << 8; 
+    for(let j = 0; j < 8; j++) { c = ((c & 0x8000) !== 0) ? (c << 1) ^ 0x1021 : c << 1; c &= 0xFFFF; } 
+  }
+  return c.toString(16).toUpperCase().padStart(4, '0');
+}
+
+function generateQRIS() {
+  const inputVal = parseInt(document.getElementById('customAmount').value);
+  if (isNaN(inputVal) || inputVal < 10000) {
+    alert("Minimal deposit adalah 10.000 Credits!");
+    return;
+  }
+  selectedAmount = inputVal;
+
+  const amountStr = selectedAmount.toString();
+  const amountLen = amountStr.length.toString().padStart(2, '0');
+  const mid = '93600915300002827902090000282790';
+  const merch = 'Royal Casino';
+  const merchLen = merch.length.toString().padStart(2, '0');
+  const city = 'Pekanbaru';
+  const cityLen = city.length.toString().padStart(2, '0');
+  const postal = '28294';
+  const postalLen = postal.length.toString().padStart(2, '0');
+  
+  let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
+  const qrisString = raw + crc16(raw);
+
+  const qrcodeContainer = document.getElementById('qrcode');
+  if (qrEngine) {
+    qrEngine.clear();
+    qrEngine.makeCode(qrisString);
+  } else {
+    qrcodeContainer.innerHTML = '';
+    qrEngine = new QRCode(qrcodeContainer, {
+      text: qrisString, width: 160, height: 160,
+      colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
+  document.getElementById('depositStep1').style.display = 'none';
+  document.getElementById('depositStep2').style.display = 'block';
+}
+
+async function submitDeposit() {
+  const btn = document.getElementById('btnConfirmDeposit');
+  btn.textContent = "MEMPROSES...";
+  btn.disabled = true;
+
+  try {
+    const db = await api.getDatabase();
+    if (!db) throw new Error("Koneksi gagal");
+    if (!db.deposits) db.deposits = [];
+
+    const newDeposit = {
+      date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
+      username: currentUser.username,
+      method: 'QRIS',
+      amount: selectedAmount,
+      status: 'pending'
+    };
+
+    db.deposits.push(newDeposit);
+    const isSuccess = await api.updateDatabase(db);
+
+    if (isSuccess) {
+      alert("✅ Deposit Terkirim!\nSilakan hubungi Admin atau tunggu beberapa saat hingga disetujui. Refresh halaman ini nanti untuk update saldo.");
+      closeDepositModal();
+    } else {
+      alert("❌ Terjadi kesalahan saat menyimpan ke server.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Gagal terhubung ke server database.");
+  } finally {
+    btn.textContent = "SAYA SUDAH TRANSFER";
+    btn.disabled = false;
+  }
+}
+
+/**
+ * ==============================================================
+ * 2. GAME CONFIGURATION (PENGATURAN TERPUSAT)
+ * ==============================================================
+ */
 const CONFIG = {
   initialBalance: 100000,
+  // Bet sudah diupdate ke 500k
   betSteps: [100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000], 
+  
+  // Buah-buahan baru sudah dimasukkan beserta perkaliannya
   symbols: [
     { id: 'cherry',     icon: '🍒', multiplier: 1, weight: 60 },
     { id: 'strawberry', icon: '🍓', multiplier: 2, weight: 50 },
@@ -435,33 +621,56 @@ const CONFIG = {
     { id: 'apple',      icon: '🍎', multiplier: 15, weight: 5 },
     { id: 'star',       icon: '⭐', multiplier: 25, weight: 3 },
     { id: 'crown',      icon: '👑', multiplier: 50, weight: 1 },
+    // --- TAMBAHAN BUAH JACKPOT ---
     { id: 'golden_apple', icon: '🍏', multiplier: 1000, weight: 0.5, isJackpot: true }
   ],
-  mechanics: { pityChance: 0.15, zonkTriggerStreak: 4, zonkChance: 0.25, zonkPenaltyMinPct: 0.001, zonkPenaltyMaxPct: 0.01 },
-  leveling: { expPerBetRatio: 0.01, baseExpForLevel2: 100, expMultiplierPerLevel: 1.5 },
-  timings: { autoNormalDelay: 120, autoFastDelay: 30, revealPause: 500, autoSpinPause: 1000 }
+
+  mechanics: {
+    pityChance: 0.15,            
+    zonkTriggerStreak: 4,        
+    zonkChance: 0.25,            
+    zonkPenaltyMinPct: 0.001,    
+    zonkPenaltyMaxPct: 0.01      
+  },
+
+  leveling: {
+    expPerBetRatio: 0.01,        
+    baseExpForLevel2: 100,       
+    expMultiplierPerLevel: 1.5   
+  },
+
+  timings: {
+    autoNormalDelay: 120, 
+    autoFastDelay: 30,    
+    revealPause: 500,     
+    autoSpinPause: 1000   
+  }
 };
 
+/**
+ * ==============================================================
+ * 3. GAME STATE & CORE LOGIC
+ * ==============================================================
+ */
 const calcExpNeeded = (level) => {
   return Math.floor(CONFIG.leveling.baseExpForLevel2 * Math.pow(CONFIG.leveling.expMultiplierPerLevel, level - 1));
 };
 
-// 3. State Permainan Dibuat
 const gameState = {
-  balance: currentUser.balance !== undefined ? parseInt(currentUser.balance) : CONFIG.initialBalance,
+  balance: currentUser.balance !== undefined ? currentUser.balance : CONFIG.initialBalance,
   currentBet: CONFIG.betSteps[2],
   lossStreak: 0,
+  
   level: currentUser.level || 1,
   currentExp: currentUser.exp || 0,
   expNeeded: calcExpNeeded(currentUser.level || 1),
+
   gridData: [], 
   cardsFlipped: 0,
   canFlipManual: false,
   isSpinning: false,
   isAutoLoop: false,
-  autoCloseTimer: null,
-  pendingWin: 0,
-  pendingWinIndices: new Set()
+  autoCloseTimer: null
 };
 
 const PAYLINES = [
@@ -474,7 +683,11 @@ const PAYLINES = [
   { line: [0,6,12,18,24], type: 'D' }, { line: [4,8,12,16,20], type: 'D' }
 ];
 
-// 4. Object-Object Engine (UI & Logic)
+/**
+ * ==============================================================
+ * 4. UI CONTROLLER (Mengatur Tampilan)
+ * ==============================================================
+ */
 const gameUI = {
   elements: {
     board: document.getElementById('board'),
@@ -497,20 +710,24 @@ const gameUI = {
     this.buildBoard();
     this.buildPaytable();
   },
+
   updateBalanceBet() {
     this.elements.balance.textContent = gameState.balance.toLocaleString();
     this.elements.bet.textContent = gameState.currentBet.toLocaleString();
   },
+
   updateLevelUI() {
     this.elements.level.textContent = `LEVEL ${gameState.level}`;
     const pct = Math.min((gameState.currentExp / gameState.expNeeded) * 100, 100);
     this.elements.expFill.style.width = `${pct}%`;
   },
+
   setBanner(text, isWin = false) {
     this.elements.info.textContent = text;
     if (isWin) this.elements.info.classList.add('win-alert');
     else this.elements.info.classList.remove('win-alert');
   },
+
   buildBoard() {
     this.elements.board.innerHTML = '';
     this.cardsDOM = [];
@@ -518,11 +735,14 @@ const gameUI = {
       const c = document.createElement('div');
       c.className = 'card'; c.dataset.index = i;
       c.innerHTML = `<div class="card-face card-back"></div><div class="card-face card-front"></div>`;
+      
       c.addEventListener('mouseenter', () => gameEngine.manualFlip(i));
       c.addEventListener('mousedown', () => gameEngine.manualFlip(i));
+      
       this.elements.board.appendChild(c);
       this.cardsDOM.push(c);
     }
+
     this.elements.board.addEventListener('touchmove', (e) => {
       if(!gameState.canFlipManual) return;
       e.preventDefault();
@@ -531,11 +751,15 @@ const gameUI = {
       if (elem && elem.closest('.card')) { gameEngine.manualFlip(elem.closest('.card').dataset.index); }
     }, { passive: false });
   },
+
   buildPaytable() {
     if (!this.elements.paytableGrid) return;
+    
     this.elements.paytableGrid.innerHTML = CONFIG.symbols.map(s => {
+      // Jika ini buah jackpot, tampilkan teks khusus
       const rewardVal = s.isJackpot ? "MINI GAME" : "+" + (gameState.currentBet * s.multiplier).toLocaleString();
       const multiplierText = s.isJackpot ? "MAX x1000" : `Multiplier: x${s.multiplier}`;
+      
       return `
         <div class="pt-item">
           <div class="pt-icon">${s.icon}</div>
@@ -546,6 +770,7 @@ const gameUI = {
       `;
     }).join('');
   },
+
   openMiniGame() {
     const modal = document.getElementById('miniGameModal');
     document.getElementById('mgReel1').textContent = '❓';
@@ -555,7 +780,11 @@ const gameUI = {
     document.getElementById('btnStartMG').style.display = 'block';
     modal.classList.add('show');
   },
-  closeMiniGame() { document.getElementById('miniGameModal').classList.remove('show'); },
+
+  closeMiniGame() {
+    document.getElementById('miniGameModal').classList.remove('show');
+  },
+
   changeBet(dir) {
     if (gameState.isSpinning) return;
     let idx = CONFIG.betSteps.indexOf(gameState.currentBet);
@@ -566,19 +795,24 @@ const gameUI = {
       this.updateBalanceBet(); 
     }
   },
+
   maxBet() {
     if (gameState.isSpinning) return;
     gameState.currentBet = CONFIG.betSteps[CONFIG.betSteps.length - 1]; 
     this.updateBalanceBet();
   },
+
   showPaytable() { document.getElementById('paytableModal').classList.add('show'); },
+
   lockControls(locked) {
     gameState.isSpinning = locked;
     this.elements.btnManual.disabled = locked;
     this.elements.btnFast.disabled = locked;
     this.elements.ctrlBtns.forEach(b => b.disabled = locked);
+    
     if (!gameState.isAutoLoop) this.elements.btnLoop.disabled = locked;
   },
+
   updateAutoLoopBtn() {
     const icon = document.getElementById('loopIcon');
     const text = document.getElementById('loopText');
@@ -592,15 +826,18 @@ const gameUI = {
       text.textContent = 'AUTO SPIN';
     }
   },
+
   resetBoardVisuals() {
     this.elements.board.classList.remove('has-win');
     this.cardsDOM.forEach(c => c.classList.remove('flipped', 'win'));
   },
+
   showJackpot(type, amount, cssClass) {
     const modal = document.getElementById('jackpotModal');
     document.getElementById('jpTitle').className = `jp-tier ${cssClass}`;
     document.getElementById('jpTitle').textContent = type;
     modal.classList.add('show');
+    
     const amtEl = document.getElementById('jpAmount');
     let startTimestamp = null;
     const step = (timestamp) => {
@@ -611,30 +848,47 @@ const gameUI = {
       if (progress < 1) window.requestAnimationFrame(step);
     };
     window.requestAnimationFrame(step);
+
     confettiEngine.start(40, 400); 
-    if (gameState.isAutoLoop) { gameState.autoCloseTimer = setTimeout(() => this.closeJackpot(), 3500); }
+
+    if (gameState.isAutoLoop) {
+      gameState.autoCloseTimer = setTimeout(() => this.closeJackpot(), 3500);
+    }
   },
+
   closeJackpot() {
     clearTimeout(gameState.autoCloseTimer);
     document.getElementById('jackpotModal').classList.remove('show');
     confettiEngine.stop();
+    
     if (gameState.isAutoLoop) setTimeout(() => gameEngine.startSpin('loop'), CONFIG.timings.autoSpinPause);
     else this.lockControls(false);
   },
+
   showZonk(amount) {
     const modal = document.getElementById('zonkModal');
     document.getElementById('zonkAmount').textContent = `- ${amount.toLocaleString()}`;
     modal.classList.add('show');
-    if (gameState.isAutoLoop) { gameState.autoCloseTimer = setTimeout(() => this.closeZonk(), 2500); }
+    
+    if (gameState.isAutoLoop) {
+      gameState.autoCloseTimer = setTimeout(() => this.closeZonk(), 2500);
+    }
   },
+
   closeZonk() {
     clearTimeout(gameState.autoCloseTimer);
     document.getElementById('zonkModal').classList.remove('show');
+    
     if (gameState.isAutoLoop) setTimeout(() => gameEngine.startSpin('loop'), CONFIG.timings.autoSpinPause);
     else this.lockControls(false);
   }
 };
 
+/**
+ * ==============================================================
+ * 5. GAME ENGINE (Logika Inti Permainan)
+ * ==============================================================
+ */
 const gameEngine = {
   getRandomSymbol() {
     const totalW = CONFIG.symbols.reduce((s, sym) => s + sym.weight, 0);
@@ -642,50 +896,80 @@ const gameEngine = {
     for (let sym of CONFIG.symbols) { if (r < sym.weight) return sym; r -= sym.weight; }
     return CONFIG.symbols[0];
   },
+
+  // PENGECEKAN KEMENANGAN REAL-TIME (SCRAMBLER BARU)
   hasWinPartial(grid) {
     for (let pl of PAYLINES) {
-      let currentSeq = 0; let lastSymId = null;
+      let currentSeq = 0;
+      let lastSymId = null;
       for(let i=0; i<5; i++) {
         let cell = grid[pl.line[i]];
-        if (!cell) { currentSeq = 0; lastSymId = null; continue; }
+        // Jika kotak belum terisi, abaikan pengecekan beruntun dan reset
+        if (!cell) { 
+            currentSeq = 0; 
+            lastSymId = null; 
+            continue; 
+        }
+        // Jika simbol sama dengan sebelumnya, tambah urutan
         if (cell.id === lastSymId) {
-          currentSeq++; if (currentSeq >= 3) return true;
+          currentSeq++;
+          if (currentSeq >= 3) return true; // Dilarang keras ada 3 sejajar
         } else {
-          currentSeq = 1; lastSymId = cell.id;
+          currentSeq = 1;
+          lastSymId = cell.id;
         }
       }
     }
     return false;
   },
+
   generateGrid() {
     let grid = new Array(25).fill(null);
+    
+    // CEK RTP SPESIFIK PEMAIN
     let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
+    
+    // KALKULASI KEMENANGAN BERDASARKAN RTP
     let forceWin = (Math.random() < currentChance);
     
     if (forceWin) {
+      // --- MODE MENANG ---
       let tLine = PAYLINES[Math.floor(Math.random() * PAYLINES.length)];
       let sym = this.getRandomSymbol();
       let matchCount = Math.random() > 0.85 ? 5 : (Math.random() > 0.5 ? 4 : 3);
       let startIdx = Math.floor(Math.random() * (6 - matchCount));
       for(let i=0; i<matchCount; i++) { grid[tLine.line[startIdx + i]] = sym; }
+      
+      // Isi sisa slot yang kosong dengan acak
       for (let i = 0; i < 25; i++) { if (!grid[i]) grid[i] = this.getRandomSymbol(); }
     } else {
+      // --- MODE ZONK (ANTI-MENANG MUTLAK) ---
       for (let i = 0; i < 25; i++) {
         let allowedSymbols = [...CONFIG.symbols];
         grid[i] = this.getRandomSymbol();
+        
         let attempts = 0;
+        // Jika simbol yang baru saja dimasukkan membentuk 3 sejajar, GANTI SIMBOLNYA!
         while (this.hasWinPartial(grid) && attempts < 10) {
+          // Buang simbol yang bikin menang dari opsi
           allowedSymbols = allowedSymbols.filter(s => s.id !== grid[i].id);
+          
           if (allowedSymbols.length > 0) {
+            // Pilih simbol lain secara acak dari yang tersisa
             let randomIdx = Math.floor(Math.random() * allowedSymbols.length);
             grid[i] = allowedSymbols[randomIdx];
-          } else { grid[i] = this.getRandomSymbol(); }
+          } else {
+            // Fallback jika tidak ada opsi (langka terjadi)
+            grid[i] = this.getRandomSymbol();
+          }
           attempts++;
         }
       }
     }
+    
     return grid;
   },
+
   addExp() {
     let expGained = Math.floor(gameState.currentBet * CONFIG.leveling.expPerBetRatio);
     gameState.currentExp += expGained;
@@ -696,6 +980,7 @@ const gameEngine = {
     }
     gameUI.updateLevelUI();
   },
+
   toggleAutoSpin() {
     if (gameState.isAutoLoop) {
       gameState.isAutoLoop = false;
@@ -703,21 +988,28 @@ const gameEngine = {
       gameUI.setBanner("STOPPING AFTER SPIN...");
     } else {
       if (gameState.currentBet > gameState.balance) { 
-        gameUI.setBanner("INSUFFICIENT BALANCE!", true); openDepositModal(); return; 
+        gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
+        openDepositModal(); 
+        return; 
       }
       gameState.isAutoLoop = true;
       gameUI.updateAutoLoopBtn();
       this.startSpin('loop');
     }
   },
+
   async startSpin(mode) {
     if (gameState.currentBet > gameState.balance && !gameState.isAutoLoop) { 
-      gameUI.setBanner("INSUFFICIENT BALANCE!", true); openDepositModal(); return; 
+      gameUI.setBanner("INSUFFICIENT BALANCE!", true); 
+      openDepositModal(); 
+      return; 
     }
     if (gameState.currentBet > gameState.balance && gameState.isAutoLoop) {
       gameState.isAutoLoop = false; gameUI.updateAutoLoopBtn();
       gameUI.setBanner("AUTO STOPPED: NO BALANCE", true);
-      gameUI.lockControls(false); openDepositModal(); return;
+      gameUI.lockControls(false); 
+      openDepositModal(); 
+      return;
     }
 
     gameUI.lockControls(true);
@@ -746,6 +1038,7 @@ const gameEngine = {
       }
     }
   },
+
   manualFlip(idx) {
     if (!gameState.canFlipManual || gameUI.cardsDOM[idx].classList.contains('flipped')) return;
     gameUI.cardsDOM[idx].classList.add('flipped'); 
@@ -755,6 +1048,7 @@ const gameEngine = {
       setTimeout(() => this.evaluateWin(), CONFIG.timings.revealPause); 
     }
   },
+
   autoFlipCard(idx) {
     gameUI.cardsDOM[idx].classList.add('flipped'); 
     gameState.cardsFlipped++;
@@ -762,7 +1056,8 @@ const gameEngine = {
       setTimeout(() => this.evaluateWin(), CONFIG.timings.revealPause); 
     }
   },
-  evaluateWin() {
+
+evaluateWin() {
     let totalWin = 0;
     let winningIndices = new Set();
     let hasMiniGame = false;
@@ -770,7 +1065,8 @@ const gameEngine = {
 
     PAYLINES.forEach(pl => {
       let maxSeq = 1; let currentSeq = 1; 
-      let bestSym = gameState.gridData[pl.line[0]]; let currSym = gameState.gridData[pl.line[0]];
+      let bestSym = gameState.gridData[pl.line[0]]; 
+      let currSym = gameState.gridData[pl.line[0]];
       let bestIndices = [pl.line[0]]; let currIndices = [pl.line[0]];
 
       for(let i=1; i<5; i++) {
@@ -784,92 +1080,165 @@ const gameEngine = {
       if(currentSeq > maxSeq) { maxSeq = currentSeq; bestSym = currSym; bestIndices = [...currIndices]; }
 
       if (maxSeq >= 3) {
+        // CEK APAKAH INI BUAH JACKPOT (MINI GAME)
         if (bestSym.isJackpot) {
           hasMiniGame = true;
           bestIndices.forEach(idx => miniGameIndices.add(idx));
         } else {
           let lengthMult = maxSeq === 5 ? 10 : (maxSeq === 4 ? 3 : 1);
-          let lineWin = Math.floor(gameState.currentBet * bestSym.multiplier * lengthMult);
+          let diagPenalty = 1; 
+          let lineWin = Math.floor(gameState.currentBet * bestSym.multiplier * lengthMult * diagPenalty);
+          
           totalWin += lineWin;
           bestIndices.forEach(idx => winningIndices.add(idx));
         }
       }
     });
 
+    // Jika dapat Mini Game, tunda pemberian hadiah normal dan buka modal 777
     if (hasMiniGame) {
       gameUI.elements.board.classList.add('has-win');
       miniGameIndices.forEach(idx => gameUI.cardsDOM[idx].classList.add('win'));
+      
+      // Simpan hadiah buah lain (jika ada) untuk diberikan setelah mini game selesai
       gameState.pendingWin = totalWin;
       gameState.pendingWinIndices = winningIndices;
+      
       setTimeout(() => gameUI.openMiniGame(), 800);
     } 
-    else if (totalWin > 0) { this.handleWin(totalWin, winningIndices); } 
-    else { this.handleLoss(); }
+    // Jika tidak ada mini game, jalankan prosedur biasa
+    else if (totalWin > 0) {
+      this.handleWin(totalWin, winningIndices);
+    } else {
+      this.handleLoss();
+    }
   },
-  async startMiniGame() {
+
+async startMiniGame() {
     document.getElementById('btnStartMG').style.display = 'none';
-    const r1 = document.getElementById('mgReel1'); const r2 = document.getElementById('mgReel2'); const r3 = document.getElementById('mgReel3');
+    const r1 = document.getElementById('mgReel1');
+    const r2 = document.getElementById('mgReel2');
+    const r3 = document.getElementById('mgReel3');
     const status = document.getElementById('mgStatus');
-    status.textContent = 'MENGACAK...'; status.style.color = 'var(--gold-light)';
+    
+    status.textContent = 'MENGACAK...';
+    status.style.color = 'var(--gold-light)';
+
+    // Reset warna reel ke hitam
     [r1, r2, r3].forEach(r => r.style.color = '#111');
 
+    // Tentukan hasil kemenangan di awal
     let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
     let miniGameChance = currentChance * 0.25; 
     let isWinJackpot = Math.random() < miniGameChance;
 
     let res1, res2, res3;
-    if (isWinJackpot) { res1 = 7; res2 = 7; res3 = 7; } 
-    else {
-        res1 = Math.floor(Math.random() * 9) + 1; res2 = Math.floor(Math.random() * 9) + 1; res3 = Math.floor(Math.random() * 9) + 1;
+    if (isWinJackpot) {
+        res1 = 7; res2 = 7; res3 = 7;
+    } else {
+        res1 = Math.floor(Math.random() * 9) + 1;
+        res2 = Math.floor(Math.random() * 9) + 1;
+        res3 = Math.floor(Math.random() * 9) + 1;
+        // Mencegah hasil 7-7-7 jika sistem menentukan kalah
         if(res1 === 7 && res2 === 7 && res3 === 7) res3 = 1; 
     }
 
+    // Mulai animasi angka acak berputar kencang
     let spin1 = setInterval(() => r1.textContent = Math.floor(Math.random() * 9) + 1, 50);
     let spin2 = setInterval(() => r2.textContent = Math.floor(Math.random() * 9) + 1, 50);
     let spin3 = setInterval(() => r3.textContent = Math.floor(Math.random() * 9) + 1, 50);
 
-    await new Promise(res => setTimeout(res, 800)); clearInterval(spin1); r1.textContent = res1; if (res1 === 7) r1.style.color = 'var(--danger)';
-    await new Promise(res => setTimeout(res, 800)); clearInterval(spin2); r2.textContent = res2; if (res2 === 7) r2.style.color = 'var(--danger)';
-    if (res1 === 7 && res2 === 7) {
-        status.textContent = 'PELUANG JACKPOT...!!'; status.style.color = 'var(--neon-blue)';
-        await new Promise(res => setTimeout(res, 1800)); 
-    } else { await new Promise(res => setTimeout(res, 800)); }
-    clearInterval(spin3); r3.textContent = res3; if (res3 === 7) r3.style.color = 'var(--danger)';
+    // STOP REEL 1
+    await new Promise(res => setTimeout(res, 800));
+    clearInterval(spin1);
+    r1.textContent = res1;
+    if (res1 === 7) r1.style.color = 'var(--danger)'; // Beri warna merah jika 7
 
+    // STOP REEL 2
+    await new Promise(res => setTimeout(res, 800));
+    clearInterval(spin2);
+    r2.textContent = res2;
+    if (res2 === 7) r2.style.color = 'var(--danger)';
+
+    // EFEK SUSPENSE: Jika Reel 1 & 2 sama-sama 7, buat Reel 3 berputar lebih lama!
+    if (res1 === 7 && res2 === 7) {
+        status.textContent = 'PELUANG JACKPOT...!!';
+        status.style.color = 'var(--neon-blue)';
+        await new Promise(res => setTimeout(res, 1800)); // Waktu tegang ekstra
+    } else {
+        await new Promise(res => setTimeout(res, 800));
+    }
+
+    // STOP REEL 3
+    clearInterval(spin3);
+    r3.textContent = res3;
+    if (res3 === 7) r3.style.color = 'var(--danger)';
+
+    // Tampilkan Hasil
     if (isWinJackpot) {
-       status.textContent = 'JACKPOT! 7-7-7 🎊'; status.style.color = 'var(--neon-pink)';
-       let blink = setInterval(() => { [r1, r2, r3].forEach(r => r.style.color = r.style.color === 'transparent' ? 'var(--danger)' : 'transparent'); }, 200);
+       status.textContent = 'JACKPOT! 7-7-7 🎊';
+       status.style.color = 'var(--neon-pink)';
+       
+       // Efek kedip pada angka 7 saat menang
+       let blink = setInterval(() => {
+           [r1, r2, r3].forEach(r => r.style.color = r.style.color === 'transparent' ? 'var(--danger)' : 'transparent');
+       }, 200);
+       
        let jackpotPrize = gameState.currentBet * 1000;
        
-       await new Promise(res => setTimeout(res, 2500)); clearInterval(blink); gameUI.closeMiniGame();
+       await new Promise(res => setTimeout(res, 2500));
+       clearInterval(blink);
+       gameUI.closeMiniGame();
+       
        let finalWin = jackpotPrize + (gameState.pendingWin || 0);
        let allIndices = new Set([...gameState.pendingWinIndices, ...gameUI.cardsDOM.filter(c => c.classList.contains('win')).map(c => parseInt(c.dataset.index))]);
+       
        this.handleWin(finalWin, allIndices);
     } else {
-       status.textContent = 'TIDAK BERUNTUNG!'; status.style.color = 'var(--text-muted)';
-       await new Promise(res => setTimeout(res, 1500)); gameUI.closeMiniGame();
-       if (gameState.pendingWin > 0) { this.handleWin(gameState.pendingWin, gameState.pendingWinIndices); } 
-       else { this.handleLoss(); }
+       status.textContent = 'TIDAK BERUNTUNG!';
+       status.style.color = 'var(--text-muted)';
+       
+       await new Promise(res => setTimeout(res, 1500));
+       gameUI.closeMiniGame();
+       
+       if (gameState.pendingWin > 0) {
+          this.handleWin(gameState.pendingWin, gameState.pendingWinIndices);
+       } else {
+          this.handleLoss();
+       }
     }
-    gameState.pendingWin = 0; gameState.pendingWinIndices = new Set();
+    
+    // Reset state sementara
+    gameState.pendingWin = 0;
+    gameState.pendingWinIndices = new Set();
   },
+
   handleWin(amount, winningIndices) {
-    gameState.lossStreak = 0; gameState.balance += amount; gameUI.updateBalanceBet();
+    gameState.lossStreak = 0;
+    gameState.balance += amount; 
+    gameUI.updateBalanceBet();
+    
     gameUI.elements.board.classList.add('has-win');
     winningIndices.forEach(idx => gameUI.cardsDOM[idx].classList.add('win'));
+    
     let ratio = amount / gameState.currentBet;
     
     if (ratio >= 100) gameUI.showJackpot('SUPER', amount, 'super');
     else if (ratio >= 50) gameUI.showJackpot('MEGA', amount, 'mega');
     else if (ratio >= 20) gameUI.showJackpot('MINI', amount, 'mini');
     else {
-      gameUI.setBanner(`WIN: +${amount.toLocaleString()}!`, true); confettiEngine.burst(50);
+      gameUI.setBanner(`WIN: +${amount.toLocaleString()}!`, true);
+      confettiEngine.burst(50);
+      
       if (gameState.isAutoLoop) setTimeout(() => this.startSpin('loop'), CONFIG.timings.autoSpinPause);
       else gameUI.lockControls(false);
     }
   },
+
   handleLoss() {
-    gameState.lossStreak++; gameUI.setBanner("NO WIN. TRY AGAIN.");
+    gameState.lossStreak++;
+    gameUI.setBanner("NO WIN. TRY AGAIN.");
+    
     if (gameState.lossStreak >= CONFIG.mechanics.zonkTriggerStreak && Math.random() < CONFIG.mechanics.zonkChance) {
       setTimeout(() => this.triggerZonk(), 500);
     } else {
@@ -877,26 +1246,47 @@ const gameEngine = {
       else gameUI.lockControls(false);
     }
   },
+
   triggerZonk() {
-    let pMin = CONFIG.mechanics.zonkPenaltyMinPct; let pMax = CONFIG.mechanics.zonkPenaltyMaxPct;
+    let pMin = CONFIG.mechanics.zonkPenaltyMinPct;
+    let pMax = CONFIG.mechanics.zonkPenaltyMaxPct;
     let penaltyPct = (Math.random() * (pMax - pMin)) + pMin;
     let penalty = Math.floor(gameState.balance * penaltyPct);
     if (penalty < 100) penalty = 100;
     
-    gameState.balance -= penalty; if(gameState.balance < 0) gameState.balance = 0;
-    gameUI.updateBalanceBet(); gameState.lossStreak = 0; gameUI.showZonk(penalty);
+    gameState.balance -= penalty; 
+    if(gameState.balance < 0) gameState.balance = 0;
+    
+    gameUI.updateBalanceBet();
+    gameState.lossStreak = 0; 
+    
+    gameUI.showZonk(penalty);
   }
 };
 
+/**
+ * ==============================================================
+ * 6. CONFETTI ENGINE (Particle System)
+ * ==============================================================
+ */
 const confettiEngine = {
   canvas: document.getElementById('confettiCanvas'),
-  ctx: null, particles: [], interval: null,
+  ctx: null,
+  particles: [],
+  interval: null,
+  isActive: false,
   colors: ['#d4af37', '#ffdf73', '#00e5ff', '#ff007f', '#ffffff'],
+
   init() {
-    this.ctx = this.canvas.getContext('2d'); this.resize();
-    window.addEventListener('resize', () => this.resize()); this.run();
+    this.ctx = this.canvas.getContext('2d');
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.run();
   },
-  resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  },
   spawn(count) {
     for(let i=0; i<count; i++) {
       this.particles.push({
@@ -907,9 +1297,16 @@ const confettiEngine = {
       });
     }
   },
-  burst(count) { this.spawn(count); },
-  start(count, ms) { this.spawn(count); this.interval = setInterval(() => this.spawn(count), ms); },
-  stop() { clearInterval(this.interval); },
+  burst(count) {
+    this.spawn(count);
+  },
+  start(count, ms) {
+    this.spawn(count);
+    this.interval = setInterval(() => this.spawn(count), ms);
+  },
+  stop() {
+    clearInterval(this.interval);
+  },
   run() {
     if(this.particles.length > 0) {
       this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
@@ -920,117 +1317,16 @@ const confettiEngine = {
         this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); this.ctx.restore();
         if(p.y > this.canvas.height || p.life <= 0) this.particles.splice(i, 1);
       });
-    } else { this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height); }
+    } else {
+      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+    }
     requestAnimationFrame(() => this.run());
   }
 };
 
-// 5. Fungsi Deposit & Exit
-function openDepositModal() { document.getElementById('depositModal').classList.add('show'); }
-function closeDepositModal() { document.getElementById('depositModal').classList.remove('show'); setTimeout(resetDepositModal, 300); }
-function resetDepositModal() {
-  document.getElementById('depositStep1').style.display = 'block';
-  document.getElementById('depositStep2').style.display = 'none';
-  document.getElementById('customAmount').value = '';
-  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
-  selectedAmount = 0;
-}
-function setNominal(amount) {
-  selectedAmount = amount; document.getElementById('customAmount').value = amount;
-  document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active');
-}
-function generateQRIS() {
-  const inputVal = parseInt(document.getElementById('customAmount').value);
-  if (isNaN(inputVal) || inputVal < 10000) return alert("Min deposit 10.000 Credits!");
-  selectedAmount = inputVal;
-
-  const amountStr = selectedAmount.toString(); const amountLen = amountStr.length.toString().padStart(2, '0');
-  const mid = '93600915300002827902090000282790'; const merch = 'Royal Casino'; const merchLen = merch.length.toString().padStart(2, '0');
-  const city = 'Pekanbaru'; const cityLen = city.length.toString().padStart(2, '0'); const postal = '28294'; const postalLen = postal.length.toString().padStart(2, '0');
-  
-  let raw = '00020101021226570011ID.DANA.WWW0118' + mid.substring(0,18) + '02090000282790303UMI51440014ID.CO.QRIS.WWW0215ID10265066640140303UMI52044814530336054' + amountLen + amountStr + '5802ID59' + merchLen + merch + '60' + cityLen + city + '61' + postalLen + postal + '6304';
-  
-  const crc16 = (str) => {
-    let c = 0xFFFF;
-    for(let i = 0; i < str.length; i++) { c ^= str.charCodeAt(i) << 8; for(let j = 0; j < 8; j++) { c = ((c & 0x8000) !== 0) ? (c << 1) ^ 0x1021 : c << 1; c &= 0xFFFF; } }
-    return c.toString(16).toUpperCase().padStart(4, '0');
-  };
-  
-  const qrisString = raw + crc16(raw);
-
-  const qrcodeContainer = document.getElementById('qrcode');
-  if (qrEngine) { qrEngine.clear(); qrEngine.makeCode(qrisString); } 
-  else {
-    qrcodeContainer.innerHTML = '';
-    qrEngine = new QRCode(qrcodeContainer, { text: qrisString, width: 160, height: 160, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
-  }
-
-  document.getElementById('qrisTotalDisplay').textContent = "Rp" + selectedAmount.toLocaleString('id-ID');
-  document.getElementById('depositStep1').style.display = 'none';
-  document.getElementById('depositStep2').style.display = 'block';
-}
-async function submitDeposit() {
-  const btn = document.getElementById('btnConfirmDeposit');
-  btn.textContent = "MEMPROSES..."; btn.disabled = true;
-
-  try {
-    const newDeposit = {
-      date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}), username: currentUser.username,
-      method: 'QRIS', amount: selectedAmount, status: 'pending'
-    };
-
-    const isSuccess = await api.addDeposit(newDeposit);
-    if (isSuccess) {
-      alert("✅ Deposit Terkirim!\nSilakan hubungi Admin atau tunggu beberapa saat hingga disetujui.");
-      closeDepositModal();
-    } else { alert("❌ Terjadi kesalahan saat menyimpan ke server."); }
-  } catch (error) { console.error(error); alert("Gagal terhubung ke server database."); } 
-  finally { btn.textContent = "SAYA SUDAH TRANSFER"; btn.disabled = false; }
-}
-
-async function saveAndExit() {
-  const btn = document.getElementById('btnExit'); btn.disabled = true; btn.textContent = "SAVING...";
-  try { await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp); } 
-  catch(error) { console.error("Gagal menyimpan progress:", error); } 
-  finally { window.location.href = 'index.html'; }
-}
-
-async function fetchFreshData() {
-  try {
-    const result = await api.login(currentUser.username, currentUser.password);
-    if (result.success && result.user) {
-      localStorage.setItem('currentUser', JSON.stringify(result.user));
-      if (result.user.winRate !== undefined) {
-        playerWinRate = parseFloat(result.user.winRate) / 100;
-      }
-      if (result.user.balance !== undefined) {
-        gameState.balance = parseInt(result.user.balance);
-        gameUI.updateBalanceBet();
-      }
-    }
-  } catch (e) {
-    console.log("Offline mode atau gagal sinkron data RTP terbaru.");
-  }
-}
-
-// 6. DAFTARKAN SEMUA FUNGSI KE BROWSER WINDOW AGAR TOMBOL HTML BISA DITEKAN
-window.saveAndExit = saveAndExit;
-window.openDepositModal = openDepositModal;
-window.closeDepositModal = closeDepositModal;
-window.resetDepositModal = resetDepositModal;
-window.setNominal = setNominal;
-window.generateQRIS = generateQRIS;
-window.submitDeposit = submitDeposit;
-window.gameUI = gameUI;
-window.gameEngine = gameEngine;
-
-// 7. INISIALISASI GAME
-async function bootGame() {
-  confettiEngine.init();
-  gameUI.init();
-  await fetchFreshData(); // Tarik RTP dari admin setelah game jalan
-}
-bootGame();
+// Initialize Application
+confettiEngine.init();
+gameUI.init();
 
 </script>
 </body>
