@@ -437,12 +437,13 @@
       <button class="btn-action-primary" id="btnStartMG" onclick="gameEngine.startMiniGame()" style="background: linear-gradient(180deg, var(--danger), #990000); color: #fff; font-size: 1.2rem; text-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 2px solid #ff4d4d; box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); padding: 15px;">SPIN SEKARANG</button>
     </div>
   </div>
+<!-- MENGGUNAKAN TYPE MODULE -->
+<script type="module">
+import { api } from './api.js';
 
-<script src="api.js"></script>
-<script>
 /**
  * ==============================================================
- * 0. AUTHENTICATION & DATA BINDING
+ * 0. AUTHENTICATION & SINKRONISASI DATA (FIRESTORE)
  * ==============================================================
  */
 const userJson = localStorage.getItem('currentUser');
@@ -454,18 +455,30 @@ const currentUser = JSON.parse(userJson);
 // Variabel untuk menyimpan RTP spesifik pemain
 let playerWinRate = null;
 
-// Tarik data RTP terbaru dari server saat game dimuat
-if (typeof api !== 'undefined' && api.getDatabase) {
-  api.getDatabase().then(db => {
-    if (db && db.users) {
-      const freshUser = db.users.find(u => u.username === currentUser.username);
-      if (freshUser && freshUser.winRate !== undefined) {
-        playerWinRate = parseFloat(freshUser.winRate) / 100;
-        console.log("RTP berhasil diload:", freshUser.winRate, "%");
-      }
+// FUNGSI BARU: Tarik data RTP & Saldo terbaru secara diam-diam saat game dimuat
+async function fetchFreshData() {
+  // Manfaatkan fungsi login untuk menarik data user terbaru dari Firestore
+  const result = await api.login(currentUser.username, currentUser.password);
+  
+  if (result.success && result.user) {
+    // Update LocalStorage agar selalu sinkron
+    localStorage.setItem('currentUser', JSON.stringify(result.user));
+
+    // Terapkan RTP (Win Rate) dari Admin
+    if (result.user.winRate !== undefined) {
+      playerWinRate = parseFloat(result.user.winRate) / 100;
+      console.log("RTP berhasil disinkronkan:", result.user.winRate, "%");
     }
-  }).catch(e => console.error("Gagal load RTP", e));
+
+    // Sinkronkan Saldo (jika diubah admin atau ada deposit masuk)
+    if (result.user.balance !== undefined) {
+      gameState.balance = parseInt(result.user.balance);
+      gameUI.updateBalanceBet();
+    }
+  }
 }
+// Eksekusi penarikan data segera setelah masuk game
+fetchFreshData();
 
 async function saveAndExit() {
   const btn = document.getElementById('btnExit');
@@ -473,32 +486,24 @@ async function saveAndExit() {
   btn.textContent = "SAVING...";
   
   try {
-    if (typeof api !== 'undefined' && api.saveProgress) {
-      await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp);
-    }
+    await api.saveProgress(currentUser.username, gameState.balance, gameState.level, gameState.currentExp);
   } catch(error) {
     console.error("Gagal menyimpan progress:", error);
   } finally {
-    window.location.href = 'index.html'; // Pindah halaman secara paksa walau error
+    window.location.href = 'index.html'; 
   }
 }
 
 /**
  * ==============================================================
- * 1. DEPOSIT SYSTEM LOGIC
+ * 1. DEPOSIT SYSTEM LOGIC (DIPERBARUI KE FIRESTORE)
  * ==============================================================
  */
 let selectedAmount = 0;
 let qrEngine = null;
 
-function openDepositModal() {
-  document.getElementById('depositModal').classList.add('show');
-}
-
-function closeDepositModal() {
-  document.getElementById('depositModal').classList.remove('show');
-  setTimeout(resetDepositModal, 300);
-}
+function openDepositModal() { document.getElementById('depositModal').classList.add('show'); }
+function closeDepositModal() { document.getElementById('depositModal').classList.remove('show'); setTimeout(resetDepositModal, 300); }
 
 function resetDepositModal() {
   document.getElementById('depositStep1').style.display = 'block';
@@ -568,10 +573,6 @@ async function submitDeposit() {
   btn.disabled = true;
 
   try {
-    const db = await api.getDatabase();
-    if (!db) throw new Error("Koneksi gagal");
-    if (!db.deposits) db.deposits = [];
-
     const newDeposit = {
       date: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}),
       username: currentUser.username,
@@ -580,8 +581,8 @@ async function submitDeposit() {
       status: 'pending'
     };
 
-    db.deposits.push(newDeposit);
-    const isSuccess = await api.updateDatabase(db);
+    // Menggunakan fungsi Firebase yang ada di api.js
+    const isSuccess = await api.addDeposit(newDeposit);
 
     if (isSuccess) {
       alert("✅ Deposit Terkirim!\nSilakan hubungi Admin atau tunggu beberapa saat hingga disetujui. Refresh halaman ini nanti untuk update saldo.");
@@ -599,17 +600,13 @@ async function submitDeposit() {
 }
 
 /**
-/**
  * ==============================================================
- * 2. GAME CONFIGURATION (PENGATURAN TERPUSAT)
+ * 2. GAME CONFIGURATION
  * ==============================================================
  */
 const CONFIG = {
   initialBalance: 100000,
-  // Bet sudah diupdate ke 500k
   betSteps: [100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000], 
-  
-  // Buah-buahan baru sudah dimasukkan beserta perkaliannya
   symbols: [
     { id: 'cherry',     icon: '🍒', multiplier: 1, weight: 60 },
     { id: 'strawberry', icon: '🍓', multiplier: 2, weight: 50 },
@@ -622,10 +619,8 @@ const CONFIG = {
     { id: 'apple',      icon: '🍎', multiplier: 15, weight: 5 },
     { id: 'star',       icon: '⭐', multiplier: 25, weight: 3 },
     { id: 'crown',      icon: '👑', multiplier: 50, weight: 1 },
-    // --- TAMBAHAN BUAH JACKPOT ---
     { id: 'golden_apple', icon: '🍏', multiplier: 1000, weight: 0.5, isJackpot: true }
   ],
-
   mechanics: {
     pityChance: 0.15,            
     zonkTriggerStreak: 4,        
@@ -633,13 +628,11 @@ const CONFIG = {
     zonkPenaltyMinPct: 0.001,    
     zonkPenaltyMaxPct: 0.01      
   },
-
   leveling: {
     expPerBetRatio: 0.01,        
     baseExpForLevel2: 100,       
     expMultiplierPerLevel: 1.5   
   },
-
   timings: {
     autoNormalDelay: 120, 
     autoFastDelay: 30,    
@@ -661,11 +654,9 @@ const gameState = {
   balance: currentUser.balance !== undefined ? currentUser.balance : CONFIG.initialBalance,
   currentBet: CONFIG.betSteps[2],
   lossStreak: 0,
-  
   level: currentUser.level || 1,
   currentExp: currentUser.exp || 0,
   expNeeded: calcExpNeeded(currentUser.level || 1),
-
   gridData: [], 
   cardsFlipped: 0,
   canFlipManual: false,
@@ -686,7 +677,7 @@ const PAYLINES = [
 
 /**
  * ==============================================================
- * 4. UI CONTROLLER (Mengatur Tampilan)
+ * 4. UI CONTROLLER 
  * ==============================================================
  */
 const gameUI = {
@@ -757,7 +748,6 @@ const gameUI = {
     if (!this.elements.paytableGrid) return;
     
     this.elements.paytableGrid.innerHTML = CONFIG.symbols.map(s => {
-      // Jika ini buah jackpot, tampilkan teks khusus
       const rewardVal = s.isJackpot ? "MINI GAME" : "+" + (gameState.currentBet * s.multiplier).toLocaleString();
       const multiplierText = s.isJackpot ? "MAX x1000" : `Multiplier: x${s.multiplier}`;
       
@@ -887,7 +877,7 @@ const gameUI = {
 
 /**
  * ==============================================================
- * 5. GAME ENGINE (Logika Inti Permainan)
+ * 5. GAME ENGINE
  * ==============================================================
  */
 const gameEngine = {
@@ -898,23 +888,20 @@ const gameEngine = {
     return CONFIG.symbols[0];
   },
 
-  // PENGECEKAN KEMENANGAN REAL-TIME (SCRAMBLER BARU)
   hasWinPartial(grid) {
     for (let pl of PAYLINES) {
       let currentSeq = 0;
       let lastSymId = null;
       for(let i=0; i<5; i++) {
         let cell = grid[pl.line[i]];
-        // Jika kotak belum terisi, abaikan pengecekan beruntun dan reset
         if (!cell) { 
             currentSeq = 0; 
             lastSymId = null; 
             continue; 
         }
-        // Jika simbol sama dengan sebelumnya, tambah urutan
         if (cell.id === lastSymId) {
           currentSeq++;
-          if (currentSeq >= 3) return true; // Dilarang keras ada 3 sejajar
+          if (currentSeq >= 3) return true;
         } else {
           currentSeq = 1;
           lastSymId = cell.id;
@@ -927,10 +914,10 @@ const gameEngine = {
   generateGrid() {
     let grid = new Array(25).fill(null);
     
-    // CEK RTP SPESIFIK PEMAIN
+    // MENGGUNAKAN RTP DARI DATABASE (ATAU DEFAULT JIKA GAGAL DIMUAT)
     let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
     
-    // KALKULASI KEMENANGAN BERDASARKAN RTP
+    // PENENTUAN KEMENANGAN SECARA MATEMATIS
     let forceWin = (Math.random() < currentChance);
     
     if (forceWin) {
@@ -941,33 +928,27 @@ const gameEngine = {
       let startIdx = Math.floor(Math.random() * (6 - matchCount));
       for(let i=0; i<matchCount; i++) { grid[tLine.line[startIdx + i]] = sym; }
       
-      // Isi sisa slot yang kosong dengan acak
       for (let i = 0; i < 25; i++) { if (!grid[i]) grid[i] = this.getRandomSymbol(); }
     } else {
-      // --- MODE ZONK (ANTI-MENANG MUTLAK) ---
+      // --- MODE ZONK (ANTI-MENANG) ---
       for (let i = 0; i < 25; i++) {
         let allowedSymbols = [...CONFIG.symbols];
         grid[i] = this.getRandomSymbol();
         
         let attempts = 0;
-        // Jika simbol yang baru saja dimasukkan membentuk 3 sejajar, GANTI SIMBOLNYA!
         while (this.hasWinPartial(grid) && attempts < 10) {
-          // Buang simbol yang bikin menang dari opsi
           allowedSymbols = allowedSymbols.filter(s => s.id !== grid[i].id);
           
           if (allowedSymbols.length > 0) {
-            // Pilih simbol lain secara acak dari yang tersisa
             let randomIdx = Math.floor(Math.random() * allowedSymbols.length);
             grid[i] = allowedSymbols[randomIdx];
           } else {
-            // Fallback jika tidak ada opsi (langka terjadi)
             grid[i] = this.getRandomSymbol();
           }
           attempts++;
         }
       }
     }
-    
     return grid;
   },
 
@@ -1058,7 +1039,7 @@ const gameEngine = {
     }
   },
 
-evaluateWin() {
+  evaluateWin() {
     let totalWin = 0;
     let winningIndices = new Set();
     let hasMiniGame = false;
@@ -1081,7 +1062,6 @@ evaluateWin() {
       if(currentSeq > maxSeq) { maxSeq = currentSeq; bestSym = currSym; bestIndices = [...currIndices]; }
 
       if (maxSeq >= 3) {
-        // CEK APAKAH INI BUAH JACKPOT (MINI GAME)
         if (bestSym.isJackpot) {
           hasMiniGame = true;
           bestIndices.forEach(idx => miniGameIndices.add(idx));
@@ -1096,18 +1076,15 @@ evaluateWin() {
       }
     });
 
-    // Jika dapat Mini Game, tunda pemberian hadiah normal dan buka modal 777
     if (hasMiniGame) {
       gameUI.elements.board.classList.add('has-win');
       miniGameIndices.forEach(idx => gameUI.cardsDOM[idx].classList.add('win'));
       
-      // Simpan hadiah buah lain (jika ada) untuk diberikan setelah mini game selesai
       gameState.pendingWin = totalWin;
       gameState.pendingWinIndices = winningIndices;
       
       setTimeout(() => gameUI.openMiniGame(), 800);
     } 
-    // Jika tidak ada mini game, jalankan prosedur biasa
     else if (totalWin > 0) {
       this.handleWin(totalWin, winningIndices);
     } else {
@@ -1115,7 +1092,7 @@ evaluateWin() {
     }
   },
 
-async startMiniGame() {
+  async startMiniGame() {
     document.getElementById('btnStartMG').style.display = 'none';
     const r1 = document.getElementById('mgReel1');
     const r2 = document.getElementById('mgReel2');
@@ -1124,11 +1101,8 @@ async startMiniGame() {
     
     status.textContent = 'MENGACAK...';
     status.style.color = 'var(--gold-light)';
-
-    // Reset warna reel ke hitam
     [r1, r2, r3].forEach(r => r.style.color = '#111');
 
-    // Tentukan hasil kemenangan di awal
     let currentChance = playerWinRate !== null ? playerWinRate : CONFIG.mechanics.pityChance;
     let miniGameChance = currentChance * 0.25; 
     let isWinJackpot = Math.random() < miniGameChance;
@@ -1140,47 +1114,33 @@ async startMiniGame() {
         res1 = Math.floor(Math.random() * 9) + 1;
         res2 = Math.floor(Math.random() * 9) + 1;
         res3 = Math.floor(Math.random() * 9) + 1;
-        // Mencegah hasil 7-7-7 jika sistem menentukan kalah
         if(res1 === 7 && res2 === 7 && res3 === 7) res3 = 1; 
     }
 
-    // Mulai animasi angka acak berputar kencang
     let spin1 = setInterval(() => r1.textContent = Math.floor(Math.random() * 9) + 1, 50);
     let spin2 = setInterval(() => r2.textContent = Math.floor(Math.random() * 9) + 1, 50);
     let spin3 = setInterval(() => r3.textContent = Math.floor(Math.random() * 9) + 1, 50);
 
-    // STOP REEL 1
     await new Promise(res => setTimeout(res, 800));
-    clearInterval(spin1);
-    r1.textContent = res1;
-    if (res1 === 7) r1.style.color = 'var(--danger)'; // Beri warna merah jika 7
+    clearInterval(spin1); r1.textContent = res1; if (res1 === 7) r1.style.color = 'var(--danger)';
 
-    // STOP REEL 2
     await new Promise(res => setTimeout(res, 800));
-    clearInterval(spin2);
-    r2.textContent = res2;
-    if (res2 === 7) r2.style.color = 'var(--danger)';
+    clearInterval(spin2); r2.textContent = res2; if (res2 === 7) r2.style.color = 'var(--danger)';
 
-    // EFEK SUSPENSE: Jika Reel 1 & 2 sama-sama 7, buat Reel 3 berputar lebih lama!
     if (res1 === 7 && res2 === 7) {
         status.textContent = 'PELUANG JACKPOT...!!';
         status.style.color = 'var(--neon-blue)';
-        await new Promise(res => setTimeout(res, 1800)); // Waktu tegang ekstra
+        await new Promise(res => setTimeout(res, 1800)); 
     } else {
         await new Promise(res => setTimeout(res, 800));
     }
 
-    // STOP REEL 3
-    clearInterval(spin3);
-    r3.textContent = res3;
-    if (res3 === 7) r3.style.color = 'var(--danger)';
+    clearInterval(spin3); r3.textContent = res3; if (res3 === 7) r3.style.color = 'var(--danger)';
 
-    // Tampilkan Hasil
     if (isWinJackpot) {
        status.textContent = 'JACKPOT! 7-7-7 🎊';
        status.style.color = 'var(--neon-pink)';
        
-       // Efek kedip pada angka 7 saat menang
        let blink = setInterval(() => {
            [r1, r2, r3].forEach(r => r.style.color = r.style.color === 'transparent' ? 'var(--danger)' : 'transparent');
        }, 200);
@@ -1209,7 +1169,6 @@ async startMiniGame() {
        }
     }
     
-    // Reset state sementara
     gameState.pendingWin = 0;
     gameState.pendingWinIndices = new Set();
   },
@@ -1298,16 +1257,12 @@ const confettiEngine = {
       });
     }
   },
-  burst(count) {
-    this.spawn(count);
-  },
+  burst(count) { this.spawn(count); },
   start(count, ms) {
     this.spawn(count);
     this.interval = setInterval(() => this.spawn(count), ms);
   },
-  stop() {
-    clearInterval(this.interval);
-  },
+  stop() { clearInterval(this.interval); },
   run() {
     if(this.particles.length > 0) {
       this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
@@ -1328,6 +1283,19 @@ const confettiEngine = {
 // Initialize Application
 confettiEngine.init();
 gameUI.init();
+
+// ==========================================================
+// EXPORT FUNGSI KE WINDOW AGAR TOMBOL HTML BISA MENGAKSESNYA
+// ==========================================================
+window.saveAndExit = saveAndExit;
+window.openDepositModal = openDepositModal;
+window.closeDepositModal = closeDepositModal;
+window.resetDepositModal = resetDepositModal;
+window.setNominal = setNominal;
+window.generateQRIS = generateQRIS;
+window.submitDeposit = submitDeposit;
+window.gameUI = gameUI;
+window.gameEngine = gameEngine;
 
 </script>
 </body>
