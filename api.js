@@ -120,4 +120,11 @@ export const api = {
       return true;
     } catch (error) { return false; }
   }
+  // 7. Tambah Permintaan Deposit (Dari pemain)
+  async addDeposit(depositObj) {
+    try {
+      await addDoc(collection(db, "deposits"), depositObj);
+      return true;
+    } catch (error) { return false; }
+  }
 };
